@@ -1,16 +1,14 @@
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Rendering;
-using Unity.Transforms;
 using UnityEngine;
-using UnityEngine.Rendering;
 using VampireSurvivors.Components;
 
 namespace VampireSurvivors.Authoring
 {
     /// <summary>
-    /// Add to a scene GameObject. Baker converts it to a player ECS entity at bake time.
-    /// Assign playerMesh (a Quad mesh asset) and playerMaterials (4 colored materials) in the Inspector.
+    /// Add to a scene GameObject (alongside MeshFilter + MeshRenderer for visuals).
+    /// Baker stamps custom ECS components onto the entity; Unity's built-in
+    /// MeshRendererBaker handles the rendering components automatically.
     /// </summary>
     public class PlayerAuthoring : MonoBehaviour
     {
@@ -18,12 +16,6 @@ namespace VampireSurvivors.Authoring
         public byte playerIndex;
         public float moveSpeed = 7f;
         public int maxHp = 100;
-
-        [Header("Visuals")]
-        [Tooltip("Assign a quad mesh (e.g. Unity built-in Quad)")]
-        public Mesh playerMesh;
-        [Tooltip("4 materials: index 0=Red, 1=Blue, 2=Green, 3=Yellow")]
-        public Material[] playerMaterials = new Material[4];
 
         class Baker : Baker<PlayerAuthoring>
         {
@@ -43,14 +35,6 @@ namespace VampireSurvivors.Authoring
                     Xp            = 0f,
                     XpToNextLevel = 100f
                 });
-
-                // Colored quad visual
-                var material = authoring.playerMaterials[authoring.playerIndex];
-                var desc = new RenderMeshDescription(ShadowCastingMode.Off, receiveShadows: false);
-                var rma  = new RenderMeshArray(new[] { material }, new[] { authoring.playerMesh });
-                RenderMeshUtility.AddComponents(
-                    entity, this, desc, rma,
-                    MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
             }
         }
     }
