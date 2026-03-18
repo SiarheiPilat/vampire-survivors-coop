@@ -21,6 +21,7 @@ namespace VampireSurvivors.MonoBehaviours
 
         Camera      _cam;
         EntityQuery _playerQuery;
+        bool        _queryCreated;
 
         void Start()
         {
@@ -33,18 +34,22 @@ namespace VampireSurvivors.MonoBehaviours
                 ComponentType.ReadOnly<PlayerTag>(),
                 ComponentType.ReadOnly<LocalTransform>()
             );
+            _queryCreated = true;
         }
 
         void OnDisable()
         {
-            if (_playerQuery.IsCreated)
+            if (_queryCreated)
+            {
                 _playerQuery.Dispose();
+                _queryCreated = false;
+            }
         }
 
         void LateUpdate()
         {
             var world = World.DefaultGameObjectInjectionWorld;
-            if (world == null || !_playerQuery.IsCreated) return;
+            if (world == null || !_queryCreated) return;
 
             var transforms = _playerQuery.ToComponentDataArray<LocalTransform>(Allocator.Temp);
             if (transforms.Length == 0)
