@@ -13,7 +13,7 @@ namespace VampireSurvivors.Menu
     /// </summary>
     public class PressToStartController : MonoBehaviour
     {
-        [SerializeField] string nextScene = "LobbyScene";
+        [SerializeField] string nextScene = "3_LobbyScene";
 
         const float CooldownSeconds = 0.3f;
         bool        _ready;

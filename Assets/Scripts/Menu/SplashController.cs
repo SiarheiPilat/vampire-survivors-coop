@@ -17,7 +17,7 @@ namespace VampireSurvivors.Menu
         [SerializeField] float       fadeInDuration  = 0.8f;
         [SerializeField] float       holdDuration    = 1.5f;
         [SerializeField] float       fadeOutDuration = 0.6f;
-        [SerializeField] string      nextScene       = "PressToStartScene";
+        [SerializeField] string      nextScene       = "2_PressToStartScene";
 
         bool _skipRequested;
 

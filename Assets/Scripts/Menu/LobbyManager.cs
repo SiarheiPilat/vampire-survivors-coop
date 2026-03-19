@@ -228,7 +228,7 @@ namespace VampireSurvivors.Menu
                 };
             }
 
-            SceneManager.LoadScene("SampleScene");
+            SceneManager.LoadScene("4_SampleScene");
         }
 
         // ── Settings ────────────────────────────────────────────────────────────
