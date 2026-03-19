@@ -46,6 +46,14 @@ namespace VampireSurvivors.Authoring
                     Range         = 1.5f,
                     ArcDegrees    = 120f
                 });
+                AddComponent(entity, new MagicWandState
+                {
+                    Timer    = 0f,
+                    Cooldown = 0.5f,
+                    Damage   = 10f,
+                    Speed    = 10f,
+                    MaxRange = 15f
+                });
             }
         }
     }

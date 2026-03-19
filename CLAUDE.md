@@ -86,12 +86,13 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [ ] Pickup system (gold, health, magnets)
 - [ ] Player death + revive mechanic — Downed component + state added; revive interaction is future work
 - [x] HUD (per-player HP bars, XP bars, level text, timer) — HUDManager + HUDCanvas in 4_SampleScene
+- [x] Magic Wand weapon — MagicWandSystem + Projectile component + ProjectileMovementSystem + ProjectileHitSystem
 - [ ] Game over / win screen
 
 ### Weapons (clone priority order)
 
 - [x] Whip — WhipSystem/HitArcSystem, hardcoded to all players
-- [ ] Magic Wand
+- [x] Magic Wand — MagicWandSystem fires Projectile at nearest enemy; 10 dmg, 0.5s CD, speed=10, range=15
 - [ ] Garlic
 - [ ] King Bible
 - [ ] Fire Wand

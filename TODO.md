@@ -48,7 +48,7 @@
 ## Weapons (priority order)
 
 - [x] Whip — WhipSystem/HitArcSystem, 120°arc, 10dmg, 0.5s CD, 1.5 range
-- [ ] Magic Wand
+- [x] Magic Wand — MagicWandSystem + ProjectileMovementSystem + ProjectileHitSystem; fires at nearest enemy, 10 dmg, 0.5s CD, speed=10, range=15
 - [ ] Garlic
 - [ ] King Bible
 - [ ] Fire Wand

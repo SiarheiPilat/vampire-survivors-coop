@@ -54,4 +54,18 @@ namespace VampireSurvivors.Components
     /// Downed players cannot move or attack. Teammates can revive them (future work).
     /// </summary>
     public struct Downed : IComponentData { }
+
+    /// <summary>
+    /// Per-player Magic Wand weapon state.
+    /// Timer counts down; when it hits 0 a projectile is fired at the nearest enemy
+    /// and the timer resets to Cooldown.
+    /// </summary>
+    public struct MagicWandState : IComponentData
+    {
+        public float Timer;
+        public float Cooldown;  // seconds between shots — wiki base: 0.5s
+        public float Damage;    // wiki base: 10
+        public float Speed;     // projectile speed in units/s — wiki base: ~10
+        public float MaxRange;  // units before projectile despawns
+    }
 }
