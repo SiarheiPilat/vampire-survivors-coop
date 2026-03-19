@@ -84,9 +84,20 @@ namespace VampireSurvivors.Components
 
     /// <summary>
     /// Marks a player as downed (HP reached 0). Added by HealthSystem instead of destroying the entity.
-    /// Downed players cannot move or attack. Teammates can revive them (future work).
+    /// Downed players cannot move or attack. Teammates revive them by holding Interact nearby.
     /// </summary>
     public struct Downed : IComponentData { }
+
+    /// <summary>
+    /// Added to a downed player entity while a teammate is actively holding Interact nearby.
+    /// Timer counts up; when it reaches ReviveSystem.ReviveDuration the player is revived.
+    /// Removed when the reviver moves away, releases Interact, or the revive completes.
+    /// </summary>
+    public struct ReviveProgress : IComponentData
+    {
+        public Entity Reviver; // living player entity performing the revive
+        public float  Timer;   // seconds held so far
+    }
 
     /// <summary>
     /// Last non-zero movement direction, normalized. Defaults to right (1,0).
