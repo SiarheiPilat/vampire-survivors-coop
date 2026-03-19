@@ -39,7 +39,8 @@ namespace VampireSurvivors.MonoBehaviours
         const float LevelUpFlashDuration = 1.5f;
 
         EntityQuery _playerQuery;
-        EntityQuery _activePlayerQuery;  // PlayerTag + NOT Downed
+        EntityQuery _activePlayerQuery;   // PlayerTag + NOT Downed
+        EntityQuery _upgradePendingQuery; // PlayerTag + UpgradeChoicePending
         bool        _queryCreated;
         float       _elapsedTime;
         bool        _gameOver;
@@ -47,6 +48,12 @@ namespace VampireSurvivors.MonoBehaviours
 
         readonly int[]   _lastLevels     = new int[4];
         readonly float[] _levelUpTimers  = new float[4];
+
+        // Upgrade-choice panel (created programmatically)
+        GameObject _upgradePanel;
+        TMP_Text   _upgradeTitle;
+        bool       _upgradeShowing;
+        Entity     _pendingUpgradeEntity;
 
         void Start()
         {
@@ -69,9 +76,15 @@ namespace VampireSurvivors.MonoBehaviours
                 ComponentType.ReadOnly<PlayerTag>(),
                 ComponentType.Exclude<Downed>()
             );
+            _upgradePendingQuery = world.EntityManager.CreateEntityQuery(
+                ComponentType.ReadOnly<PlayerTag>(),
+                ComponentType.ReadOnly<PlayerIndex>(),
+                ComponentType.ReadOnly<UpgradeChoicePending>()
+            );
             _queryCreated = true;
 
             if (gameOverPanel != null) gameOverPanel.SetActive(false);
+            CreateUpgradePanel();
         }
 
         void OnDisable()
@@ -80,6 +93,7 @@ namespace VampireSurvivors.MonoBehaviours
             {
                 _playerQuery.Dispose();
                 _activePlayerQuery.Dispose();
+                _upgradePendingQuery.Dispose();
                 _queryCreated = false;
             }
         }
@@ -88,12 +102,15 @@ namespace VampireSurvivors.MonoBehaviours
         {
             if (_gameOver) return;
 
-            _elapsedTime += Time.deltaTime;
+            _elapsedTime += Time.unscaledDeltaTime; // unscaled so timer advances while paused
             UpdateTimer();
             TickLevelUpTimers();
 
             var world = World.DefaultGameObjectInjectionWorld;
             if (world == null || !_queryCreated) return;
+
+            HandleUpgradeChoices(world);
+            if (_upgradeShowing) return; // freeze HUD updates while choice panel is visible
 
             bool[] seen = new bool[4];
 
@@ -192,6 +209,158 @@ namespace VampireSurvivors.MonoBehaviours
             if (ratio > 0.5f)  return HpColorHigh;
             if (ratio > 0.25f) return HpColorMid;
             return HpColorLow;
+        }
+
+        // ─── Upgrade Choice Panel ───────────────────────────────────────────
+
+        void CreateUpgradePanel()
+        {
+            var canvas = GetComponentInParent<Canvas>();
+            if (canvas == null) canvas = FindFirstObjectByType<Canvas>();
+            if (canvas == null) return;
+
+            // Semi-transparent full-screen overlay
+            _upgradePanel = new GameObject("UpgradeChoicePanel");
+            _upgradePanel.transform.SetParent(canvas.transform, false);
+            var rt = _upgradePanel.AddComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+            var bg = _upgradePanel.AddComponent<Image>();
+            bg.color = new Color(0f, 0f, 0f, 0.78f);
+
+            // Title
+            var titleGO = new GameObject("UpgradeTitle");
+            titleGO.transform.SetParent(_upgradePanel.transform, false);
+            var titleRt = titleGO.AddComponent<RectTransform>();
+            titleRt.anchoredPosition = new Vector2(0f, 100f);
+            titleRt.sizeDelta        = new Vector2(700f, 60f);
+            _upgradeTitle = titleGO.AddComponent<TextMeshProUGUI>();
+            _upgradeTitle.fontSize  = 34;
+            _upgradeTitle.alignment = TextAlignmentOptions.Center;
+            _upgradeTitle.color     = new Color(1f, 0.95f, 0.1f);
+
+            // Three upgrade buttons
+            string[] labels = {
+                "Spinach\n+10% Might (weapon damage)",
+                "Pummarola\n+0.2 HP/s regen",
+                "Armor\n+1 flat damage reduction"
+            };
+            float[] yPos = { 30f, -60f, -150f };
+            for (int i = 0; i < 3; i++)
+            {
+                int capturedIdx = i;
+
+                var btnGO = new GameObject($"UpgradeBtn{i}");
+                btnGO.transform.SetParent(_upgradePanel.transform, false);
+                var btnRt = btnGO.AddComponent<RectTransform>();
+                btnRt.anchoredPosition = new Vector2(0f, yPos[i]);
+                btnRt.sizeDelta        = new Vector2(480f, 75f);
+
+                var btnImg = btnGO.AddComponent<Image>();
+                btnImg.color = new Color(0.15f, 0.15f, 0.45f, 1f);
+
+                var btn = btnGO.AddComponent<Button>();
+                btn.targetGraphic = btnImg;
+
+                var colors = btn.colors;
+                colors.highlightedColor = new Color(0.25f, 0.25f, 0.70f, 1f);
+                colors.pressedColor     = new Color(0.35f, 0.35f, 0.90f, 1f);
+                btn.colors = colors;
+
+                btn.onClick.AddListener(() =>
+                {
+                    var w = World.DefaultGameObjectInjectionWorld;
+                    if (w != null) ApplyUpgrade(w, capturedIdx);
+                });
+
+                var lblGO = new GameObject("Label");
+                lblGO.transform.SetParent(btnGO.transform, false);
+                var lblRt = lblGO.AddComponent<RectTransform>();
+                lblRt.anchorMin = Vector2.zero;
+                lblRt.anchorMax = Vector2.one;
+                lblRt.offsetMin = Vector2.zero;
+                lblRt.offsetMax = Vector2.zero;
+                var lbl = lblGO.AddComponent<TextMeshProUGUI>();
+                lbl.text      = labels[i];
+                lbl.fontSize  = 22;
+                lbl.alignment = TextAlignmentOptions.Center;
+                lbl.color     = Color.white;
+            }
+
+            _upgradePanel.SetActive(false);
+        }
+
+        void HandleUpgradeChoices(World world)
+        {
+            if (_upgradePanel == null) return;
+
+            if (_upgradeShowing)
+            {
+                // Dismiss if entity was destroyed unexpectedly
+                if (_pendingUpgradeEntity == Entity.Null ||
+                    !world.EntityManager.Exists(_pendingUpgradeEntity) ||
+                    !world.EntityManager.HasComponent<UpgradeChoicePending>(_pendingUpgradeEntity))
+                {
+                    DismissUpgradePanel();
+                }
+                return;
+            }
+
+            if (_upgradePendingQuery.CalculateEntityCount() == 0) return;
+
+            // Show panel for first pending player (one at a time)
+            var entities = _upgradePendingQuery.ToEntityArray(Allocator.Temp);
+            var indices  = _upgradePendingQuery.ToComponentDataArray<PlayerIndex>(Allocator.Temp);
+            _pendingUpgradeEntity = entities[0];
+            int slot = indices[0].Value;
+            entities.Dispose();
+            indices.Dispose();
+
+            _upgradeShowing = true;
+            if (_upgradeTitle != null)
+                _upgradeTitle.text = $"P{slot + 1}  LEVEL UP!\nChoose an upgrade:";
+            _upgradePanel.SetActive(true);
+            Time.timeScale = 0f;
+        }
+
+        void ApplyUpgrade(World world, int choiceIndex)
+        {
+            if (_pendingUpgradeEntity == Entity.Null) return;
+            if (!world.EntityManager.Exists(_pendingUpgradeEntity)) return;
+            if (!world.EntityManager.HasComponent<PlayerStats>(_pendingUpgradeEntity)) return;
+
+            var stats = world.EntityManager.GetComponentData<PlayerStats>(_pendingUpgradeEntity);
+            int pidx  = world.EntityManager.GetComponentData<PlayerIndex>(_pendingUpgradeEntity).Value;
+
+            switch (choiceIndex)
+            {
+                case 0:
+                    stats.Might += 0.1f;
+                    Debug.Log($"[HUDManager] P{pidx} chose Spinach — Might = {stats.Might:F1}x");
+                    break;
+                case 1:
+                    stats.HpRegen += 0.2f;
+                    Debug.Log($"[HUDManager] P{pidx} chose Pummarola — HpRegen = {stats.HpRegen:F1}/s");
+                    break;
+                case 2:
+                    stats.Armor += 1;
+                    Debug.Log($"[HUDManager] P{pidx} chose Armor — Armor = {stats.Armor}");
+                    break;
+            }
+
+            world.EntityManager.SetComponentData(_pendingUpgradeEntity, stats);
+            world.EntityManager.RemoveComponent<UpgradeChoicePending>(_pendingUpgradeEntity);
+            DismissUpgradePanel();
+        }
+
+        void DismissUpgradePanel()
+        {
+            _upgradeShowing       = false;
+            _pendingUpgradeEntity = Entity.Null;
+            if (_upgradePanel != null) _upgradePanel.SetActive(false);
+            Time.timeScale = 1f;
         }
     }
 }

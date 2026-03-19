@@ -83,7 +83,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] Main menu — Splash → PressToStart → Lobby (4-player device assignment, char cycling)
 - [x] XP orb + leveling system — XpGem component, XpGemSystem (magnet r=30, collect r=0.5, speed=8), LevelUpSystem (wiki formula 5+(level-1)*10, 2s iframes)
 - [x] Wave scaling — EnemySpawnerSystem: new wave every 30s, StatMultiplier +20%/wave (cap 3×), spawn count grows, interval shrinks to 1.5s floor, bat→skeleton weight shift
-- [ ] Level-up UI (weapon choice cards)
+- [x] Level-up UI (upgrade choice cards) — HUDManager detects UpgradeChoicePending on player, pauses Time.timeScale, shows 3-button overlay; player picks Spinach/Pummarola/Armor; EntityManager applies stat + removes component; time resumes
 - [ ] Pickup system (gold, health, magnets)
 - [ ] Player death + revive mechanic — Downed component + state added; revive interaction is future work
 - [x] HUD (per-player HP bars, XP bars, level text, timer) — HUDManager + HUDCanvas in 4_SampleScene
@@ -124,7 +124,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 
 - [x] Spinach — PlayerStats.Might +0.1 per odd level (5,7,9…); all weapon systems multiply base damage by Might
 - [x] Pummarola — PlayerStats.HpRegen +0.2 HP/s per even level (6,8,10…); HpRegenSystem (Burst, fractional accumulator)
-- [ ] Armor (reduce incoming dmg)
+- [x] Armor — PlayerStats.Armor int; ContactDamageSystem applies max(1, contactDamage - Armor); granted via level-up choice UI at lv11+ (Armor choice = index 2)
 - [ ] Empty Tome (Cooldown -8%)
 - [ ] *(others later)*
 

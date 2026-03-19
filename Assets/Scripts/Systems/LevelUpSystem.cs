@@ -141,28 +141,16 @@ namespace VampireSurvivors.Systems
                             break;
                     }
 
-                    // Passive items at level 11+ (cycling Spinach / Pummarola / Armor)
-                    // (lv-11)%3 == 0 → Spinach (+0.1 Might)
-                    // (lv-11)%3 == 1 → Pummarola (+0.2 HP/s)
-                    // (lv-11)%3 == 2 → Armor (+1 flat dmg reduction)
+                    // Passive items at level 11+: pause and let the player choose.
+                    // HUDManager detects UpgradeChoicePending, pauses time, shows 3 upgrade cards,
+                    // applies the chosen stat, then removes UpgradeChoicePending.
+                    // We break out of the XP-while-loop so remaining XP is processed
+                    // only after the player has made their choice.
                     if (newLevel >= 11)
                     {
-                        int pidx = SystemAPI.GetComponent<PlayerIndex>(entity).Value;
-                        switch ((newLevel - 11) % 3)
-                        {
-                            case 0:
-                                stats.ValueRW.Might += 0.1f;
-                                Debug.Log($"[LevelUpSystem] P{pidx} got Spinach! Might = {stats.ValueRO.Might:F1}x");
-                                break;
-                            case 1:
-                                stats.ValueRW.HpRegen += 0.2f;
-                                Debug.Log($"[LevelUpSystem] P{pidx} got Pummarola! HpRegen = {stats.ValueRO.HpRegen:F1}/s");
-                                break;
-                            case 2:
-                                stats.ValueRW.Armor += 1;
-                                Debug.Log($"[LevelUpSystem] P{pidx} got Armor! Armor = {stats.ValueRO.Armor}");
-                                break;
-                        }
+                        if (!SystemAPI.HasComponent<UpgradeChoicePending>(entity))
+                            ecb.AddComponent<UpgradeChoicePending>(entity);
+                        break; // resume next frame once UpgradeChoicePending is removed
                     }
 
                     var idx = SystemAPI.GetComponent<PlayerIndex>(entity);

@@ -75,6 +75,14 @@ namespace VampireSurvivors.Components
     }
 
     /// <summary>
+    /// Added to a player entity when a passive-item level-up is pending player input.
+    /// LevelUpSystem stops auto-granting and breaks its XP loop.
+    /// HUDManager detects this, pauses time, and shows upgrade choice cards.
+    /// Removed by HUDManager once the player makes a choice.
+    /// </summary>
+    public struct UpgradeChoicePending : IComponentData { }
+
+    /// <summary>
     /// Marks a player as downed (HP reached 0). Added by HealthSystem instead of destroying the entity.
     /// Downed players cannot move or attack. Teammates can revive them (future work).
     /// </summary>
