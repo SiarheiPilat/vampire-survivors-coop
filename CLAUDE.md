@@ -81,7 +81,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] Weapon system (Whip) — WhipSystem + HitArcSystem, 120° arc, 10 dmg, 0.5s CD
 - [x] Health + damage loop — Health/Invincible components, ContactDamageSystem, HealthSystem
 - [x] Main menu — Splash → PressToStart → Lobby (4-player device assignment, char cycling)
-- [ ] XP orb + leveling system
+- [x] XP orb + leveling system — XpGem component, XpGemSystem (magnet r=30, collect r=0.5, speed=8), LevelUpSystem (wiki formula 5+(level-1)*10, 2s iframes)
 - [ ] Level-up UI (weapon choice cards)
 - [ ] Pickup system (gold, health, magnets)
 - [ ] Player death + revive mechanic

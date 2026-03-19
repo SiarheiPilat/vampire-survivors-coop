@@ -32,7 +32,7 @@
 - [x] Enemy spawner — EnemySpawnerSystem, 3s waves, Bat/Zombie/Skeleton weighted random at r=12
 - [x] Weapon system (Whip) — WhipSystem + HitArcSystem, 120° arc, 0.5s cooldown, 10 dmg
 - [x] Health + damage loop — Health/Invincible components, ContactDamageSystem, HealthSystem
-- [ ] XP orb + leveling system
+- [x] XP orb + leveling system — XpGem, XpGemSystem (magnet r=30, speed=8, collect r=0.5), LevelUpSystem (wiki formula, 2s iframes)
 - [ ] Level-up UI (weapon choice cards)
 - [ ] Pickup system (gold, health, magnets)
 - [ ] Player death + revive mechanic
