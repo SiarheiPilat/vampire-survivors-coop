@@ -57,8 +57,9 @@ namespace VampireSurvivors.Systems
                     }
                 }
 
-                float3 dir = math.normalizesafe(nearest - transform.Position);
-                transform.Position += dir * stats.MoveSpeed * DeltaTime;
+                float3 dir      = math.normalizesafe(nearest - transform.Position);
+                float3 movement = dir * stats.MoveSpeed * DeltaTime;
+                transform.Position += new float3(movement.x, movement.y, 0f);
             }
         }
     }
