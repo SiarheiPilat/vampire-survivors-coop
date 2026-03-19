@@ -37,7 +37,7 @@ namespace VampireSurvivors.Systems
             _invincibleLookup.Update(ref state);
 
             var playerQuery = SystemAPI.QueryBuilder()
-                .WithAll<PlayerTag, LocalTransform, Health, Invincible>()
+                .WithAll<PlayerTag, LocalTransform, Health, Invincible, PlayerStats>()
                 .WithNone<Downed>()
                 .Build();
 
@@ -45,17 +45,20 @@ namespace VampireSurvivors.Systems
 
             var playerEntities   = playerQuery.ToEntityArray(Allocator.TempJob);
             var playerTransforms = playerQuery.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
+            var playerStats      = playerQuery.ToComponentDataArray<PlayerStats>(Allocator.TempJob);
 
             new ContactDamageJob
             {
                 PlayerEntities   = playerEntities,
                 PlayerTransforms = playerTransforms,
+                PlayerStats      = playerStats,
                 HealthLookup     = _healthLookup,
                 InvincibleLookup = _invincibleLookup
             }.Run(); // Single-threaded — multiple enemies can target the same player
 
             playerEntities.Dispose();
             playerTransforms.Dispose();
+            playerStats.Dispose();
         }
 
         [BurstCompile]
@@ -67,6 +70,7 @@ namespace VampireSurvivors.Systems
 
             [ReadOnly] public NativeArray<Entity>         PlayerEntities;
             [ReadOnly] public NativeArray<LocalTransform> PlayerTransforms;
+            [ReadOnly] public NativeArray<PlayerStats>    PlayerStats;
 
             [NativeDisableParallelForRestriction] public ComponentLookup<Health>     HealthLookup;
             [NativeDisableParallelForRestriction] public ComponentLookup<Invincible> InvincibleLookup;
@@ -81,9 +85,12 @@ namespace VampireSurvivors.Systems
                     var inv = InvincibleLookup[PlayerEntities[i]];
                     if (inv.Timer > 0f) continue;
 
+                    // Armor reduces incoming damage; always deal at least 1
+                    int damage = math.max(1, stats.ContactDamage - PlayerStats[i].Armor);
+
                     var hp = HealthLookup[PlayerEntities[i]];
-                    hp.Current      -= stats.ContactDamage;
-                    inv.Timer        = InvincibilityDuration;
+                    hp.Current -= damage;
+                    inv.Timer   = InvincibilityDuration;
 
                     HealthLookup[PlayerEntities[i]]     = hp;
                     InvincibleLookup[PlayerEntities[i]] = inv;

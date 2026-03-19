@@ -12,7 +12,7 @@ namespace VampireSurvivors.Systems
     ///   - Grants 2 s invincibility
     ///   - Lv2 MagicWand, Lv3 Garlic, Lv4 Knife, Lv5 KingBible, Lv6 FireWand,
     ///     Lv7 Axe, Lv8 Cross, Lv9 HolyWater, Lv10 LightningRing
-    ///   - Lv11+: (lv-11)%2==0 → Spinach (+0.1 Might), else → Pummarola (+0.2 HpRegen)
+    ///   - Lv11+: (lv-11)%3: 0→Spinach (+0.1 Might), 1→Pummarola (+0.2 HpRegen), 2→Armor (+1)
     /// Weapon systems activate once their state component is present (structural change via ECB).
     /// Not Burst-compiled — calls Debug.Log and uses ECB for structural changes.
     /// </summary>
@@ -141,21 +141,27 @@ namespace VampireSurvivors.Systems
                             break;
                     }
 
-                    // Passive items at level 11+ (alternating Spinach / Pummarola)
-                    // Level 11, 13, 15 … → Spinach (+0.1 Might)
-                    // Level 12, 14, 16 … → Pummarola (+0.2 HP/s)
+                    // Passive items at level 11+ (cycling Spinach / Pummarola / Armor)
+                    // (lv-11)%3 == 0 → Spinach (+0.1 Might)
+                    // (lv-11)%3 == 1 → Pummarola (+0.2 HP/s)
+                    // (lv-11)%3 == 2 → Armor (+1 flat dmg reduction)
                     if (newLevel >= 11)
                     {
                         int pidx = SystemAPI.GetComponent<PlayerIndex>(entity).Value;
-                        if ((newLevel - 11) % 2 == 0) // lv11, 13, 15… → Spinach
+                        switch ((newLevel - 11) % 3)
                         {
-                            stats.ValueRW.Might += 0.1f;
-                            Debug.Log($"[LevelUpSystem] P{pidx} got Spinach! Might = {stats.ValueRO.Might:F1}x");
-                        }
-                        else // lv12, 14, 16… → Pummarola
-                        {
-                            stats.ValueRW.HpRegen += 0.2f;
-                            Debug.Log($"[LevelUpSystem] P{pidx} got Pummarola! HpRegen = {stats.ValueRO.HpRegen:F1}/s");
+                            case 0:
+                                stats.ValueRW.Might += 0.1f;
+                                Debug.Log($"[LevelUpSystem] P{pidx} got Spinach! Might = {stats.ValueRO.Might:F1}x");
+                                break;
+                            case 1:
+                                stats.ValueRW.HpRegen += 0.2f;
+                                Debug.Log($"[LevelUpSystem] P{pidx} got Pummarola! HpRegen = {stats.ValueRO.HpRegen:F1}/s");
+                                break;
+                            case 2:
+                                stats.ValueRW.Armor += 1;
+                                Debug.Log($"[LevelUpSystem] P{pidx} got Armor! Armor = {stats.ValueRO.Armor}");
+                                break;
                         }
                     }
 

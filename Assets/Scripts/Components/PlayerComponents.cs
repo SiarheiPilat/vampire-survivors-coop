@@ -64,6 +64,14 @@ namespace VampireSurvivors.Components
 
         /// <summary>Fractional HP accumulator for sub-integer regen per frame.</summary>
         public float HpRegenAccum;
+
+        /// <summary>
+        /// Flat damage reduction applied to every hit before HP is deducted.
+        /// damage_taken = max(1, contactDamage - Armor).
+        /// Default 0. Each Armor pickup adds +1.
+        /// Wiki: Armor reduces all incoming damage by a flat amount.
+        /// </summary>
+        public int Armor;
     }
 
     /// <summary>
