@@ -85,7 +85,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [ ] Level-up UI (weapon choice cards)
 - [ ] Pickup system (gold, health, magnets)
 - [ ] Player death + revive mechanic
-- [ ] HUD (per-player HP bars, timer, kill count)
+- [ ] HUD (per-player HP bars, timer, kill count) — HUDManager.cs done; scene setup pending Unity editor reconnect
 - [ ] Game over / win screen
 
 ### Weapons (clone priority order)

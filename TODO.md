@@ -6,6 +6,9 @@
       once the SubScene setup is stable — it's not needed at runtime.
 - [ ] **MeshCollider on player Quads** — Quad primitive adds a MeshCollider automatically.
       Remove it from Player_0–3 (players don't need physics colliders yet).
+- [ ] **HUD scene setup** — `HUDManager.cs` is created and committed. Needs Canvas + panel
+      hierarchy built in `4_SampleScene` via Unity Editor. Plan: `docs/superpowers/plans/2026-03-19-hud.md`
+      *(Unity MCP lost connection during long Burst compilation — do this when editor is responsive)*
 
 ## Menu / Lobby Follow-ups
 
