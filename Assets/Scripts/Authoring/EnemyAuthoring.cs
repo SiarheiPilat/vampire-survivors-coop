@@ -6,7 +6,7 @@ namespace VampireSurvivors.Authoring
 {
     /// <summary>
     /// Attach to each enemy prefab GameObject.
-    /// Baker stamps EnemyTag, EnemyStats, Health, and Invincible onto the entity.
+    /// Baker stamps EnemyTag, EnemyStats, and Health onto the entity.
     /// </summary>
     public class EnemyAuthoring : MonoBehaviour
     {
