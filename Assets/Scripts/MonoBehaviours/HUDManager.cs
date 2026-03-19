@@ -82,7 +82,7 @@ namespace VampireSurvivors.MonoBehaviours
                 int slot = indices[i].Value;
                 if (slot < 0 || slot >= 4) continue;
                 seen[slot] = true;
-                UpdatePanel(slot, in healths[i], in stats[i]);
+                UpdatePanel(slot, healths[i], stats[i]);
             }
 
             indices.Dispose();
@@ -94,7 +94,7 @@ namespace VampireSurvivors.MonoBehaviours
                     panelRoots[slot].SetActive(false);
         }
 
-        void UpdatePanel(int slot, in Health health, in PlayerStats stats)
+        void UpdatePanel(int slot, Health health, PlayerStats stats)
         {
             if (panelRoots[slot] == null) return;
             panelRoots[slot].SetActive(true);
