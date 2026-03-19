@@ -375,22 +375,23 @@ namespace VampireSurvivors.MonoBehaviours
             var titleGO = new GameObject("UpgradeTitle");
             titleGO.transform.SetParent(_upgradePanel.transform, false);
             var titleRt = titleGO.AddComponent<RectTransform>();
-            titleRt.anchoredPosition = new Vector2(0f, 100f);
+            titleRt.anchoredPosition = new Vector2(0f, 140f);
             titleRt.sizeDelta        = new Vector2(700f, 60f);
             _upgradeTitle = titleGO.AddComponent<TextMeshProUGUI>();
             _upgradeTitle.fontSize  = 34;
             _upgradeTitle.alignment = TextAlignmentOptions.Center;
             _upgradeTitle.color     = new Color(1f, 0.95f, 0.1f);
 
-            // Four upgrade buttons
+            // Five upgrade buttons
             string[] labels = {
                 "Spinach\n+10% Might (weapon damage)",
                 "Pummarola\n+0.2 HP/s regen",
                 "Armor\n+1 flat damage reduction",
-                "Empty Tome\n-8% weapon cooldown"
+                "Empty Tome\n-8% weapon cooldown",
+                "Crown\n+8% XP gain"
             };
-            float[] yPos = { 60f, -20f, -100f, -180f };
-            for (int i = 0; i < 4; i++)
+            float[] yPos = { 95f, 30f, -35f, -100f, -165f };
+            for (int i = 0; i < 5; i++)
             {
                 int capturedIdx = i;
 
@@ -493,6 +494,10 @@ namespace VampireSurvivors.MonoBehaviours
                 case 3:
                     stats.CooldownMult = Mathf.Max(0.5f, stats.CooldownMult * 0.92f);
                     Debug.Log($"[HUDManager] P{pidx} chose Empty Tome — CooldownMult = {stats.CooldownMult:F3}×");
+                    break;
+                case 4:
+                    stats.XpMult *= 1.08f;
+                    Debug.Log($"[HUDManager] P{pidx} chose Crown — XpMult = {stats.XpMult:F3}×");
                     break;
             }
 

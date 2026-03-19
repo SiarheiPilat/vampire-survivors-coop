@@ -74,6 +74,13 @@ namespace VampireSurvivors.Components
         public int Armor;
 
         /// <summary>
+        /// XP gain multiplier. Default 1.0. Each Crown pickup multiplies by 1.08.
+        /// Applied at XP gem collection time: xpGained = gem.Value * XpMult.
+        /// Wiki: Crown grants +8% XP gain per level (up to 5 levels in original).
+        /// </summary>
+        public float XpMult;
+
+        /// <summary>
         /// Weapon cooldown multiplier. Default 1.0. Each Empty Tome pickup multiplies by 0.92.
         /// Applied at weapon fire time: nextTimer = baseCooldown * CooldownMult.
         /// Lower value = shorter cooldown = higher fire rate.

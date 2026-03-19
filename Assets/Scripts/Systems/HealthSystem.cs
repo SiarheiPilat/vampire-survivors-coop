@@ -69,6 +69,15 @@ namespace VampireSurvivors.Systems
                             ecb.AddComponent(healEntity, LocalTransform.FromPosition(
                                 transform.Position + new float3(0.3f, -0.3f, 0f)));
                         }
+
+                        // Magnet pickup (~3% chance) — vacuums all XP gems on screen
+                        if (UnityEngine.Random.value < 0.03f)
+                        {
+                            var magEntity = ecb.CreateEntity();
+                            ecb.AddComponent(magEntity, new MagnetPickup());
+                            ecb.AddComponent(magEntity, LocalTransform.FromPosition(
+                                transform.Position + new float3(0f, 0.5f, 0f)));
+                        }
                     }
                     ecb.DestroyEntity(entity);
                 }

@@ -23,6 +23,13 @@ namespace VampireSurvivors.Components
     }
 
     /// <summary>
+    /// Magnet item dropped rarely by enemies. When collected, immediately vacuums
+    /// all XP gems on screen to the collecting player (full XP credited, gems destroyed).
+    /// Effect is instant — no duration. Wiki: Attractorb / floor magnet item.
+    /// </summary>
+    public struct MagnetPickup : IComponentData { }
+
+    /// <summary>
     /// Singleton — total gold accumulated by the whole team this run.
     /// Created by SharedGoldBootstrapSystem on world startup.
     /// Written by GoldCoinSystem; read by HUDManager for display.

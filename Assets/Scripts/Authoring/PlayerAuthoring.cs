@@ -37,6 +37,7 @@ namespace VampireSurvivors.Authoring
                     Might         = 1.0f,
                     HpRegen       = 0.0f,
                     HpRegenAccum  = 0.0f,
+                    XpMult        = 1.0f,  // Crown increases this by ×1.08 per pickup
                     CooldownMult  = 1.0f,  // Empty Tome reduces this by ×0.92 per pickup
                 });
                 AddComponent(entity, new AssignedDeviceId { Value = 0 });

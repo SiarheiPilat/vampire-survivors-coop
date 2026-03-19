@@ -126,6 +126,8 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] Pummarola — PlayerStats.HpRegen +0.2 HP/s per even level (6,8,10…); HpRegenSystem (Burst, fractional accumulator)
 - [x] Armor — PlayerStats.Armor int; ContactDamageSystem applies max(1, contactDamage - Armor); granted via level-up choice UI at lv11+ (Armor choice = index 2)
 - [x] Empty Tome — PlayerStats.CooldownMult ×0.92 per level (min 0.5); all weapon systems apply at fire time; 4th choice in level-up UI
+- [x] Crown — PlayerStats.XpMult ×1.08 per level; applied in XpGemSystem at collect time; 5th choice in level-up UI
+- [x] Magnet pickup — MagnetPickup floor item dropped by enemies (3% chance); MagnetPickupSystem vacuums all XP gems to collector instantly; uses XpMult
 - [ ] *(others later)*
 
 ---

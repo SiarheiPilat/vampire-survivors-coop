@@ -90,9 +90,9 @@ namespace VampireSurvivors.Systems
 
                 if (nearestDist <= CollectRadius)
                 {
-                    // Collect: add XP, destroy gem
+                    // Collect: add XP scaled by Crown multiplier, destroy gem
                     var stats = StatsLookup[PlayerEntities[nearestIdx]];
-                    stats.Xp += gem.Value;
+                    stats.Xp += gem.Value * stats.XpMult;
                     StatsLookup[PlayerEntities[nearestIdx]] = stats;
                     Ecb.DestroyEntity(entity);
                 }
