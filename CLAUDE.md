@@ -94,7 +94,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] Whip — WhipSystem/HitArcSystem, hardcoded to all players
 - [x] Magic Wand — MagicWandSystem fires Projectile at nearest enemy; 10 dmg, 0.5s CD, speed=10, range=15
 - [x] Garlic — GarlicSystem aura pulse; 10 dmg, r=1.5, 1.5s CD, hits all enemies simultaneously
-- [ ] King Bible
+- [x] King Bible — KingBibleSystem; orbiting entity (KingBibleOrbit), radius=1.4u, 120°/s, 10 dmg, 0.5s hit CD; unlocked at lv5
 - [x] Knife — KnifeSystem fires in FacingDirection (last movement dir); 10 dmg, 0.35s CD, speed=15
 - [ ] Fire Wand
 - [ ] Axe
