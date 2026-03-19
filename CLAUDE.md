@@ -106,10 +106,14 @@ critical for maintaining 60fps with 500+ entities on screen.
 
 ### Characters
 
-- [ ] Antonio (starter — Whip)
-- [ ] Imelda (starter — Magic Wand)
-- [ ] Pasqualina (starter — Runetracer)
-- [ ] Gennaro (starter — Knife)
+Characters are selected in the lobby (`LobbyManager`). `GameSceneBootstrap` reads
+`GameSession.Slots[i].CharacterId` and swaps the baked Whip for the correct starting weapon.
+`LevelUpSystem` already guards with `!HasComponent<X>` so it won't re-grant starting weapons.
+
+- [x] Antonio — Whip (baked default), Might +10% (1.1)
+- [x] Imelda — Magic Wand (replaces Whip at start), XpMult +10% (1.1)
+- [x] Pasqualina — Magic Wand (Runetracer TBD), no stat bonus
+- [x] Gennaro — Knife (replaces Whip at start), no stat bonus
 - [ ] *(others later)*
 
 ### Enemies
