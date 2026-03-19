@@ -93,6 +93,8 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] Floating damage numbers — DamageNumberEvent IComponentData spawned by all weapon systems on hit; DamageNumberSystem bridges to DamageNumberRenderer MonoBehaviour (pool of 64 world-space TMP labels, float 1.5u up over 0.7s, fade out); color: white ≤10 dmg, yellow ≤30, orange >30; auto-creates via RuntimeInitializeOnLoadMethod
 - [x] Infinite tiling background — InfiniteBackground MonoBehaviour; 5×5 grid of 10×10 world-unit sprite tiles; two alternating dark-green shades (checkerboard) for movement reference; tiles snap to camera-grid each LateUpdate; sorting order -100; RuntimeInitializeOnLoadMethod auto-creates (no scene wiring)
 - [x] Enemy knockback on hit — Knockback IComponentData (float2 Velocity) baked on all enemy prefabs; all weapon systems write knockback via ECB on each hit (projectiles 8 u/s, whip 6 u/s, garlic 4 u/s, king bible 5 u/s, holy water 3 u/s, lightning ring random 6 u/s); EnemyMovementSystem decays velocity with damping=12/s (~0.25 s to dissipate)
+- [x] Pause menu — PauseManager MonoBehaviour; ESC in game scene (buildIndex ≥ 3) toggles overlay; Time.timeScale=0 pauses DOTS + physics; Resume / Quit to Menu buttons; RuntimeInitializeOnLoadMethod auto-creates (no scene wiring)
+- [x] Weapon evolution — Holy Wand (Magic Wand + Empty Tome): 7 shots, 20 dmg, 0.25s CD, 10° tight fan; Soul Eater (Garlic + Pummarola): r=3.5u, 25 dmg, heals 2 HP/pulse; evolutions appear in level-up pool (★ label) when conditions met (has weapon + has passive), each only once (IsEvolved guard)
 
 ### Weapons (clone priority order)
 
@@ -118,6 +120,9 @@ Characters are selected in the lobby (`LobbyManager`). `GameSceneBootstrap` read
 - [x] Imelda — Magic Wand (replaces Whip at start), HP=100, speed=7.0, XpMult=1.1
 - [x] Pasqualina — Runetracer (replaces Whip at start), HP=130, speed=7.0, no stat bonus
 - [x] Gennaro — Knife (replaces Whip at start), HP=100, speed=7.7, no stat bonus
+- [x] Arca — Garlic (replaces Whip at start), HP=130, speed=7.0, CooldownMult=0.95 (-5% cooldown)
+- [x] Porta — Lightning Ring (replaces Whip at start), HP=100, speed=7.5, no stat bonus
+- [x] Lama — Axe (replaces Whip at start), HP=130, speed=6.5, Might=1.1 (+10% damage)
 - [ ] *(others later)*
 
 ### Enemies
