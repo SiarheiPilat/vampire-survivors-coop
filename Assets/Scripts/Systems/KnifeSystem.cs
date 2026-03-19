@@ -36,7 +36,7 @@ namespace VampireSurvivors.Systems
                 knife.ValueRW.Timer -= dt;
                 if (knife.ValueRO.Timer > 0f) continue;
 
-                knife.ValueRW.Timer = knife.ValueRO.Cooldown;
+                knife.ValueRW.Timer = knife.ValueRO.Cooldown * stats.ValueRO.CooldownMult;
 
                 float2 dir2 = math.lengthsq(facing.ValueRO.Value) > 0.001f
                     ? math.normalize(facing.ValueRO.Value)

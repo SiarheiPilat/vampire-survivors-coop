@@ -4,6 +4,7 @@ using Unity.Entities;
 using UnityEngine;
 using UnityEngine.UI;
 using VampireSurvivors.Components;
+using VampireSurvivors.Systems;
 
 namespace VampireSurvivors.MonoBehaviours
 {
@@ -59,6 +60,12 @@ namespace VampireSurvivors.MonoBehaviours
         EntityQuery _sharedGoldQuery;
         TMP_Text    _goldText;
 
+        // Revive progress display
+        EntityQuery  _reviveProgressQuery;
+        GameObject   _reviveBar;
+        TMP_Text     _reviveText;
+        Image        _reviveFill;
+
         void Start()
         {
             for (int i = 0; i < 4; i++)
@@ -90,10 +97,15 @@ namespace VampireSurvivors.MonoBehaviours
             _sharedGoldQuery = world.EntityManager.CreateEntityQuery(
                 ComponentType.ReadOnly<SharedGold>()
             );
+            _reviveProgressQuery = world.EntityManager.CreateEntityQuery(
+                ComponentType.ReadOnly<ReviveProgress>(),
+                ComponentType.ReadOnly<PlayerIndex>()
+            );
 
             if (gameOverPanel != null) gameOverPanel.SetActive(false);
             CreateUpgradePanel();
             CreateGoldDisplay();
+            CreateReviveBar();
         }
 
         void OnDisable()
@@ -104,6 +116,7 @@ namespace VampireSurvivors.MonoBehaviours
                 _activePlayerQuery.Dispose();
                 _upgradePendingQuery.Dispose();
                 _sharedGoldQuery.Dispose();
+                _reviveProgressQuery.Dispose();
                 _queryCreated = false;
             }
         }
@@ -121,6 +134,7 @@ namespace VampireSurvivors.MonoBehaviours
 
             HandleUpgradeChoices(world);
             UpdateGoldDisplay();
+            UpdateReviveBar();
             if (_upgradeShowing) return; // freeze HUD updates while choice panel is visible
 
             bool[] seen = new bool[4];
@@ -222,6 +236,88 @@ namespace VampireSurvivors.MonoBehaviours
             return HpColorLow;
         }
 
+        // ─── Revive Progress Bar ────────────────────────────────────────────
+
+        void CreateReviveBar()
+        {
+            var canvas = GetComponentInParent<Canvas>();
+            if (canvas == null) canvas = FindFirstObjectByType<Canvas>();
+            if (canvas == null) return;
+
+            _reviveBar = new GameObject("ReviveBar");
+            _reviveBar.transform.SetParent(canvas.transform, false);
+            var rt = _reviveBar.AddComponent<RectTransform>();
+            rt.anchorMin        = new Vector2(0.5f, 0f);
+            rt.anchorMax        = new Vector2(0.5f, 0f);
+            rt.pivot            = new Vector2(0.5f, 0f);
+            rt.anchoredPosition = new Vector2(0f, 20f);
+            rt.sizeDelta        = new Vector2(300f, 40f);
+
+            // Background
+            var bgImg = _reviveBar.AddComponent<Image>();
+            bgImg.color = new Color(0.1f, 0.1f, 0.1f, 0.85f);
+
+            // Fill bar child
+            var fillGO = new GameObject("Fill");
+            fillGO.transform.SetParent(_reviveBar.transform, false);
+            var fillRt = fillGO.AddComponent<RectTransform>();
+            fillRt.anchorMin = new Vector2(0f, 0f);
+            fillRt.anchorMax = new Vector2(0f, 1f);
+            fillRt.offsetMin = new Vector2(2f, 2f);
+            fillRt.offsetMax = new Vector2(2f, -2f);
+            fillRt.sizeDelta = new Vector2(0f, -4f);
+            _reviveFill = fillGO.AddComponent<Image>();
+            _reviveFill.color = new Color(0.1f, 0.8f, 0.3f);
+
+            // Label
+            var lblGO = new GameObject("Label");
+            lblGO.transform.SetParent(_reviveBar.transform, false);
+            var lblRt = lblGO.AddComponent<RectTransform>();
+            lblRt.anchorMin = Vector2.zero;
+            lblRt.anchorMax = Vector2.one;
+            lblRt.offsetMin = Vector2.zero;
+            lblRt.offsetMax = Vector2.zero;
+            _reviveText = lblGO.AddComponent<TextMeshProUGUI>();
+            _reviveText.fontSize  = 18;
+            _reviveText.alignment = TextAlignmentOptions.Center;
+            _reviveText.color     = Color.white;
+
+            _reviveBar.SetActive(false);
+        }
+
+        void UpdateReviveBar()
+        {
+            if (_reviveBar == null || !_queryCreated) return;
+
+            if (_reviveProgressQuery.CalculateEntityCount() == 0)
+            {
+                _reviveBar.SetActive(false);
+                return;
+            }
+
+            var progresses = _reviveProgressQuery.ToComponentDataArray<ReviveProgress>(Allocator.Temp);
+            var indices    = _reviveProgressQuery.ToComponentDataArray<PlayerIndex>(Allocator.Temp);
+
+            // Show bar for the first in-progress revive
+            float ratio = Mathf.Clamp01(progresses[0].Timer / ReviveSystem.ReviveDuration);
+            int   slot  = indices[0].Value;
+            progresses.Dispose();
+            indices.Dispose();
+
+            _reviveBar.SetActive(true);
+
+            if (_reviveFill != null)
+            {
+                var fillRt = _reviveFill.GetComponent<RectTransform>();
+                var barRt  = _reviveBar.GetComponent<RectTransform>();
+                float maxW = barRt.sizeDelta.x - 4f;
+                fillRt.sizeDelta = new Vector2(maxW * ratio, fillRt.sizeDelta.y);
+            }
+
+            if (_reviveText != null)
+                _reviveText.text = $"Reviving P{slot + 1}... {Mathf.FloorToInt(ratio * 100)}%";
+        }
+
         // ─── Gold Display ───────────────────────────────────────────────────
 
         void CreateGoldDisplay()
@@ -286,14 +382,15 @@ namespace VampireSurvivors.MonoBehaviours
             _upgradeTitle.alignment = TextAlignmentOptions.Center;
             _upgradeTitle.color     = new Color(1f, 0.95f, 0.1f);
 
-            // Three upgrade buttons
+            // Four upgrade buttons
             string[] labels = {
                 "Spinach\n+10% Might (weapon damage)",
                 "Pummarola\n+0.2 HP/s regen",
-                "Armor\n+1 flat damage reduction"
+                "Armor\n+1 flat damage reduction",
+                "Empty Tome\n-8% weapon cooldown"
             };
-            float[] yPos = { 30f, -60f, -150f };
-            for (int i = 0; i < 3; i++)
+            float[] yPos = { 60f, -20f, -100f, -180f };
+            for (int i = 0; i < 4; i++)
             {
                 int capturedIdx = i;
 
@@ -392,6 +489,10 @@ namespace VampireSurvivors.MonoBehaviours
                 case 2:
                     stats.Armor += 1;
                     Debug.Log($"[HUDManager] P{pidx} chose Armor — Armor = {stats.Armor}");
+                    break;
+                case 3:
+                    stats.CooldownMult = Mathf.Max(0.5f, stats.CooldownMult * 0.92f);
+                    Debug.Log($"[HUDManager] P{pidx} chose Empty Tome — CooldownMult = {stats.CooldownMult:F3}×");
                     break;
             }
 

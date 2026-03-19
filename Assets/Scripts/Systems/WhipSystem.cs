@@ -45,7 +45,7 @@ namespace VampireSurvivors.Systems
                     Origin     = transform.ValueRO.Position
                 });
 
-                ws.SwingTimer = ws.SwingCooldown;
+                ws.SwingTimer = ws.SwingCooldown * stats.ValueRO.CooldownMult;
             }
         }
     }

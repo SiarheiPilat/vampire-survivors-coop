@@ -36,7 +36,8 @@ namespace VampireSurvivors.Authoring
                     XpToNextLevel = 5f,
                     Might         = 1.0f,
                     HpRegen       = 0.0f,
-                    HpRegenAccum  = 0.0f
+                    HpRegenAccum  = 0.0f,
+                    CooldownMult  = 1.0f,  // Empty Tome reduces this by ×0.92 per pickup
                 });
                 AddComponent(entity, new AssignedDeviceId { Value = 0 });
                 AddComponent(entity, new Health { Current = authoring.maxHp, Max = authoring.maxHp });

@@ -68,7 +68,7 @@ namespace VampireSurvivors.Systems
                 ring.Timer -= DeltaTime;
                 if (ring.Timer > 0f) return;
 
-                ring.Timer = ring.Cooldown;
+                ring.Timer = ring.Cooldown * stats.CooldownMult;
 
                 int damage  = (int)(ring.Damage * stats.Might);
                 int count   = EnemyEntities.Length;

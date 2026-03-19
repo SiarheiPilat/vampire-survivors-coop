@@ -68,7 +68,7 @@ namespace VampireSurvivors.Systems
                 garlic.Timer -= DeltaTime;
                 if (garlic.Timer > 0f) return;
 
-                garlic.Timer = garlic.Cooldown;
+                garlic.Timer = garlic.Cooldown * stats.CooldownMult;
 
                 int damage = (int)(garlic.Damage * stats.Might);
 

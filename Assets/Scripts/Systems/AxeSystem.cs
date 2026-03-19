@@ -42,7 +42,7 @@ namespace VampireSurvivors.Systems
                 axe.ValueRW.Timer -= dt;
                 if (axe.ValueRO.Timer > 0f) continue;
 
-                axe.ValueRW.Timer = axe.ValueRO.Cooldown;
+                axe.ValueRW.Timer = axe.ValueRO.Cooldown * stats.ValueRO.CooldownMult;
 
                 // Horizontal component follows facing direction; always launches upward
                 float facingX = math.lengthsq(facing.ValueRO.Value) > 0.001f

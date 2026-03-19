@@ -85,7 +85,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] Wave scaling — EnemySpawnerSystem: new wave every 30s, StatMultiplier +20%/wave (cap 3×), spawn count grows, interval shrinks to 1.5s floor, bat→skeleton weight shift
 - [x] Level-up UI (upgrade choice cards) — HUDManager detects UpgradeChoicePending on player, pauses Time.timeScale, shows 3-button overlay; player picks Spinach/Pummarola/Armor; EntityManager applies stat + removes component; time resumes
 - [x] Pickup system (gold, health) — GoldCoin + HealthPickup dropped by enemies on death (10% health chance); GoldCoinSystem + HealthPickupSystem (Burst, walk-to-collect r=0.6u); SharedGold singleton for team pool; HUDManager gold counter top-center
-- [x] Player death + revive mechanic — Downed component; ReviveSystem (hold E/I/gamepad-South 2s within 1.5u); ReviveProgress tracks timer on downed entity; revive restores 50% MaxHp + 2s iframes
+- [x] Player death + revive mechanic — Downed component; ReviveSystem (hold E/I/gamepad-South 2s within 1.5u); ReviveProgress tracks timer on downed entity; revive restores 50% MaxHp + 2s iframes; HUD revive bar bottom-center shows progress %
 - [x] HUD (per-player HP bars, XP bars, level text, timer) — HUDManager + HUDCanvas in 4_SampleScene
 - [x] Magic Wand weapon — MagicWandSystem + Projectile component + ProjectileMovementSystem + ProjectileHitSystem
 - [x] Fire Wand weapon — FireWandSystem, random-direction Projectile, per-player RNG
@@ -125,7 +125,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] Spinach — PlayerStats.Might +0.1 per odd level (5,7,9…); all weapon systems multiply base damage by Might
 - [x] Pummarola — PlayerStats.HpRegen +0.2 HP/s per even level (6,8,10…); HpRegenSystem (Burst, fractional accumulator)
 - [x] Armor — PlayerStats.Armor int; ContactDamageSystem applies max(1, contactDamage - Armor); granted via level-up choice UI at lv11+ (Armor choice = index 2)
-- [ ] Empty Tome (Cooldown -8%)
+- [x] Empty Tome — PlayerStats.CooldownMult ×0.92 per level (min 0.5); all weapon systems apply at fire time; 4th choice in level-up UI
 - [ ] *(others later)*
 
 ---

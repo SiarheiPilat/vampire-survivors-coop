@@ -41,7 +41,7 @@ namespace VampireSurvivors.Systems
                 cross.ValueRW.Timer -= dt;
                 if (cross.ValueRO.Timer > 0f) continue;
 
-                cross.ValueRW.Timer = cross.ValueRO.Cooldown;
+                cross.ValueRW.Timer = cross.ValueRO.Cooldown * stats.ValueRO.CooldownMult;
 
                 float2 dir2 = math.lengthsq(facing.ValueRO.Value) > 0.001f
                     ? math.normalize(facing.ValueRO.Value)

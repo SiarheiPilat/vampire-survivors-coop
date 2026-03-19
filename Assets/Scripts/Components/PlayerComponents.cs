@@ -72,6 +72,14 @@ namespace VampireSurvivors.Components
         /// Wiki: Armor reduces all incoming damage by a flat amount.
         /// </summary>
         public int Armor;
+
+        /// <summary>
+        /// Weapon cooldown multiplier. Default 1.0. Each Empty Tome pickup multiplies by 0.92.
+        /// Applied at weapon fire time: nextTimer = baseCooldown * CooldownMult.
+        /// Lower value = shorter cooldown = higher fire rate.
+        /// Wiki: Empty Tome grants -8% Cooldown per level (multiplicative, capped at lv5 ≈ 0.659×).
+        /// </summary>
+        public float CooldownMult;
     }
 
     /// <summary>

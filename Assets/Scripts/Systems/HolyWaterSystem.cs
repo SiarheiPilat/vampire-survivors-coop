@@ -44,7 +44,7 @@ namespace VampireSurvivors.Systems
                 hw.ValueRW.Timer -= dt;
                 if (hw.ValueRO.Timer > 0f) continue;
 
-                hw.ValueRW.Timer = hw.ValueRO.Cooldown;
+                hw.ValueRW.Timer = hw.ValueRO.Cooldown * stats.ValueRO.CooldownMult;
 
                 float angle = hw.ValueRW.Rng.NextFloat(0f, 2f * math.PI);
                 var   dir2  = new float2(math.cos(angle), math.sin(angle));

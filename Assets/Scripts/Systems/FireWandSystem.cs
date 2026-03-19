@@ -38,7 +38,7 @@ namespace VampireSurvivors.Systems
                 wand.ValueRW.Timer -= dt;
                 if (wand.ValueRO.Timer > 0f) continue;
 
-                wand.ValueRW.Timer = wand.ValueRO.Cooldown;
+                wand.ValueRW.Timer = wand.ValueRO.Cooldown * stats.ValueRO.CooldownMult;
 
                 // Random direction in [0, 2π)
                 float angle = wand.ValueRW.Rng.NextFloat(0f, 2f * math.PI);

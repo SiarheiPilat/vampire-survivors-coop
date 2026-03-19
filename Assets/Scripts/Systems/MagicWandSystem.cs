@@ -45,7 +45,7 @@ namespace VampireSurvivors.Systems
                 wand.ValueRW.Timer -= dt;
                 if (wand.ValueRO.Timer > 0f) continue;
 
-                wand.ValueRW.Timer = wand.ValueRO.Cooldown;
+                wand.ValueRW.Timer = wand.ValueRO.Cooldown * stats.ValueRO.CooldownMult;
 
                 // Find nearest enemy
                 int   nearestIdx  = -1;
