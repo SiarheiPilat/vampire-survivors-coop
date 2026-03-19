@@ -2,16 +2,16 @@
     "name": "MenuTests",
     "rootNamespace": "Tests.EditMode",
     "references": [
-        "VampireSurvivors.Menu"
+        "GUID:45e81dc8997619949b142cb4d448e028"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": true,
-    "precompiledReferences": [
-        "nunit.framework.dll"
-    ],
-    "autoReferenced": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false,
