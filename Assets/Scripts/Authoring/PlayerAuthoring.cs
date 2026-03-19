@@ -47,29 +47,11 @@ namespace VampireSurvivors.Authoring
                     ArcDegrees    = 120f
                 });
                 AddComponent(entity, new FacingDirection { Value = new float2(1f, 0f) });
-                AddComponent(entity, new KnifeState
-                {
-                    Timer    = 0f,
-                    Cooldown = 0.35f,
-                    Damage   = 10f,
-                    Speed    = 15f,
-                    MaxRange = 12f
-                });
-                AddComponent(entity, new GarlicState
-                {
-                    Timer    = 0f,
-                    Cooldown = 1.5f,
-                    Damage   = 10f,
-                    Range    = 1.5f
-                });
-                AddComponent(entity, new MagicWandState
-                {
-                    Timer    = 0f,
-                    Cooldown = 0.5f,
-                    Damage   = 10f,
-                    Speed    = 10f,
-                    MaxRange = 15f
-                });
+                // Weapons are unlocked by LevelUpSystem as the player levels up:
+                //   Level 2 → Magic Wand (MagicWandState added)
+                //   Level 3 → Garlic     (GarlicState added)
+                //   Level 4 → Knife      (KnifeState added)
+                // Weapon systems naturally activate once their state component exists.
             }
         }
     }
