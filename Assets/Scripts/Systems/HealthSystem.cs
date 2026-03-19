@@ -74,40 +74,79 @@ namespace VampireSurvivors.Systems
                         }
                     }
 
-                    // Spawn XP gem, gold coin, and (rarely) a health pickup at death position
+                    // Spawn XP gem, gold coin, and (rarely) a health/magnet pickup at death position
                     if (_enemyStatsLookup.HasComponent(entity) && _transformLookup.HasComponent(entity))
                     {
-                        var stats     = _enemyStatsLookup[entity];
-                        var transform = _transformLookup[entity];
+                        var enemyStats = _enemyStatsLookup[entity];
+                        var transform  = _transformLookup[entity];
+                        bool hasPrefabs = SystemAPI.TryGetSingleton<SpawnerData>(out var pickupSpawner);
 
-                        // XP gem
-                        var gemEntity = ecb.CreateEntity();
-                        ecb.AddComponent(gemEntity, new XpGem { Value = stats.XpValue });
-                        ecb.AddComponent(gemEntity, LocalTransform.FromPosition(transform.Position));
-
-                        // Gold coin (always) — value scales with XP worth of the enemy
-                        int goldValue  = UnityEngine.Mathf.Max(1, stats.XpValue / 2);
-                        var coinEntity = ecb.CreateEntity();
-                        ecb.AddComponent(coinEntity, new GoldCoin { Value = goldValue });
-                        ecb.AddComponent(coinEntity, LocalTransform.FromPosition(
-                            transform.Position + new float3(-0.3f, 0.3f, 0f)));
-
-                        // Health pickup (~10% base chance, scaled by team Luck) — restores 30 HP to the collector
-                        if (UnityEngine.Random.value < 0.10f * luckMult)
+                        // XP gem — use prefab for visuals if available, otherwise plain entity
+                        if (hasPrefabs && pickupSpawner.XpGemPrefab != Entity.Null)
                         {
-                            var healEntity = ecb.CreateEntity();
-                            ecb.AddComponent(healEntity, new HealthPickup { HealAmount = 30 });
-                            ecb.AddComponent(healEntity, LocalTransform.FromPosition(
-                                transform.Position + new float3(0.3f, -0.3f, 0f)));
+                            var gem = ecb.Instantiate(pickupSpawner.XpGemPrefab);
+                            ecb.SetComponent(gem, new XpGem { Value = enemyStats.XpValue });
+                            ecb.SetComponent(gem, LocalTransform.FromPosition(transform.Position));
+                        }
+                        else
+                        {
+                            var gem = ecb.CreateEntity();
+                            ecb.AddComponent(gem, new XpGem { Value = enemyStats.XpValue });
+                            ecb.AddComponent(gem, LocalTransform.FromPosition(transform.Position));
                         }
 
-                        // Magnet pickup (~3% base chance, scaled by team Luck) — vacuums all XP gems on screen
+                        // Gold coin (always) — value scales with XP worth of the enemy
+                        int goldValue = UnityEngine.Mathf.Max(1, enemyStats.XpValue / 2);
+                        if (hasPrefabs && pickupSpawner.GoldCoinPrefab != Entity.Null)
+                        {
+                            var coin = ecb.Instantiate(pickupSpawner.GoldCoinPrefab);
+                            ecb.SetComponent(coin, new GoldCoin { Value = goldValue });
+                            ecb.SetComponent(coin, LocalTransform.FromPosition(
+                                transform.Position + new float3(-0.3f, 0.3f, 0f)));
+                        }
+                        else
+                        {
+                            var coin = ecb.CreateEntity();
+                            ecb.AddComponent(coin, new GoldCoin { Value = goldValue });
+                            ecb.AddComponent(coin, LocalTransform.FromPosition(
+                                transform.Position + new float3(-0.3f, 0.3f, 0f)));
+                        }
+
+                        // Health pickup (~10% base chance, scaled by team Luck) — restores 30 HP
+                        if (UnityEngine.Random.value < 0.10f * luckMult)
+                        {
+                            if (hasPrefabs && pickupSpawner.HealthPickupPrefab != Entity.Null)
+                            {
+                                var heal = ecb.Instantiate(pickupSpawner.HealthPickupPrefab);
+                                ecb.SetComponent(heal, new HealthPickup { HealAmount = 30 });
+                                ecb.SetComponent(heal, LocalTransform.FromPosition(
+                                    transform.Position + new float3(0.3f, -0.3f, 0f)));
+                            }
+                            else
+                            {
+                                var heal = ecb.CreateEntity();
+                                ecb.AddComponent(heal, new HealthPickup { HealAmount = 30 });
+                                ecb.AddComponent(heal, LocalTransform.FromPosition(
+                                    transform.Position + new float3(0.3f, -0.3f, 0f)));
+                            }
+                        }
+
+                        // Magnet pickup (~3% base chance, scaled by team Luck) — vacuums all XP gems
                         if (UnityEngine.Random.value < 0.03f * luckMult)
                         {
-                            var magEntity = ecb.CreateEntity();
-                            ecb.AddComponent(magEntity, new MagnetPickup());
-                            ecb.AddComponent(magEntity, LocalTransform.FromPosition(
-                                transform.Position + new float3(0f, 0.5f, 0f)));
+                            if (hasPrefabs && pickupSpawner.MagnetPickupPrefab != Entity.Null)
+                            {
+                                var mag = ecb.Instantiate(pickupSpawner.MagnetPickupPrefab);
+                                ecb.SetComponent(mag, LocalTransform.FromPosition(
+                                    transform.Position + new float3(0f, 0.5f, 0f)));
+                            }
+                            else
+                            {
+                                var mag = ecb.CreateEntity();
+                                ecb.AddComponent(mag, new MagnetPickup());
+                                ecb.AddComponent(mag, LocalTransform.FromPosition(
+                                    transform.Position + new float3(0f, 0.5f, 0f)));
+                            }
                         }
                     }
                     if (hasRunStats) runStats.EnemiesKilled++;

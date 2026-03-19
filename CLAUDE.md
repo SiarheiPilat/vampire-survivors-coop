@@ -84,7 +84,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] XP orb + leveling system — XpGem component, XpGemSystem (magnet r=30, collect r=0.5, speed=8), LevelUpSystem (wiki formula 5+(level-1)*10, 2s iframes)
 - [x] Wave scaling — EnemySpawnerSystem: new wave every 30s, StatMultiplier +20%/wave (cap 3×), spawn count grows, interval shrinks to 1.5s floor, bat→skeleton weight shift
 - [x] Level-up UI (upgrade choice cards) — HUDManager shows 3 random cards from pool; pool = 6 passives + weapon Amount upgrades (if player has weapon and Amount < 5); Fisher-Yates shuffle; choice applies to ECS component directly; time resumes
-- [x] Pickup system (gold, health) — GoldCoin + HealthPickup dropped by enemies on death (10% health chance); GoldCoinSystem + HealthPickupSystem (Burst, walk-to-collect r=0.6u); SharedGold singleton for team pool; HUDManager gold counter top-center
+- [x] Pickup system (gold, health) — GoldCoin + HealthPickup dropped by enemies on death (10% health chance); GoldCoinSystem + HealthPickupSystem (Burst, walk-to-collect r=0.6u); SharedGold singleton for team pool; HUDManager gold counter top-center; all pickups are visible colored quads (XpGem=blue 0.25u, GoldCoin=gold 0.25u, HealthPickup=red 0.3u, MagnetPickup=cyan 0.35u) via prefab instantiation in HealthSystem
 - [x] Player death + revive mechanic — Downed component; ReviveSystem (hold E/I/gamepad-South 2s within 1.5u); ReviveProgress tracks timer on downed entity; revive restores 50% MaxHp + 2s iframes; HUD revive bar bottom-center shows progress %
 - [x] HUD (per-player HP bars, XP bars, level text, timer) — HUDManager + HUDCanvas in 4_SampleScene
 - [x] Magic Wand weapon — MagicWandSystem + Projectile component + ProjectileMovementSystem + ProjectileHitSystem

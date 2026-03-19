@@ -97,6 +97,13 @@ namespace VampireSurvivors.Components
         public Entity BigSlimePrefab;
         public Entity SmallSlimePrefab;
         public Entity BossPrefab;
+
+        // Pickup prefabs — instantiated by HealthSystem on enemy death
+        public Entity XpGemPrefab;
+        public Entity GoldCoinPrefab;
+        public Entity HealthPickupPrefab;
+        public Entity MagnetPickupPrefab;
+
         public float  Timer;
         public float  BossTimer;   // counts down; spawn boss when ≤ 0
         public Unity.Mathematics.Random Rng;

@@ -1624,6 +1624,10 @@ MonoBehaviour:
   bigSlimePrefab: {fileID: 1509845159821908351, guid: 27eb97116a04a2741ba27632b1bedd7c, type: 3}
   smallSlimePrefab: {fileID: 1509845159821908351, guid: 40dbaf710f53e1342996ea104342c4d9, type: 3}
   bossPrefab: {fileID: 7200000000000001, guid: b055e0e0b055000000000000b055b055, type: 3}
+  xpGemPrefab: {fileID: 6100000000000001, guid: 5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b, type: 3}
+  goldCoinPrefab: {fileID: 6200000000000001, guid: 6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c, type: 3}
+  healthPickupPrefab: {fileID: 6300000000000001, guid: 7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d, type: 3}
+  magnetPickupPrefab: {fileID: 6400000000000001, guid: 8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e, type: 3}
 --- !u!4 &774028992
 Transform:
   m_ObjectHideFlags: 0
