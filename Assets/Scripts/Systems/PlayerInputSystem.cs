@@ -27,7 +27,7 @@ namespace VampireSurvivors.Systems
             var keyboard = Keyboard.current;
 
             foreach (var (index, assignedDevice, moveInput) in
-                SystemAPI.Query<RefRO<PlayerIndex>, RefRO<AssignedDeviceId>, RefRW<MoveInput>>())
+                SystemAPI.Query<RefRO<PlayerIndex>, RefRO<AssignedDeviceId>, RefRW<MoveInput>>().WithNone<Downed>())
             {
                 int i = index.ValueRO.Value;
                 float2 dir = float2.zero;

@@ -48,4 +48,10 @@ namespace VampireSurvivors.Components
         public float Xp;
         public float XpToNextLevel;
     }
+
+    /// <summary>
+    /// Marks a player as downed (HP reached 0). Added by HealthSystem instead of destroying the entity.
+    /// Downed players cannot move or attack. Teammates can revive them (future work).
+    /// </summary>
+    public struct Downed : IComponentData { }
 }

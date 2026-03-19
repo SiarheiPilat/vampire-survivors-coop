@@ -7,8 +7,10 @@ namespace VampireSurvivors.Systems
 {
     /// <summary>
     /// Runs after all damage systems. Destroys any entity whose Health.Current
-    /// has dropped to or below 0. Logs a message for player deaths.
-    /// Spawns an XpGem entity at the position of each destroyed enemy.
+    /// has dropped to or below 0.
+    /// - Enemies: spawns an XpGem entity at the death position, then destroys.
+    /// - Players: adds Downed component (entity preserved for revive) — does NOT destroy.
+    /// Already-downed players are excluded from this query via WithNone&lt;Downed&gt;.
     /// Not Burst-compiled — calls Debug.Log.
     /// </summary>
     [UpdateAfter(typeof(ContactDamageSystem))]
@@ -32,14 +34,15 @@ namespace VampireSurvivors.Systems
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             var ecb          = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
+            // WithNone<Downed> — skip already-downed players so this doesn't re-trigger
             foreach (var (health, entity) in
-                SystemAPI.Query<RefRO<Health>>().WithEntityAccess())
+                SystemAPI.Query<RefRO<Health>>().WithNone<Downed>().WithEntityAccess())
             {
                 if (health.ValueRO.Current > 0) continue;
 
                 if (SystemAPI.HasComponent<EnemyTag>(entity))
                 {
-                    // Spawn XP gem at enemy's current position
+                    // Spawn XP gem at enemy's current position, then destroy enemy
                     if (_enemyStatsLookup.HasComponent(entity) && _transformLookup.HasComponent(entity))
                     {
                         var stats     = _enemyStatsLookup[entity];
@@ -49,14 +52,20 @@ namespace VampireSurvivors.Systems
                         ecb.AddComponent(gemEntity, new XpGem { Value = stats.XpValue });
                         ecb.AddComponent(gemEntity, LocalTransform.FromPosition(transform.Position));
                     }
+                    ecb.DestroyEntity(entity);
                 }
                 else if (SystemAPI.HasComponent<PlayerTag>(entity))
                 {
+                    // Player down — preserve entity for revive, mark as Downed
                     var idx = SystemAPI.GetComponent<PlayerIndex>(entity);
-                    Debug.Log($"[HealthSystem] Player {idx.Value} died.");
+                    Debug.Log($"[HealthSystem] Player {idx.Value} went down.");
+                    ecb.AddComponent<Downed>(entity);
+                    // Note: entity is NOT destroyed — ReviveSystem (future) removes Downed on revive
                 }
-
-                ecb.DestroyEntity(entity);
+                else
+                {
+                    ecb.DestroyEntity(entity);
+                }
             }
         }
     }

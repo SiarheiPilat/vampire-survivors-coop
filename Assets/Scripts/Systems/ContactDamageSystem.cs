@@ -34,6 +34,7 @@ namespace VampireSurvivors.Systems
 
             var playerQuery = SystemAPI.QueryBuilder()
                 .WithAll<PlayerTag, LocalTransform, Health, Invincible>()
+                .WithNone<Downed>()
                 .Build();
 
             if (playerQuery.IsEmpty) return;

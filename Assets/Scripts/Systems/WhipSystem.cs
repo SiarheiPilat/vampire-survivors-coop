@@ -24,7 +24,7 @@ namespace VampireSurvivors.Systems
 
             foreach (var (weaponState, moveInput, transform) in
                 SystemAPI.Query<RefRW<WeaponState>, RefRO<MoveInput>, RefRO<LocalTransform>>()
-                    .WithAll<PlayerTag>())
+                    .WithAll<PlayerTag>().WithNone<Downed>())
             {
                 ref var ws = ref weaponState.ValueRW;
                 ws.SwingTimer -= dt;
