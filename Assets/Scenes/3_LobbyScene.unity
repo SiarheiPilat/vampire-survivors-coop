@@ -774,7 +774,7 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 0}
+  m_TargetGraphic: {fileID: 355896546}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
@@ -2991,7 +2991,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!223 &1418060942
 Canvas:
   m_ObjectHideFlags: 0
@@ -3045,10 +3045,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: VampireSurvivors.Menu::VampireSurvivors.Menu.LobbyManager
   slots:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 2008721290}
+  - {fileID: 189890182}
+  - {fileID: 2054578254}
+  - {fileID: 1340318108}
   playButton: {fileID: 1647291248}
   settingsPanel: {fileID: 1295385697}
 --- !u!4 &1490719545
@@ -3681,7 +3681,7 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 0}
+  m_TargetGraphic: {fileID: 1647291246}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
