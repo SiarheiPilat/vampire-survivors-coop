@@ -90,6 +90,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] Magic Wand weapon — MagicWandSystem + Projectile component + ProjectileMovementSystem + ProjectileHitSystem
 - [x] Fire Wand weapon — FireWandSystem, random-direction Projectile, per-player RNG
 - [x] Game over screen — GameOverPanel overlay, "GAME OVER" + survived time + kills + gold; SharedGold.EnemiesKilled tracked by HealthSystem; TriggerGameOver() appends stat lines programmatically
+- [x] Floating damage numbers — DamageNumberEvent IComponentData spawned by all weapon systems on hit; DamageNumberSystem bridges to DamageNumberRenderer MonoBehaviour (pool of 64 world-space TMP labels, float 1.5u up over 0.7s, fade out); color: white ≤10 dmg, yellow ≤30, orange >30; auto-creates via RuntimeInitializeOnLoadMethod
 
 ### Weapons (clone priority order)
 
