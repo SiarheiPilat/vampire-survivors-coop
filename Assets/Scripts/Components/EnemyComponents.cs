@@ -62,15 +62,29 @@ namespace VampireSurvivors.Components
 
     /// <summary>
     /// Singleton component on the spawner entity. Baked by SpawnerAuthoring.
-    /// Holds entity prefab references and mutable spawner state (timer + RNG).
+    /// Holds entity prefab references and mutable spawner state (timer, RNG, wave).
+    ///
+    /// Wave scaling: every 30 s a new wave starts.
+    ///   StatMultiplier = 1 + (wave-1) * 0.2  → wave 5 = 2× stats
+    ///   Spawn count grows by 1 each wave (capped at 18).
+    ///   Spawn interval shrinks by 0.15 s each wave (floor 1.5 s).
     /// </summary>
     public struct SpawnerData : IComponentData
     {
         public Entity BatPrefab;
         public Entity ZombiePrefab;
         public Entity SkeletonPrefab;
-        public float Timer;
+        public float  Timer;
         public Unity.Mathematics.Random Rng;
+
+        /// <summary>Total elapsed play time in seconds. Drives wave number.</summary>
+        public float ElapsedTime;
+
+        /// <summary>Current wave number (1-based). Increments every 30 s.</summary>
+        public int   WaveNumber;
+
+        /// <summary>Enemy stat multiplier for this wave (HP, damage, XP scale together).</summary>
+        public float StatMultiplier;
     }
 
     /// <summary>

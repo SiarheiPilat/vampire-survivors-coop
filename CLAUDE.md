@@ -113,9 +113,9 @@ critical for maintaining 60fps with 500+ entities on screen.
 
 ### Enemies
 
-- [ ] Bat (basic — chases player)
-- [ ] Zombie (slow melee)
-- [ ] Skeleton (medium melee)
+- [x] Bat — red quad, HP=10, speed=2.5, dmg=10, XP=1; 60% spawn weight
+- [x] Zombie — green quad, HP=40, speed=1, dmg=20, XP=5; 25% spawn weight
+- [x] Skeleton — blue quad, HP=75, speed=1.8, dmg=25, XP=10; 15% spawn weight
 - [ ] Slime (splits on death)
 - [ ] *(bosses after basics work)*
 
