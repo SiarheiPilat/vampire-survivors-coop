@@ -39,14 +39,30 @@ namespace VampireSurvivors.Components
         public float Value;
     }
 
-    /// <summary>Player stats — components are live now, systems come later.</summary>
+    /// <summary>Player stats — all per-player progression data in one component.</summary>
     public struct PlayerStats : IComponentData
     {
-        public int Hp;
-        public int MaxHp;
-        public int Level;
+        public int   Hp;
+        public int   MaxHp;
+        public int   Level;
         public float Xp;
         public float XpToNextLevel;
+
+        /// <summary>
+        /// Weapon damage multiplier. Default 1.0. Each Spinach pickup adds +0.1.
+        /// Applied by all weapon systems at fire time: finalDamage = baseDamage * Might.
+        /// Wiki: Spinach grants +10% Might per level (up to 5 levels in original).
+        /// </summary>
+        public float Might;
+
+        /// <summary>
+        /// HP regenerated per second. 0 = no regen. Each Pummarola pickup adds +0.2.
+        /// Wiki base: 0.2 HP/s per Pummarola level.
+        /// </summary>
+        public float HpRegen;
+
+        /// <summary>Fractional HP accumulator for sub-integer regen per frame.</summary>
+        public float HpRegenAccum;
     }
 
     /// <summary>

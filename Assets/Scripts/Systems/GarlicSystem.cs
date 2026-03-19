@@ -63,12 +63,14 @@ namespace VampireSurvivors.Systems
 
             public float DeltaTime;
 
-            void Execute(ref GarlicState garlic, in LocalTransform transform)
+            void Execute(ref GarlicState garlic, in LocalTransform transform, in PlayerStats stats)
             {
                 garlic.Timer -= DeltaTime;
                 if (garlic.Timer > 0f) return;
 
                 garlic.Timer = garlic.Cooldown;
+
+                int damage = (int)(garlic.Damage * stats.Might);
 
                 for (int i = 0; i < EnemyEntities.Length; i++)
                 {
@@ -76,7 +78,7 @@ namespace VampireSurvivors.Systems
                     if (dist > garlic.Range) continue;
 
                     var hp = HealthLookup[EnemyEntities[i]];
-                    hp.Current -= (int)garlic.Damage;
+                    hp.Current -= damage;
                     HealthLookup[EnemyEntities[i]] = hp;
                 }
             }

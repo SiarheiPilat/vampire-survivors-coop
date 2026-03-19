@@ -10,11 +10,9 @@ namespace VampireSurvivors.Systems
     /// On level-up:
     ///   - Increments Level, resets Xp, updates XpToNextLevel (wiki formula)
     ///   - Grants 2 s invincibility
-    ///   - Unlocks new weapon components at specific level thresholds:
-    ///       Level 2 → MagicWandState
-    ///       Level 3 → GarlicState
-    ///       Level 4 → KnifeState
-    /// Weapon systems activate automatically once their state component is present.
+    ///   - Levels 2-4: unlocks weapons (MagicWand, Garlic, Knife)
+    ///   - Levels 5+:  alternates Spinach (+0.1 Might) and Pummarola (+0.2 HpRegen)
+    /// Weapon systems activate once their state component is present (structural change via ECB).
     /// Not Burst-compiled — calls Debug.Log and uses ECB for structural changes.
     /// </summary>
     [UpdateAfter(typeof(XpGemSystem))]
@@ -69,8 +67,26 @@ namespace VampireSurvivors.Systems
                             break;
                     }
 
+                    // Passive items at level 5+ (alternating Spinach / Pummarola)
+                    // Level 5, 7, 9, 11 … → Spinach (+0.1 Might)
+                    // Level 6, 8, 10, 12 … → Pummarola (+0.2 HP/s)
+                    if (newLevel >= 5)
+                    {
+                        int pidx = SystemAPI.GetComponent<PlayerIndex>(entity).Value;
+                        if (newLevel % 2 == 1) // odd: Spinach
+                        {
+                            stats.ValueRW.Might += 0.1f;
+                            Debug.Log($"[LevelUpSystem] P{pidx} got Spinach! Might = {stats.ValueRO.Might:F1}x");
+                        }
+                        else // even: Pummarola
+                        {
+                            stats.ValueRW.HpRegen += 0.2f;
+                            Debug.Log($"[LevelUpSystem] P{pidx} got Pummarola! HpRegen = {stats.ValueRO.HpRegen:F1}/s");
+                        }
+                    }
+
                     var idx = SystemAPI.GetComponent<PlayerIndex>(entity);
-                    Debug.Log($"[LevelUpSystem] P{idx.Value} → Lv{newLevel}! XP needed: {stats.ValueRO.XpToNextLevel}");
+                    Debug.Log($"[LevelUpSystem] P{idx.Value} → Lv{newLevel}! Next: {stats.ValueRO.XpToNextLevel} XP");
                 }
             }
         }

@@ -37,8 +37,8 @@ namespace VampireSurvivors.Systems
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             var ecb          = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            foreach (var (wand, transform) in
-                SystemAPI.Query<RefRW<MagicWandState>, RefRO<LocalTransform>>()
+            foreach (var (wand, transform, stats) in
+                SystemAPI.Query<RefRW<MagicWandState>, RefRO<LocalTransform>, RefRO<PlayerStats>>()
                     .WithAll<PlayerTag>()
                     .WithNone<Downed>())
             {
@@ -70,7 +70,7 @@ namespace VampireSurvivors.Systems
                 var bullet = ecb.Instantiate(bulletPrefab);
                 ecb.AddComponent(bullet, new Projectile
                 {
-                    Damage    = wand.ValueRO.Damage,
+                    Damage    = wand.ValueRO.Damage * stats.ValueRO.Might,
                     Speed     = wand.ValueRO.Speed,
                     Direction = dir,
                     MaxRange  = wand.ValueRO.MaxRange,

@@ -28,8 +28,8 @@ namespace VampireSurvivors.Systems
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             var ecb          = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            foreach (var (knife, facing, transform) in
-                SystemAPI.Query<RefRW<KnifeState>, RefRO<FacingDirection>, RefRO<LocalTransform>>()
+            foreach (var (knife, facing, transform, stats) in
+                SystemAPI.Query<RefRW<KnifeState>, RefRO<FacingDirection>, RefRO<LocalTransform>, RefRO<PlayerStats>>()
                     .WithAll<PlayerTag>()
                     .WithNone<Downed>())
             {
@@ -45,7 +45,7 @@ namespace VampireSurvivors.Systems
                 var bullet = ecb.Instantiate(bulletPrefab);
                 ecb.AddComponent(bullet, new Projectile
                 {
-                    Damage    = knife.ValueRO.Damage,
+                    Damage    = knife.ValueRO.Damage * stats.ValueRO.Might,
                     Speed     = knife.ValueRO.Speed,
                     Direction = new float3(dir2.x, dir2.y, 0f),
                     MaxRange  = knife.ValueRO.MaxRange,
