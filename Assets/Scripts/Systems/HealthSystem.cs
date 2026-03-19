@@ -1,4 +1,5 @@
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 using VampireSurvivors.Components;
@@ -42,15 +43,32 @@ namespace VampireSurvivors.Systems
 
                 if (SystemAPI.HasComponent<EnemyTag>(entity))
                 {
-                    // Spawn XP gem at enemy's current position, then destroy enemy
+                    // Spawn XP gem, gold coin, and (rarely) a health pickup at death position
                     if (_enemyStatsLookup.HasComponent(entity) && _transformLookup.HasComponent(entity))
                     {
                         var stats     = _enemyStatsLookup[entity];
                         var transform = _transformLookup[entity];
 
+                        // XP gem
                         var gemEntity = ecb.CreateEntity();
                         ecb.AddComponent(gemEntity, new XpGem { Value = stats.XpValue });
                         ecb.AddComponent(gemEntity, LocalTransform.FromPosition(transform.Position));
+
+                        // Gold coin (always) — value scales with XP worth of the enemy
+                        int goldValue  = UnityEngine.Mathf.Max(1, stats.XpValue / 2);
+                        var coinEntity = ecb.CreateEntity();
+                        ecb.AddComponent(coinEntity, new GoldCoin { Value = goldValue });
+                        ecb.AddComponent(coinEntity, LocalTransform.FromPosition(
+                            transform.Position + new float3(-0.3f, 0.3f, 0f)));
+
+                        // Health pickup (~10% chance) — restores 30 HP to the collector
+                        if (UnityEngine.Random.value < 0.10f)
+                        {
+                            var healEntity = ecb.CreateEntity();
+                            ecb.AddComponent(healEntity, new HealthPickup { HealAmount = 30 });
+                            ecb.AddComponent(healEntity, LocalTransform.FromPosition(
+                                transform.Position + new float3(0.3f, -0.3f, 0f)));
+                        }
                     }
                     ecb.DestroyEntity(entity);
                 }

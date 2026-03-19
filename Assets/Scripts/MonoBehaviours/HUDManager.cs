@@ -55,6 +55,10 @@ namespace VampireSurvivors.MonoBehaviours
         bool       _upgradeShowing;
         Entity     _pendingUpgradeEntity;
 
+        // Gold display (created programmatically)
+        EntityQuery _sharedGoldQuery;
+        TMP_Text    _goldText;
+
         void Start()
         {
             for (int i = 0; i < 4; i++)
@@ -83,8 +87,13 @@ namespace VampireSurvivors.MonoBehaviours
             );
             _queryCreated = true;
 
+            _sharedGoldQuery = world.EntityManager.CreateEntityQuery(
+                ComponentType.ReadOnly<SharedGold>()
+            );
+
             if (gameOverPanel != null) gameOverPanel.SetActive(false);
             CreateUpgradePanel();
+            CreateGoldDisplay();
         }
 
         void OnDisable()
@@ -94,6 +103,7 @@ namespace VampireSurvivors.MonoBehaviours
                 _playerQuery.Dispose();
                 _activePlayerQuery.Dispose();
                 _upgradePendingQuery.Dispose();
+                _sharedGoldQuery.Dispose();
                 _queryCreated = false;
             }
         }
@@ -110,6 +120,7 @@ namespace VampireSurvivors.MonoBehaviours
             if (world == null || !_queryCreated) return;
 
             HandleUpgradeChoices(world);
+            UpdateGoldDisplay();
             if (_upgradeShowing) return; // freeze HUD updates while choice panel is visible
 
             bool[] seen = new bool[4];
@@ -209,6 +220,40 @@ namespace VampireSurvivors.MonoBehaviours
             if (ratio > 0.5f)  return HpColorHigh;
             if (ratio > 0.25f) return HpColorMid;
             return HpColorLow;
+        }
+
+        // ─── Gold Display ───────────────────────────────────────────────────
+
+        void CreateGoldDisplay()
+        {
+            var canvas = GetComponentInParent<Canvas>();
+            if (canvas == null) canvas = FindFirstObjectByType<Canvas>();
+            if (canvas == null) return;
+
+            var go = new GameObject("GoldText");
+            go.transform.SetParent(canvas.transform, false);
+            var rt = go.AddComponent<RectTransform>();
+            rt.anchorMin        = new Vector2(0.5f, 1f);
+            rt.anchorMax        = new Vector2(0.5f, 1f);
+            rt.pivot            = new Vector2(0.5f, 1f);
+            rt.anchoredPosition = new Vector2(100f, -8f); // top-center, right of timer
+            rt.sizeDelta        = new Vector2(160f, 36f);
+
+            _goldText = go.AddComponent<TextMeshProUGUI>();
+            _goldText.fontSize  = 22;
+            _goldText.alignment = TextAlignmentOptions.Left;
+            _goldText.color     = new Color(1f, 0.85f, 0.1f);
+            _goldText.text      = "G: 0";
+        }
+
+        void UpdateGoldDisplay()
+        {
+            if (_goldText == null || !_queryCreated) return;
+            if (_sharedGoldQuery.CalculateEntityCount() == 0) return;
+
+            var golds = _sharedGoldQuery.ToComponentDataArray<SharedGold>(Allocator.Temp);
+            _goldText.text = $"G: {golds[0].Total}";
+            golds.Dispose();
         }
 
         // ─── Upgrade Choice Panel ───────────────────────────────────────────

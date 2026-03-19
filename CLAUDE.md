@@ -84,7 +84,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] XP orb + leveling system — XpGem component, XpGemSystem (magnet r=30, collect r=0.5, speed=8), LevelUpSystem (wiki formula 5+(level-1)*10, 2s iframes)
 - [x] Wave scaling — EnemySpawnerSystem: new wave every 30s, StatMultiplier +20%/wave (cap 3×), spawn count grows, interval shrinks to 1.5s floor, bat→skeleton weight shift
 - [x] Level-up UI (upgrade choice cards) — HUDManager detects UpgradeChoicePending on player, pauses Time.timeScale, shows 3-button overlay; player picks Spinach/Pummarola/Armor; EntityManager applies stat + removes component; time resumes
-- [ ] Pickup system (gold, health, magnets)
+- [x] Pickup system (gold, health) — GoldCoin + HealthPickup dropped by enemies on death (10% health chance); GoldCoinSystem + HealthPickupSystem (Burst, walk-to-collect r=0.6u); SharedGold singleton for team pool; HUDManager gold counter top-center
 - [ ] Player death + revive mechanic — Downed component + state added; revive interaction is future work
 - [x] HUD (per-player HP bars, XP bars, level text, timer) — HUDManager + HUDCanvas in 4_SampleScene
 - [x] Magic Wand weapon — MagicWandSystem + Projectile component + ProjectileMovementSystem + ProjectileHitSystem
