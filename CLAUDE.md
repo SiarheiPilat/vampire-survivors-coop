@@ -100,7 +100,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] Knife — KnifeSystem fires in FacingDirection (last movement dir); 10 dmg, 0.35s CD, speed=15
 - [x] Fire Wand — FireWandSystem fires Projectile in random direction; 10 dmg, 0.4s CD, speed=11; per-player RNG via Unity.Mathematics.Random
 - [x] Axe — AxeSystem; parabolic arc via Projectile.Gravity+Velocity; 20 dmg, 1.25s CD, ~60° elevation, Gravity=12 u/s²; unlocked at lv7
-- [ ] Cross
+- [x] Cross — CrossSystem; returning boomerang via Projectile.TurnDistance+Returning+OwnerEntity; 50 dmg, 5.0s CD, speed=15, turn=8u; unlocked lv8
 - [ ] Holy Water
 - [ ] Lightning Ring
 
