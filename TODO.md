@@ -41,7 +41,7 @@
 - [ ] Player death + revive mechanic — Downed state done; revive interaction future work
 - [x] HUD (per-player HP bars, XP bars, level text, timer) — HUDManager + HUDCanvas in 4_SampleScene
 - [x] Main menu / character select — Splash → PressToStart → Lobby (4-player device assignment, char cycling, persistence)
-- [ ] Game over / win screen
+- [x] Game over screen — dark overlay + "GAME OVER" + "Survived MM:SS"; triggered when all players Downed
 
 ---
 

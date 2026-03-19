@@ -87,7 +87,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [ ] Player death + revive mechanic — Downed component + state added; revive interaction is future work
 - [x] HUD (per-player HP bars, XP bars, level text, timer) — HUDManager + HUDCanvas in 4_SampleScene
 - [x] Magic Wand weapon — MagicWandSystem + Projectile component + ProjectileMovementSystem + ProjectileHitSystem
-- [ ] Game over / win screen
+- [x] Game over screen — GameOverPanel overlay, "GAME OVER" + survived time; HUDManager detects all-Downed
 
 ### Weapons (clone priority order)
 

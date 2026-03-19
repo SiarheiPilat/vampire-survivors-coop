@@ -26,6 +26,10 @@ namespace VampireSurvivors.MonoBehaviours
         [Header("Timer")]
         [SerializeField] TMP_Text timerText;
 
+        [Header("Game Over")]
+        [SerializeField] GameObject gameOverPanel;
+        [SerializeField] TMP_Text   gameOverTimeText;
+
         static readonly Color HpColorHigh   = new Color(0.20f, 0.80f, 0.20f, 1f);
         static readonly Color HpColorMid    = new Color(0.90f, 0.80f, 0.10f, 1f);
         static readonly Color HpColorLow    = new Color(0.85f, 0.15f, 0.15f, 1f);
@@ -35,8 +39,11 @@ namespace VampireSurvivors.MonoBehaviours
         const float LevelUpFlashDuration = 1.5f;
 
         EntityQuery _playerQuery;
+        EntityQuery _activePlayerQuery;  // PlayerTag + NOT Downed
         bool        _queryCreated;
         float       _elapsedTime;
+        bool        _gameOver;
+        bool        _hadPlayers;  // true once at least 1 player was alive
 
         readonly int[]   _lastLevels     = new int[4];
         readonly float[] _levelUpTimers  = new float[4];
@@ -58,7 +65,13 @@ namespace VampireSurvivors.MonoBehaviours
                 ComponentType.ReadOnly<PlayerStats>(),
                 ComponentType.ReadOnly<Health>()
             );
+            _activePlayerQuery = world.EntityManager.CreateEntityQuery(
+                ComponentType.ReadOnly<PlayerTag>(),
+                ComponentType.Exclude<Downed>()
+            );
             _queryCreated = true;
+
+            if (gameOverPanel != null) gameOverPanel.SetActive(false);
         }
 
         void OnDisable()
@@ -66,12 +79,15 @@ namespace VampireSurvivors.MonoBehaviours
             if (_queryCreated)
             {
                 _playerQuery.Dispose();
+                _activePlayerQuery.Dispose();
                 _queryCreated = false;
             }
         }
 
         void Update()
         {
+            if (_gameOver) return;
+
             _elapsedTime += Time.deltaTime;
             UpdateTimer();
             TickLevelUpTimers();
@@ -81,11 +97,12 @@ namespace VampireSurvivors.MonoBehaviours
 
             bool[] seen = new bool[4];
 
-            var indices = _playerQuery.ToComponentDataArray<PlayerIndex>(Allocator.Temp);
-            var stats   = _playerQuery.ToComponentDataArray<PlayerStats>(Allocator.Temp);
-            var healths = _playerQuery.ToComponentDataArray<Health>(Allocator.Temp);
+            var indices     = _playerQuery.ToComponentDataArray<PlayerIndex>(Allocator.Temp);
+            var stats       = _playerQuery.ToComponentDataArray<PlayerStats>(Allocator.Temp);
+            var healths     = _playerQuery.ToComponentDataArray<Health>(Allocator.Temp);
+            int playerCount = indices.Length;
 
-            for (int i = 0; i < indices.Length; i++)
+            for (int i = 0; i < playerCount; i++)
             {
                 int slot = indices[i].Value;
                 if (slot < 0 || slot >= 4) continue;
@@ -100,6 +117,11 @@ namespace VampireSurvivors.MonoBehaviours
             for (int slot = 0; slot < 4; slot++)
                 if (panelRoots[slot] != null && !seen[slot])
                     panelRoots[slot].SetActive(false);
+
+            // Game-over: all players downed
+            if (playerCount > 0) _hadPlayers = true;
+            if (_hadPlayers && _activePlayerQuery.CalculateEntityCount() == 0)
+                TriggerGameOver();
         }
 
         void UpdatePanel(int slot, Health health, PlayerStats stats)
@@ -152,6 +174,17 @@ namespace VampireSurvivors.MonoBehaviours
             if (timerText == null) return;
             int total      = Mathf.FloorToInt(_elapsedTime);
             timerText.text = $"{total / 60:00}:{total % 60:00}";
+        }
+
+        void TriggerGameOver()
+        {
+            _gameOver = true;
+            if (gameOverPanel != null)  gameOverPanel.SetActive(true);
+            if (gameOverTimeText != null)
+            {
+                int total = Mathf.FloorToInt(_elapsedTime);
+                gameOverTimeText.text = $"Survived  {total / 60:00}:{total % 60:00}";
+            }
         }
 
         static Color HpColor(float ratio)
