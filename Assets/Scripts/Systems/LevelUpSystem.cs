@@ -47,7 +47,7 @@ namespace VampireSurvivors.Systems
                                 ecb.AddComponent(entity, new MagicWandState
                                 {
                                     Timer = 0f, Cooldown = 0.5f,
-                                    Damage = 10f, Speed = 10f, MaxRange = 15f
+                                    Damage = 10f, Speed = 10f, MaxRange = 15f, Amount = 1
                                 });
                             break;
                         case 3:
@@ -63,7 +63,7 @@ namespace VampireSurvivors.Systems
                                 ecb.AddComponent(entity, new KnifeState
                                 {
                                     Timer = 0f, Cooldown = 0.35f,
-                                    Damage = 10f, Speed = 15f, MaxRange = 12f
+                                    Damage = 10f, Speed = 15f, MaxRange = 12f, Amount = 1
                                 });
                             break;
                         case 5:
@@ -87,7 +87,8 @@ namespace VampireSurvivors.Systems
                                     Damage   = 10f,
                                     Speed    = 11f,
                                     MaxRange = 10f,
-                                    Rng      = new Unity.Mathematics.Random((uint)(entity.Index * 2654435761u + 1u))
+                                    Rng      = new Unity.Mathematics.Random((uint)(entity.Index * 2654435761u + 1u)),
+                                    Amount   = 1
                                 });
                             break;
                         case 7:

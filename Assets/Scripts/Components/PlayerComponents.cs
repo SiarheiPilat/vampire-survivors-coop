@@ -142,6 +142,7 @@ namespace VampireSurvivors.Components
         public float Damage;
         public float Speed;
         public float MaxRange;
+        public int   Amount;  // knives per throw; 1 = default; fan spread, 20° between blades
     }
 
     /// <summary>
@@ -169,6 +170,7 @@ namespace VampireSurvivors.Components
         public float Damage;    // wiki base: 10
         public float Speed;     // projectile speed in units/s — wiki base: ~10
         public float MaxRange;  // units before projectile despawns
+        public int   Amount;    // projectiles per shot; 1 = default; upgrade adds +1 (fan spread, 20° between shots)
     }
 
     /// <summary>
@@ -253,6 +255,7 @@ namespace VampireSurvivors.Components
         public float  Speed;
         public float  MaxRange;
         public Random Rng; // per-player RNG so all players fire independently
+        public int    Amount; // fireballs per trigger; 1 = default; each fires in independent random direction
     }
 
     /// <summary>

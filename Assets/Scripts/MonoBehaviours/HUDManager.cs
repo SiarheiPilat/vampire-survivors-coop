@@ -56,6 +56,31 @@ namespace VampireSurvivors.MonoBehaviours
         bool       _upgradeShowing;
         Entity     _pendingUpgradeEntity;
 
+        // Dynamic 3-choice upgrade system
+        enum UpgradeType
+        {
+            Spinach, Pummarola, Armor, EmptyTome, Crown, Clover,
+            WandAmount, KnifeAmount, FireAmount
+        }
+        readonly UpgradeType[] _currentChoices = new UpgradeType[3];
+        readonly TMP_Text[]    _btnLabels       = new TMP_Text[3];
+
+        static readonly (UpgradeType type, string label)[] k_WeaponUpgrades =
+        {
+            (UpgradeType.WandAmount,  "Magic Wand +1 shot\nFire an extra Wand projectile"),
+            (UpgradeType.KnifeAmount, "Knife +1 blade\nThrow an extra Knife per volley"),
+            (UpgradeType.FireAmount,  "Fire Wand +1 flame\nLaunch an extra fireball per burst"),
+        };
+        static readonly (UpgradeType type, string label)[] k_PassiveUpgrades =
+        {
+            (UpgradeType.Spinach,  "Spinach\n+10% Might (weapon damage)"),
+            (UpgradeType.Pummarola,"Pummarola\n+0.2 HP/s regen"),
+            (UpgradeType.Armor,    "Armor\n+1 flat damage reduction"),
+            (UpgradeType.EmptyTome,"Empty Tome\n-8% weapon cooldown"),
+            (UpgradeType.Crown,    "Crown\n+8% XP gain"),
+            (UpgradeType.Clover,   "Clover\n+10% Luck (better drops)"),
+        };
+
         // Gold display (created programmatically)
         EntityQuery _sharedGoldQuery;
         TMP_Text    _goldText;
@@ -409,24 +434,16 @@ namespace VampireSurvivors.MonoBehaviours
             var titleGO = new GameObject("UpgradeTitle");
             titleGO.transform.SetParent(_upgradePanel.transform, false);
             var titleRt = titleGO.AddComponent<RectTransform>();
-            titleRt.anchoredPosition = new Vector2(0f, 140f);
+            titleRt.anchoredPosition = new Vector2(0f, 120f);
             titleRt.sizeDelta        = new Vector2(700f, 60f);
             _upgradeTitle = titleGO.AddComponent<TextMeshProUGUI>();
             _upgradeTitle.fontSize  = 34;
             _upgradeTitle.alignment = TextAlignmentOptions.Center;
             _upgradeTitle.color     = new Color(1f, 0.95f, 0.1f);
 
-            // Five upgrade buttons
-            string[] labels = {
-                "Spinach\n+10% Might (weapon damage)",
-                "Pummarola\n+0.2 HP/s regen",
-                "Armor\n+1 flat damage reduction",
-                "Empty Tome\n-8% weapon cooldown",
-                "Crown\n+8% XP gain",
-                "Clover\n+10% Luck (better drops)"
-            };
-            float[] yPos = { 120f, 60f, 0f, -60f, -120f, -180f };
-            for (int i = 0; i < 6; i++)
+            // 3 dynamic upgrade buttons, larger than before
+            float[] yPos = { 40f, -60f, -160f };
+            for (int i = 0; i < 3; i++)
             {
                 int capturedIdx = i;
 
@@ -434,10 +451,10 @@ namespace VampireSurvivors.MonoBehaviours
                 btnGO.transform.SetParent(_upgradePanel.transform, false);
                 var btnRt = btnGO.AddComponent<RectTransform>();
                 btnRt.anchoredPosition = new Vector2(0f, yPos[i]);
-                btnRt.sizeDelta        = new Vector2(480f, 75f);
+                btnRt.sizeDelta        = new Vector2(540f, 85f);
 
                 var btnImg = btnGO.AddComponent<Image>();
-                btnImg.color = new Color(0.15f, 0.15f, 0.45f, 1f);
+                btnImg.color = new Color(0.12f, 0.12f, 0.42f, 1f);
 
                 var btn = btnGO.AddComponent<Button>();
                 btn.targetGraphic = btnImg;
@@ -460,11 +477,11 @@ namespace VampireSurvivors.MonoBehaviours
                 lblRt.anchorMax = Vector2.one;
                 lblRt.offsetMin = Vector2.zero;
                 lblRt.offsetMax = Vector2.zero;
-                var lbl = lblGO.AddComponent<TextMeshProUGUI>();
-                lbl.text      = labels[i];
-                lbl.fontSize  = 22;
-                lbl.alignment = TextAlignmentOptions.Center;
-                lbl.color     = Color.white;
+                _btnLabels[i] = lblGO.AddComponent<TextMeshProUGUI>();
+                _btnLabels[i].text      = "...";
+                _btnLabels[i].fontSize  = 22;
+                _btnLabels[i].alignment = TextAlignmentOptions.Center;
+                _btnLabels[i].color     = Color.white;
             }
 
             _upgradePanel.SetActive(false);
@@ -499,8 +516,65 @@ namespace VampireSurvivors.MonoBehaviours
             _upgradeShowing = true;
             if (_upgradeTitle != null)
                 _upgradeTitle.text = $"P{slot + 1}  LEVEL UP!\nChoose an upgrade:";
+
+            BuildUpgradeChoices(world);
+
             _upgradePanel.SetActive(true);
             Time.timeScale = 0f;
+        }
+
+        void BuildUpgradeChoices(World world)
+        {
+            var em = world.EntityManager;
+
+            // Build pool: all 6 passives + weapon amount upgrades for weapons the player has
+            var pool = new System.Collections.Generic.List<(UpgradeType type, string label)>(k_PassiveUpgrades);
+
+            foreach (var (type, label) in k_WeaponUpgrades)
+            {
+                bool canAdd = false;
+                int  curAmt = 1;
+                switch (type)
+                {
+                    case UpgradeType.WandAmount:
+                        if (em.HasComponent<MagicWandState>(_pendingUpgradeEntity))
+                        {
+                            curAmt = em.GetComponentData<MagicWandState>(_pendingUpgradeEntity).Amount;
+                            canAdd = curAmt < 5;
+                        }
+                        break;
+                    case UpgradeType.KnifeAmount:
+                        if (em.HasComponent<KnifeState>(_pendingUpgradeEntity))
+                        {
+                            curAmt = em.GetComponentData<KnifeState>(_pendingUpgradeEntity).Amount;
+                            canAdd = curAmt < 5;
+                        }
+                        break;
+                    case UpgradeType.FireAmount:
+                        if (em.HasComponent<FireWandState>(_pendingUpgradeEntity))
+                        {
+                            curAmt = em.GetComponentData<FireWandState>(_pendingUpgradeEntity).Amount;
+                            canAdd = curAmt < 5;
+                        }
+                        break;
+                }
+                if (canAdd) pool.Add((type, label + $"  ({curAmt}→{curAmt + 1})"));
+            }
+
+            // Fisher-Yates shuffle using UnityEngine.Random (unscaled, so fine while paused)
+            for (int i = pool.Count - 1; i > 0; i--)
+            {
+                int j = UnityEngine.Random.Range(0, i + 1);
+                (pool[i], pool[j]) = (pool[j], pool[i]);
+            }
+
+            // Pick up to 3
+            int count = Mathf.Min(3, pool.Count);
+            for (int i = 0; i < count; i++)
+            {
+                _currentChoices[i] = pool[i].type;
+                if (_btnLabels[i] != null) _btnLabels[i].text = pool[i].label;
+            }
         }
 
         void ApplyUpgrade(World world, int choiceIndex)
@@ -508,40 +582,69 @@ namespace VampireSurvivors.MonoBehaviours
             if (_pendingUpgradeEntity == Entity.Null) return;
             if (!world.EntityManager.Exists(_pendingUpgradeEntity)) return;
             if (!world.EntityManager.HasComponent<PlayerStats>(_pendingUpgradeEntity)) return;
+            if (choiceIndex < 0 || choiceIndex >= 3) return;
 
-            var stats = world.EntityManager.GetComponentData<PlayerStats>(_pendingUpgradeEntity);
-            int pidx  = world.EntityManager.GetComponentData<PlayerIndex>(_pendingUpgradeEntity).Value;
+            var em    = world.EntityManager;
+            var stats = em.GetComponentData<PlayerStats>(_pendingUpgradeEntity);
+            int pidx  = em.GetComponentData<PlayerIndex>(_pendingUpgradeEntity).Value;
 
-            switch (choiceIndex)
+            switch (_currentChoices[choiceIndex])
             {
-                case 0:
+                case UpgradeType.Spinach:
                     stats.Might += 0.1f;
                     Debug.Log($"[HUDManager] P{pidx} chose Spinach — Might = {stats.Might:F1}x");
                     break;
-                case 1:
+                case UpgradeType.Pummarola:
                     stats.HpRegen += 0.2f;
                     Debug.Log($"[HUDManager] P{pidx} chose Pummarola — HpRegen = {stats.HpRegen:F1}/s");
                     break;
-                case 2:
+                case UpgradeType.Armor:
                     stats.Armor += 1;
                     Debug.Log($"[HUDManager] P{pidx} chose Armor — Armor = {stats.Armor}");
                     break;
-                case 3:
+                case UpgradeType.EmptyTome:
                     stats.CooldownMult = Mathf.Max(0.5f, stats.CooldownMult * 0.92f);
                     Debug.Log($"[HUDManager] P{pidx} chose Empty Tome — CooldownMult = {stats.CooldownMult:F3}×");
                     break;
-                case 4:
+                case UpgradeType.Crown:
                     stats.XpMult *= 1.08f;
                     Debug.Log($"[HUDManager] P{pidx} chose Crown — XpMult = {stats.XpMult:F3}×");
                     break;
-                case 5:
+                case UpgradeType.Clover:
                     stats.Luck += 0.1f;
                     Debug.Log($"[HUDManager] P{pidx} chose Clover — Luck = {stats.Luck:F1}");
                     break;
+                case UpgradeType.WandAmount:
+                    if (em.HasComponent<MagicWandState>(_pendingUpgradeEntity))
+                    {
+                        var wand = em.GetComponentData<MagicWandState>(_pendingUpgradeEntity);
+                        wand.Amount++;
+                        em.SetComponentData(_pendingUpgradeEntity, wand);
+                        Debug.Log($"[HUDManager] P{pidx} chose Wand +1 — Amount = {wand.Amount}");
+                    }
+                    break;
+                case UpgradeType.KnifeAmount:
+                    if (em.HasComponent<KnifeState>(_pendingUpgradeEntity))
+                    {
+                        var knife = em.GetComponentData<KnifeState>(_pendingUpgradeEntity);
+                        knife.Amount++;
+                        em.SetComponentData(_pendingUpgradeEntity, knife);
+                        Debug.Log($"[HUDManager] P{pidx} chose Knife +1 — Amount = {knife.Amount}");
+                    }
+                    break;
+                case UpgradeType.FireAmount:
+                    if (em.HasComponent<FireWandState>(_pendingUpgradeEntity))
+                    {
+                        var fire = em.GetComponentData<FireWandState>(_pendingUpgradeEntity);
+                        fire.Amount++;
+                        em.SetComponentData(_pendingUpgradeEntity, fire);
+                        Debug.Log($"[HUDManager] P{pidx} chose FireWand +1 — Amount = {fire.Amount}");
+                    }
+                    break;
             }
 
-            world.EntityManager.SetComponentData(_pendingUpgradeEntity, stats);
-            world.EntityManager.RemoveComponent<UpgradeChoicePending>(_pendingUpgradeEntity);
+            em.SetComponentData(_pendingUpgradeEntity, stats);
+            em.RemoveComponent<UpgradeChoicePending>(_pendingUpgradeEntity);
             DismissUpgradePanel();
         }
 

@@ -88,7 +88,8 @@ namespace VampireSurvivors.MonoBehaviours
                         Cooldown = 0.5f,
                         Damage   = 10f,
                         Speed    = 10f,
-                        MaxRange = 15f
+                        MaxRange = 15f,
+                        Amount   = 1
                     });
                     var imeldaStats = em.GetComponentData<PlayerStats>(entity);
                     imeldaStats.XpMult = 1.1f;
@@ -122,7 +123,8 @@ namespace VampireSurvivors.MonoBehaviours
                         Cooldown = 0.35f,
                         Damage   = 10f,
                         Speed    = 15f,
-                        MaxRange = 12f
+                        MaxRange = 12f,
+                        Amount   = 1
                     });
                     Debug.Log($"[GameSceneBootstrap] P{slot} Gennaro: Knife, HP=100, Speed=7.7");
                     break;

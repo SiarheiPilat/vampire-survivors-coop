@@ -40,21 +40,26 @@ namespace VampireSurvivors.Systems
 
                 wand.ValueRW.Timer = wand.ValueRO.Cooldown * stats.ValueRO.CooldownMult;
 
-                // Random direction in [0, 2π)
-                float angle = wand.ValueRW.Rng.NextFloat(0f, 2f * math.PI);
-                var   dir   = new float3(math.cos(angle), math.sin(angle), 0f);
+                float dmg    = wand.ValueRO.Damage * stats.ValueRO.Might;
+                int   amount = math.max(1, wand.ValueRO.Amount);
 
-                var bullet = ecb.Instantiate(bulletPrefab);
-                ecb.AddComponent(bullet, new Projectile
+                // Each fireball fires in an independent random direction
+                for (int s = 0; s < amount; s++)
                 {
-                    Damage    = wand.ValueRO.Damage * stats.ValueRO.Might,
-                    Speed     = wand.ValueRO.Speed,
-                    Direction = dir,
-                    MaxRange  = wand.ValueRO.MaxRange,
-                    Traveled  = 0f
-                });
-                ecb.SetComponent(bullet, LocalTransform.FromPositionRotationScale(
-                    transform.ValueRO.Position, quaternion.identity, 0.2f));
+                    float  angle  = wand.ValueRW.Rng.NextFloat(0f, 2f * math.PI);
+                    float3 dir    = new float3(math.cos(angle), math.sin(angle), 0f);
+                    var    bullet = ecb.Instantiate(bulletPrefab);
+                    ecb.AddComponent(bullet, new Projectile
+                    {
+                        Damage    = dmg,
+                        Speed     = wand.ValueRO.Speed,
+                        Direction = dir,
+                        MaxRange  = wand.ValueRO.MaxRange,
+                        Traveled  = 0f
+                    });
+                    ecb.SetComponent(bullet, LocalTransform.FromPositionRotationScale(
+                        transform.ValueRO.Position, quaternion.identity, 0.2f));
+                }
             }
         }
     }

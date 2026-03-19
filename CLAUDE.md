@@ -83,7 +83,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] Main menu — Splash → PressToStart → Lobby (4-player device assignment, char cycling)
 - [x] XP orb + leveling system — XpGem component, XpGemSystem (magnet r=30, collect r=0.5, speed=8), LevelUpSystem (wiki formula 5+(level-1)*10, 2s iframes)
 - [x] Wave scaling — EnemySpawnerSystem: new wave every 30s, StatMultiplier +20%/wave (cap 3×), spawn count grows, interval shrinks to 1.5s floor, bat→skeleton weight shift
-- [x] Level-up UI (upgrade choice cards) — HUDManager detects UpgradeChoicePending on player, pauses Time.timeScale, shows 3-button overlay; player picks Spinach/Pummarola/Armor; EntityManager applies stat + removes component; time resumes
+- [x] Level-up UI (upgrade choice cards) — HUDManager shows 3 random cards from pool; pool = 6 passives + weapon Amount upgrades (if player has weapon and Amount < 5); Fisher-Yates shuffle; choice applies to ECS component directly; time resumes
 - [x] Pickup system (gold, health) — GoldCoin + HealthPickup dropped by enemies on death (10% health chance); GoldCoinSystem + HealthPickupSystem (Burst, walk-to-collect r=0.6u); SharedGold singleton for team pool; HUDManager gold counter top-center
 - [x] Player death + revive mechanic — Downed component; ReviveSystem (hold E/I/gamepad-South 2s within 1.5u); ReviveProgress tracks timer on downed entity; revive restores 50% MaxHp + 2s iframes; HUD revive bar bottom-center shows progress %
 - [x] HUD (per-player HP bars, XP bars, level text, timer) — HUDManager + HUDCanvas in 4_SampleScene
@@ -94,11 +94,11 @@ critical for maintaining 60fps with 500+ entities on screen.
 ### Weapons (clone priority order)
 
 - [x] Whip — WhipSystem/HitArcSystem, hardcoded to all players
-- [x] Magic Wand — MagicWandSystem fires Projectile at nearest enemy; 10 dmg, 0.5s CD, speed=10, range=15
+- [x] Magic Wand — MagicWandSystem fires Amount projectiles at nearest enemy (fan spread, 20° between shots); 10 dmg, 0.5s CD, speed=10, range=15; Amount upgradeable via level-up pool
 - [x] Garlic — GarlicSystem aura pulse; 10 dmg, r=1.5, 1.5s CD, hits all enemies simultaneously
 - [x] King Bible — KingBibleSystem; orbiting entity (KingBibleOrbit), radius=1.4u, 120°/s, 10 dmg, 0.5s hit CD; unlocked at lv5
-- [x] Knife — KnifeSystem fires in FacingDirection (last movement dir); 10 dmg, 0.35s CD, speed=15
-- [x] Fire Wand — FireWandSystem fires Projectile in random direction; 10 dmg, 0.4s CD, speed=11; per-player RNG via Unity.Mathematics.Random
+- [x] Knife — KnifeSystem fires Amount blades in FacingDirection (fan spread, 20° between blades); 10 dmg, 0.35s CD, speed=15; Amount upgradeable via level-up pool
+- [x] Fire Wand — FireWandSystem fires Amount fireballs in random directions; 10 dmg, 0.4s CD, speed=11; per-player RNG; Amount upgradeable via level-up pool
 - [x] Axe — AxeSystem; parabolic arc via Projectile.Gravity+Velocity; 20 dmg, 1.25s CD, ~60° elevation, Gravity=12 u/s²; unlocked at lv7
 - [x] Cross — CrossSystem; returning boomerang via Projectile.TurnDistance+Returning+OwnerEntity; 50 dmg, 5.0s CD, speed=15, turn=8u; unlocked lv8
 - [x] Holy Water — HolyWaterSystem throws flask (random dir, lands at 4u); HolyWaterPuddleSystem ticks all enemies in 1.5u radius every 0.5s for 5s; 20 dmg/tick; unlocked lv9
