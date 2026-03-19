@@ -38,8 +38,8 @@
 - [x] XP orb + leveling system — XpGem, XpGemSystem (magnet r=30, speed=8, collect r=0.5), LevelUpSystem (wiki formula, 2s iframes)
 - [ ] Level-up UI (weapon choice cards)
 - [ ] Pickup system (gold, health, magnets)
-- [ ] Player death + revive mechanic
-- [ ] HUD (per-player HP bars, timer, kill count)
+- [ ] Player death + revive mechanic — Downed state done; revive interaction future work
+- [x] HUD (per-player HP bars, XP bars, level text, timer) — HUDManager + HUDCanvas in 4_SampleScene
 - [x] Main menu / character select — Splash → PressToStart → Lobby (4-player device assignment, char cycling, persistence)
 - [ ] Game over / win screen
 
