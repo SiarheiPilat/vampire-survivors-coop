@@ -67,10 +67,10 @@ namespace VampireSurvivors.Systems
                 float3 primaryDir = math.normalizesafe(
                     enemyTransforms[nearestIdx].Position - transform.ValueRO.Position);
 
-                // Fan spread: 20° between shots, centered on primary direction
-                float baseAngle   = math.atan2(primaryDir.y, primaryDir.x);
-                float spreadRad   = math.radians(20f);
-                int   amount      = math.max(1, wand.ValueRO.Amount);
+                // Fan spread: 20° (base) or 10° (Holy Wand evolved), centered on primary direction
+                float baseAngle  = math.atan2(primaryDir.y, primaryDir.x);
+                float spreadRad  = wand.ValueRO.IsEvolved ? math.radians(10f) : math.radians(20f);
+                int   amount     = math.max(1, wand.ValueRO.Amount);
                 float halfSpread  = (amount - 1) * 0.5f * spreadRad;
 
                 float dmg = wand.ValueRO.Damage * stats.ValueRO.Might;

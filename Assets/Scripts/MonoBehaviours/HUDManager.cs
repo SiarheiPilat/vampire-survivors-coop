@@ -60,7 +60,9 @@ namespace VampireSurvivors.MonoBehaviours
         enum UpgradeType
         {
             Spinach, Pummarola, Armor, EmptyTome, Crown, Clover,
-            WandAmount, KnifeAmount, FireAmount
+            WandAmount, KnifeAmount, FireAmount,
+            HolyWandEvolution,   // Magic Wand + Empty Tome
+            SoulEaterEvolution,  // Garlic + Pummarola
         }
         readonly UpgradeType[] _currentChoices = new UpgradeType[3];
         readonly TMP_Text[]    _btnLabels       = new TMP_Text[3];
@@ -561,6 +563,27 @@ namespace VampireSurvivors.MonoBehaviours
                 if (canAdd) pool.Add((type, label + $"  ({curAmt}→{curAmt + 1})"));
             }
 
+            // ── Evolution checks ─────────────────────────────────────────────
+            var playerStats = em.GetComponentData<PlayerStats>(_pendingUpgradeEntity);
+
+            // Holy Wand = Magic Wand + Empty Tome (CooldownMult < 1 means tome was taken)
+            if (em.HasComponent<MagicWandState>(_pendingUpgradeEntity))
+            {
+                var ws = em.GetComponentData<MagicWandState>(_pendingUpgradeEntity);
+                if (!ws.IsEvolved && playerStats.CooldownMult < 1.0f)
+                    pool.Add((UpgradeType.HolyWandEvolution,
+                        "★ Holy Wand\nMagic Wand + Empty Tome — 7 bolts, 20 dmg, tight fan"));
+            }
+
+            // Soul Eater = Garlic + Pummarola (HpRegen > 0 means pummarola was taken)
+            if (em.HasComponent<GarlicState>(_pendingUpgradeEntity))
+            {
+                var gs = em.GetComponentData<GarlicState>(_pendingUpgradeEntity);
+                if (!gs.IsEvolved && playerStats.HpRegen > 0f)
+                    pool.Add((UpgradeType.SoulEaterEvolution,
+                        "★ Soul Eater\nGarlic + Pummarola — r=3.5u, 25 dmg, heals 2 HP/pulse"));
+            }
+
             // Fisher-Yates shuffle using UnityEngine.Random (unscaled, so fine while paused)
             for (int i = pool.Count - 1; i > 0; i--)
             {
@@ -639,6 +662,33 @@ namespace VampireSurvivors.MonoBehaviours
                         fire.Amount++;
                         em.SetComponentData(_pendingUpgradeEntity, fire);
                         Debug.Log($"[HUDManager] P{pidx} chose FireWand +1 — Amount = {fire.Amount}");
+                    }
+                    break;
+
+                case UpgradeType.HolyWandEvolution:
+                    if (em.HasComponent<MagicWandState>(_pendingUpgradeEntity))
+                    {
+                        var wand = em.GetComponentData<MagicWandState>(_pendingUpgradeEntity);
+                        wand.IsEvolved = true;
+                        wand.Amount    = 7;
+                        wand.Damage    = 20f;
+                        wand.Cooldown  = 0.25f;
+                        wand.Speed     = 14f;
+                        em.SetComponentData(_pendingUpgradeEntity, wand);
+                        Debug.Log($"[HUDManager] P{pidx} evolved Magic Wand → Holy Wand");
+                    }
+                    break;
+
+                case UpgradeType.SoulEaterEvolution:
+                    if (em.HasComponent<GarlicState>(_pendingUpgradeEntity))
+                    {
+                        var garlic = em.GetComponentData<GarlicState>(_pendingUpgradeEntity);
+                        garlic.IsEvolved    = true;
+                        garlic.Range        = 3.5f;
+                        garlic.Damage       = 25f;
+                        garlic.HealPerPulse = 2f;
+                        em.SetComponentData(_pendingUpgradeEntity, garlic);
+                        Debug.Log($"[HUDManager] P{pidx} evolved Garlic → Soul Eater");
                     }
                     break;
             }

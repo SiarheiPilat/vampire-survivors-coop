@@ -68,12 +68,20 @@ namespace VampireSurvivors.Systems
             public float               DeltaTime;
             public EntityCommandBuffer Ecb;
 
-            void Execute(ref GarlicState garlic, in LocalTransform transform, in PlayerStats stats)
+            void Execute(Entity entity, ref GarlicState garlic, in LocalTransform transform, in PlayerStats stats)
             {
                 garlic.Timer -= DeltaTime;
                 if (garlic.Timer > 0f) return;
 
                 garlic.Timer = garlic.Cooldown * stats.CooldownMult;
+
+                // Soul Eater: heal owning player once per pulse
+                if (garlic.IsEvolved && garlic.HealPerPulse > 0f && HealthLookup.HasComponent(entity))
+                {
+                    var playerHp = HealthLookup[entity];
+                    playerHp.Current = math.min(playerHp.Max, playerHp.Current + (int)garlic.HealPerPulse);
+                    HealthLookup[entity] = playerHp;
+                }
 
                 int damage = (int)(garlic.Damage * stats.Might);
 

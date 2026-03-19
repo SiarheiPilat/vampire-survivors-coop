@@ -153,9 +153,11 @@ namespace VampireSurvivors.Components
     public struct GarlicState : IComponentData
     {
         public float Timer;
-        public float Cooldown; // seconds between pulses — wiki base: 1.5s
-        public float Damage;   // wiki base: 10
-        public float Range;    // radius in units — wiki base: ~1.5
+        public float Cooldown;     // seconds between pulses — wiki base: 1.5s
+        public float Damage;       // wiki base: 10
+        public float Range;        // radius in units — wiki base: ~1.5
+        public bool  IsEvolved;    // true = Soul Eater: Range 3.5u, 25 dmg, heals owner
+        public float HealPerPulse; // HP healed to the owning player per pulse (Soul Eater only)
     }
 
     /// <summary>
@@ -166,11 +168,12 @@ namespace VampireSurvivors.Components
     public struct MagicWandState : IComponentData
     {
         public float Timer;
-        public float Cooldown;  // seconds between shots — wiki base: 0.5s
-        public float Damage;    // wiki base: 10
-        public float Speed;     // projectile speed in units/s — wiki base: ~10
-        public float MaxRange;  // units before projectile despawns
-        public int   Amount;    // projectiles per shot; 1 = default; upgrade adds +1 (fan spread, 20° between shots)
+        public float Cooldown;   // seconds between shots — wiki base: 0.5s
+        public float Damage;     // wiki base: 10
+        public float Speed;      // projectile speed in units/s — wiki base: ~10
+        public float MaxRange;   // units before projectile despawns
+        public int   Amount;     // projectiles per shot; 1 = default; upgrade adds +1 (fan spread, 20° between shots)
+        public bool  IsEvolved;  // true = Holy Wand: 7 shots, 20 dmg, 0.25 s CD, 10° spread
     }
 
     /// <summary>
