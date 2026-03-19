@@ -48,7 +48,7 @@ namespace VampireSurvivors.Systems
             [ReadOnly] public NativeArray<LocalTransform> PlayerPositions;
             public float DeltaTime;
 
-            void Execute(in EnemyStats stats, ref LocalTransform transform)
+            void Execute(in EnemyStats stats, ref LocalTransform transform, ref Knockback knockback)
             {
                 float3 nearest   = PlayerPositions[0].Position;
                 float  minDistSq = math.distancesq(transform.Position, nearest);
@@ -66,6 +66,17 @@ namespace VampireSurvivors.Systems
                 float3 dir      = math.normalizesafe(nearest - transform.Position);
                 float3 movement = dir * stats.MoveSpeed * DeltaTime;
                 transform.Position += new float3(movement.x, movement.y, 0f);
+
+                // Apply knockback impulse and decay it (~0.25 s to dissipate)
+                if (math.lengthsq(knockback.Velocity) > 0.01f)
+                {
+                    transform.Position += new float3(knockback.Velocity.x, knockback.Velocity.y, 0f) * DeltaTime;
+                    knockback.Velocity *= math.max(0f, 1f - 12f * DeltaTime);
+                }
+                else
+                {
+                    knockback.Velocity = float2.zero;
+                }
             }
         }
     }

@@ -98,6 +98,12 @@ namespace VampireSurvivors.Systems
                         WorldPosition = EnemyTransforms[idx].Position,
                         Damage        = damage
                     });
+
+                    // Knockback: lightning — random outward burst (no directional source)
+                    Ecb.SetComponent(EnemyEntities[idx], new Knockback
+                    {
+                        Velocity = ring.Rng.NextFloat2Direction() * 6f
+                    });
                 }
             }
         }

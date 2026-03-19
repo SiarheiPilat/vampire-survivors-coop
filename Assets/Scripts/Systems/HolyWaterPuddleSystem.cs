@@ -100,6 +100,11 @@ namespace VampireSurvivors.Systems
                         WorldPosition = EnemyTransforms[i].Position,
                         Damage        = damage
                     });
+
+                    // Knockback: push enemy away from puddle center
+                    float2 pushDir = math.normalizesafe(
+                        EnemyTransforms[i].Position.xy - transform.Position.xy);
+                    Ecb.SetComponent(EnemyEntities[i], new Knockback { Velocity = pushDir * 3f });
                 }
             }
         }

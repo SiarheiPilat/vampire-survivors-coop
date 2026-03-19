@@ -40,6 +40,7 @@ namespace VampireSurvivors.Authoring
                     Current = authoring.hp,
                     Max     = authoring.hp
                 });
+                AddComponent(entity, new Knockback()); // velocity starts at zero; set by weapon systems on hit
                 if (authoring.isSlime)      AddComponent(entity, new SlimeTag());
                 if (authoring.isSmallSlime) AddComponent(entity, new SmallSlimeTag());
                 if (authoring.isBoss)       AddComponent(entity, new BossTag());

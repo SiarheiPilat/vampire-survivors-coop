@@ -80,6 +80,11 @@ namespace VampireSurvivors.Systems
                         Damage        = (int)proj.Damage
                     });
 
+                    // Knockback: push enemy away from projectile impact direction
+                    float2 pushDir = math.normalizesafe(
+                        EnemyTransforms[i].Position.xy - transform.Position.xy);
+                    Ecb.SetComponent(EnemyEntities[i], new Knockback { Velocity = pushDir * 8f });
+
                     Ecb.DestroyEntity(entity); // bolt hits once then disappears
                     return;
                 }

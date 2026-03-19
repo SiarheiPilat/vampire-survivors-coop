@@ -88,6 +88,11 @@ namespace VampireSurvivors.Systems
                         WorldPosition = EnemyTransforms[i].Position,
                         Damage        = (int)arc.Damage
                     });
+
+                    // Knockback: push enemy away from arc origin (whip swing)
+                    float2 pushDir = math.normalizesafe(
+                        EnemyTransforms[i].Position.xy - arc.Origin.xy);
+                    Ecb.SetComponent(EnemyEntities[i], new Knockback { Velocity = pushDir * 6f });
                 }
 
                 Ecb.DestroyEntity(entity);

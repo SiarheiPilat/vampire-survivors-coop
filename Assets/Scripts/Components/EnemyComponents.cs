@@ -146,4 +146,16 @@ namespace VampireSurvivors.Components
         public Unity.Mathematics.float3 WorldPosition;
         public int                      Damage;
     }
+
+    /// <summary>
+    /// Knockback impulse applied to enemy entities on hit.
+    /// Velocity is added to world position each frame then decayed exponentially
+    /// by EnemyMovementSystem (damping ~12/s → fully dissipated in ~0.25 s).
+    /// Baked with Velocity = 0 on all enemy prefabs.
+    /// Weapon systems write new velocity via ECB on each hit.
+    /// </summary>
+    public struct Knockback : IComponentData
+    {
+        public Unity.Mathematics.float2 Velocity; // world units per second
+    }
 }
