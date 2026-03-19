@@ -56,6 +56,29 @@ namespace VampireSurvivors.Components
     public struct Downed : IComponentData { }
 
     /// <summary>
+    /// Last non-zero movement direction, normalized. Defaults to right (1,0).
+    /// Updated by PlayerMovementSystem. Used by Knife and other directional weapons.
+    /// </summary>
+    public struct FacingDirection : IComponentData
+    {
+        public float2 Value;
+    }
+
+    /// <summary>
+    /// Per-player Knife weapon state.
+    /// Fires a fast projectile in the player's facing direction.
+    /// Wiki base stats: Damage 10, Speed 15 u/s, Cooldown 0.35 s.
+    /// </summary>
+    public struct KnifeState : IComponentData
+    {
+        public float Timer;
+        public float Cooldown;
+        public float Damage;
+        public float Speed;
+        public float MaxRange;
+    }
+
+    /// <summary>
     /// Per-player Garlic aura state.
     /// Pulses every Cooldown seconds, damaging all enemies within Range.
     /// Wiki base stats: Damage 10, Area 1.5 u, Cooldown 1.5 s.

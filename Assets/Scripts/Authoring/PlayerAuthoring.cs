@@ -46,6 +46,15 @@ namespace VampireSurvivors.Authoring
                     Range         = 1.5f,
                     ArcDegrees    = 120f
                 });
+                AddComponent(entity, new FacingDirection { Value = new float2(1f, 0f) });
+                AddComponent(entity, new KnifeState
+                {
+                    Timer    = 0f,
+                    Cooldown = 0.35f,
+                    Damage   = 10f,
+                    Speed    = 15f,
+                    MaxRange = 12f
+                });
                 AddComponent(entity, new GarlicState
                 {
                     Timer    = 0f,

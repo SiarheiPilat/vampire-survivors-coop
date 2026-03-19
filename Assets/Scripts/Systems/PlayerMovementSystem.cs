@@ -24,10 +24,15 @@ namespace VampireSurvivors.Systems
         {
             public float DeltaTime;
 
-            void Execute(in MoveInput input, in MoveSpeed speed, ref LocalTransform transform)
+            void Execute(in MoveInput input, in MoveSpeed speed,
+                         ref LocalTransform transform, ref FacingDirection facing)
             {
                 // Move in XY plane only; Z stays 0
                 transform.Position += new float3(input.Value * speed.Value * DeltaTime, 0f);
+
+                // Update facing when there is input; keep last known direction otherwise
+                if (math.lengthsq(input.Value) > 0.001f)
+                    facing.Value = math.normalize(input.Value);
             }
         }
     }

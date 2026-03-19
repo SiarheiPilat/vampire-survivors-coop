@@ -52,7 +52,7 @@
 - [x] Garlic — GarlicSystem, radial pulse r=1.5, 10 dmg, 1.5s CD, hits all enemies in range simultaneously
 - [ ] King Bible
 - [ ] Fire Wand
-- [ ] Knife
+- [x] Knife — KnifeSystem fires in FacingDirection (last movement dir), 10 dmg, 0.35s CD, speed=15, range=12
 - [ ] Axe
 - [ ] Cross
 - [ ] Holy Water

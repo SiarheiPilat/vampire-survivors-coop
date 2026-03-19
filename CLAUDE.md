@@ -95,6 +95,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] Magic Wand — MagicWandSystem fires Projectile at nearest enemy; 10 dmg, 0.5s CD, speed=10, range=15
 - [x] Garlic — GarlicSystem aura pulse; 10 dmg, r=1.5, 1.5s CD, hits all enemies simultaneously
 - [ ] King Bible
+- [x] Knife — KnifeSystem fires in FacingDirection (last movement dir); 10 dmg, 0.35s CD, speed=15
 - [ ] Fire Wand
 - [ ] Knife
 - [ ] Axe
