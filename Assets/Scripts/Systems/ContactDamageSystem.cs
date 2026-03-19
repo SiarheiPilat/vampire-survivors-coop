@@ -58,6 +58,7 @@ namespace VampireSurvivors.Systems
         partial struct ContactDamageJob : IJobEntity
         {
             const float ContactRadius = 0.5f;
+            const float InvincibilityDuration = 1.0f;
 
             [ReadOnly] public NativeArray<Entity>         PlayerEntities;
             [ReadOnly] public NativeArray<LocalTransform> PlayerTransforms;
@@ -77,7 +78,7 @@ namespace VampireSurvivors.Systems
 
                     var hp = HealthLookup[PlayerEntities[i]];
                     hp.Current      -= stats.ContactDamage;
-                    inv.Timer        = 1.0f;
+                    inv.Timer        = InvincibilityDuration;
 
                     HealthLookup[PlayerEntities[i]]     = hp;
                     InvincibleLookup[PlayerEntities[i]] = inv;
