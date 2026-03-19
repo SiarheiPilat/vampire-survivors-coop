@@ -123,6 +123,22 @@ namespace VampireSurvivors.Components
     }
 
     /// <summary>
+    /// Per-player Axe weapon state.
+    /// Fires a heavy axe in a parabolic arc (upward then falling).
+    /// Uses Projectile.Gravity/Velocity for arcing movement.
+    /// Wiki base stats: Damage 20, Cooldown 1.25 s.
+    /// </summary>
+    public struct AxeState : IComponentData
+    {
+        public float Timer;
+        public float Cooldown;  // wiki: 1.25 s
+        public float Damage;    // wiki: 20
+        public float Speed;     // launch speed (u/s)
+        public float Gravity;   // downward accel (u/s²)
+        public float MaxRange;  // path length before despawn
+    }
+
+    /// <summary>
     /// Per-player Fire Wand weapon state.
     /// Fires a fireball in a random direction each Cooldown seconds.
     /// Unlike Magic Wand (targets nearest enemy), Fire Wand sprays randomly —
