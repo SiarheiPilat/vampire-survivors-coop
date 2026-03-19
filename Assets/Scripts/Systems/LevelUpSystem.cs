@@ -10,8 +10,8 @@ namespace VampireSurvivors.Systems
     /// On level-up:
     ///   - Increments Level, resets Xp, updates XpToNextLevel (wiki formula)
     ///   - Grants 2 s invincibility
-    ///   - Levels 2-4: unlocks weapons (MagicWand, Garlic, Knife)
-    ///   - Levels 5+:  alternates Spinach (+0.1 Might) and Pummarola (+0.2 HpRegen)
+    ///   - Lv2=MagicWand, Lv3=Garlic, Lv4=Knife, Lv5=KingBible, Lv6=FireWand
+    ///   - Lv7+: odd→Spinach (+0.1 Might), even→Pummarola (+0.2 HpRegen)
     /// Weapon systems activate once their state component is present (structural change via ECB).
     /// Not Burst-compiled — calls Debug.Log and uses ECB for structural changes.
     /// </summary>
@@ -77,20 +77,32 @@ namespace VampireSurvivors.Systems
                                     Spawned      = false
                                 });
                             break;
+                        case 6:
+                            if (!SystemAPI.HasComponent<FireWandState>(entity))
+                                ecb.AddComponent(entity, new FireWandState
+                                {
+                                    Timer    = 0f,
+                                    Cooldown = 0.4f,
+                                    Damage   = 10f,
+                                    Speed    = 11f,
+                                    MaxRange = 10f,
+                                    Rng      = new Unity.Mathematics.Random((uint)(entity.Index * 2654435761u + 1u))
+                                });
+                            break;
                     }
 
-                    // Passive items at level 6+ (alternating Spinach / Pummarola)
-                    // Level 6, 8, 10, 12 … → Spinach (+0.1 Might)
-                    // Level 7, 9, 11, 13 … → Pummarola (+0.2 HP/s)
-                    if (newLevel >= 6)
+                    // Passive items at level 7+ (alternating Spinach / Pummarola)
+                    // Level 7, 9, 11 … → Spinach (+0.1 Might)
+                    // Level 8, 10, 12 … → Pummarola (+0.2 HP/s)
+                    if (newLevel >= 7)
                     {
                         int pidx = SystemAPI.GetComponent<PlayerIndex>(entity).Value;
-                        if (newLevel % 2 == 0) // even: Spinach (lv6, 8, 10…)
+                        if (newLevel % 2 == 1) // odd: Spinach (lv7, 9, 11…)
                         {
                             stats.ValueRW.Might += 0.1f;
                             Debug.Log($"[LevelUpSystem] P{pidx} got Spinach! Might = {stats.ValueRO.Might:F1}x");
                         }
-                        else // odd: Pummarola (lv7, 9, 11…)
+                        else // even: Pummarola (lv8, 10, 12…)
                         {
                             stats.ValueRW.HpRegen += 0.2f;
                             Debug.Log($"[LevelUpSystem] P{pidx} got Pummarola! HpRegen = {stats.ValueRO.HpRegen:F1}/s");

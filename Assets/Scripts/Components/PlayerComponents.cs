@@ -1,5 +1,6 @@
 using Unity.Entities;
 using Unity.Mathematics;
+using Random = Unity.Mathematics.Random;
 
 namespace VampireSurvivors.Components
 {
@@ -119,6 +120,23 @@ namespace VampireSurvivors.Components
         public float Damage;    // wiki base: 10
         public float Speed;     // projectile speed in units/s — wiki base: ~10
         public float MaxRange;  // units before projectile despawns
+    }
+
+    /// <summary>
+    /// Per-player Fire Wand weapon state.
+    /// Fires a fireball in a random direction each Cooldown seconds.
+    /// Unlike Magic Wand (targets nearest enemy), Fire Wand sprays randomly —
+    /// good at clearing crowds but unreliable at range.
+    /// Wiki base stats: Damage 10, Speed 11 u/s, Cooldown 0.4 s, MaxRange 10 u.
+    /// </summary>
+    public struct FireWandState : IComponentData
+    {
+        public float  Timer;
+        public float  Cooldown;
+        public float  Damage;
+        public float  Speed;
+        public float  MaxRange;
+        public Random Rng; // per-player RNG so all players fire independently
     }
 
     /// <summary>
