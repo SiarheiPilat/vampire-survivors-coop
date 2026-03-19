@@ -35,6 +35,7 @@ namespace VampireSurvivors.Authoring
                     Xp            = 0f,
                     XpToNextLevel = 100f
                 });
+                AddComponent(entity, new AssignedDeviceId { Value = 0 }); // 0 = unassigned; set by GameSceneBootstrap when coming from lobby
             }
         }
     }
