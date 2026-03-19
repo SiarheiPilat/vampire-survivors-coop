@@ -87,6 +87,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [ ] Player death + revive mechanic — Downed component + state added; revive interaction is future work
 - [x] HUD (per-player HP bars, XP bars, level text, timer) — HUDManager + HUDCanvas in 4_SampleScene
 - [x] Magic Wand weapon — MagicWandSystem + Projectile component + ProjectileMovementSystem + ProjectileHitSystem
+- [x] Fire Wand weapon — FireWandSystem, random-direction Projectile, per-player RNG
 - [x] Game over screen — GameOverPanel overlay, "GAME OVER" + survived time; HUDManager detects all-Downed
 
 ### Weapons (clone priority order)
@@ -96,7 +97,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] Garlic — GarlicSystem aura pulse; 10 dmg, r=1.5, 1.5s CD, hits all enemies simultaneously
 - [x] King Bible — KingBibleSystem; orbiting entity (KingBibleOrbit), radius=1.4u, 120°/s, 10 dmg, 0.5s hit CD; unlocked at lv5
 - [x] Knife — KnifeSystem fires in FacingDirection (last movement dir); 10 dmg, 0.35s CD, speed=15
-- [ ] Fire Wand
+- [x] Fire Wand — FireWandSystem fires Projectile in random direction; 10 dmg, 0.4s CD, speed=11; per-player RNG via Unity.Mathematics.Random
 - [ ] Axe
 - [ ] Cross
 - [ ] Holy Water
