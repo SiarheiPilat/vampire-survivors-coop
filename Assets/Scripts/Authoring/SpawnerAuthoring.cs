@@ -17,6 +17,7 @@ namespace VampireSurvivors.Authoring
         public GameObject skeletonPrefab;
         public GameObject bigSlimePrefab;
         public GameObject smallSlimePrefab;
+        public GameObject bossPrefab;
 
         class Baker : Baker<SpawnerAuthoring>
         {
@@ -30,7 +31,9 @@ namespace VampireSurvivors.Authoring
                     SkeletonPrefab   = GetEntity(authoring.skeletonPrefab, TransformUsageFlags.Dynamic),
                     BigSlimePrefab   = authoring.bigSlimePrefab   != null ? GetEntity(authoring.bigSlimePrefab,   TransformUsageFlags.Dynamic) : Entity.Null,
                     SmallSlimePrefab = authoring.smallSlimePrefab != null ? GetEntity(authoring.smallSlimePrefab, TransformUsageFlags.Dynamic) : Entity.Null,
+                    BossPrefab       = authoring.bossPrefab       != null ? GetEntity(authoring.bossPrefab,       TransformUsageFlags.Dynamic) : Entity.Null,
                     Timer          = 3f,
+                    BossTimer      = 45f,
                     Rng            = Unity.Mathematics.Random.CreateFromIndex(42),
                     ElapsedTime    = 0f,
                     WaveNumber     = 1,

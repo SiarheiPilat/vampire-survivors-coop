@@ -6,6 +6,13 @@ namespace VampireSurvivors.Components
     /// <summary>Zero-size marker — identifies all enemy entities.</summary>
     public struct EnemyTag : IComponentData { }
 
+    /// <summary>
+    /// Marks an elite/boss enemy. Spawned on a countdown by EnemySpawnerSystem
+    /// at boss-timer intervals (starting 45 s, decreasing with wave number).
+    /// No split or special death logic — just much higher HP, damage, and XP.
+    /// </summary>
+    public struct BossTag : IComponentData { }
+
     /// <summary>Enemy movement and combat stats.</summary>
     public struct EnemyStats : IComponentData
     {
@@ -89,7 +96,9 @@ namespace VampireSurvivors.Components
         public Entity SkeletonPrefab;
         public Entity BigSlimePrefab;
         public Entity SmallSlimePrefab;
+        public Entity BossPrefab;
         public float  Timer;
+        public float  BossTimer;   // counts down; spawn boss when ≤ 0
         public Unity.Mathematics.Random Rng;
 
         /// <summary>Total elapsed play time in seconds. Drives wave number.</summary>

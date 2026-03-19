@@ -20,6 +20,9 @@ namespace VampireSurvivors.Authoring
         public bool isSlime;       // big slime — splits on death
         public bool isSmallSlime;  // small slime — no split
 
+        [Header("Boss")]
+        public bool isBoss;        // elite/boss — BossTag marker
+
         class Baker : Baker<EnemyAuthoring>
         {
             public override void Bake(EnemyAuthoring authoring)
@@ -39,6 +42,7 @@ namespace VampireSurvivors.Authoring
                 });
                 if (authoring.isSlime)      AddComponent(entity, new SlimeTag());
                 if (authoring.isSmallSlime) AddComponent(entity, new SmallSlimeTag());
+                if (authoring.isBoss)       AddComponent(entity, new BossTag());
             }
         }
     }

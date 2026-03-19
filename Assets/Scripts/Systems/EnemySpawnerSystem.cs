@@ -45,6 +45,53 @@ namespace VampireSurvivors.Systems
                 Debug.Log($"[EnemySpawnerSystem] Wave {newWave}! StatMult={spawner.StatMultiplier:F1}x");
             }
 
+            // ── Boss timer ─────────────────────────────────────────────────────
+            spawner.BossTimer -= dt;
+            if (spawner.BossTimer <= 0f && spawner.BossPrefab != Entity.Null)
+            {
+                // Spawn boss near a living player
+                var bossPlayerQ = EntityManager.CreateEntityQuery(
+                    ComponentType.ReadOnly<PlayerTag>(),
+                    ComponentType.ReadOnly<LocalTransform>(),
+                    ComponentType.Exclude<Downed>());
+                if (!bossPlayerQ.IsEmpty)
+                {
+                    var bpt = bossPlayerQ.ToComponentDataArray<LocalTransform>(Allocator.Temp);
+                    float3 bc = float3.zero;
+                    for (int i = 0; i < bpt.Length; i++) bc += bpt[i].Position;
+                    bc /= bpt.Length;
+                    bpt.Dispose();
+
+                    float bossAngle = spawner.Rng.NextFloat(0f, math.PI * 2f);
+                    float3 bossPos  = new float3(bc.x + math.cos(bossAngle) * 12f,
+                                                 bc.y + math.sin(bossAngle) * 12f, 0f);
+                    var boss = EntityManager.Instantiate(spawner.BossPrefab);
+                    EntityManager.SetComponentData(boss, LocalTransform.FromPositionRotationScale(
+                        bossPos, quaternion.identity, 1f));
+
+                    // Scale boss HP and damage by wave multiplier
+                    var baseHp    = EntityManager.GetComponentData<Health>(boss);
+                    var baseStats = EntityManager.GetComponentData<EnemyStats>(boss);
+                    EntityManager.SetComponentData(boss, new Health
+                    {
+                        Current = (int)(baseHp.Max * spawner.StatMultiplier),
+                        Max     = (int)(baseHp.Max * spawner.StatMultiplier)
+                    });
+                    EntityManager.SetComponentData(boss, new EnemyStats
+                    {
+                        MoveSpeed     = baseStats.MoveSpeed,
+                        ContactDamage = (int)(baseStats.ContactDamage * spawner.StatMultiplier),
+                        XpValue       = (int)(baseStats.XpValue * spawner.StatMultiplier)
+                    });
+
+                    Debug.Log($"[EnemySpawnerSystem] BOSS spawned at wave {spawner.WaveNumber}!");
+                }
+                bossPlayerQ.Dispose();
+
+                // Reset interval: 45s base, -2s per wave, floor 25s
+                spawner.BossTimer = math.max(45f - (spawner.WaveNumber - 1) * 2f, 25f);
+            }
+
             // ── Spawn timer ────────────────────────────────────────────────────
             float spawnInterval = math.max(3f - (spawner.WaveNumber - 1) * 0.15f, MinInterval);
             spawner.Timer -= dt;

@@ -1623,6 +1623,7 @@ MonoBehaviour:
   skeletonPrefab: {fileID: 8448242909902688075, guid: 47821f6b0a2a6f14f8fcb7d38f31619c, type: 3}
   bigSlimePrefab: {fileID: 1509845159821908351, guid: 27eb97116a04a2741ba27632b1bedd7c, type: 3}
   smallSlimePrefab: {fileID: 1509845159821908351, guid: 40dbaf710f53e1342996ea104342c4d9, type: 3}
+  bossPrefab: {fileID: 7200000000000001, guid: b055e0e0b055000000000000b055b055, type: 3}
 --- !u!4 &774028992
 Transform:
   m_ObjectHideFlags: 0
