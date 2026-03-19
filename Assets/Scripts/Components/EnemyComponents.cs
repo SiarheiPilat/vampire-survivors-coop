@@ -135,4 +135,15 @@ namespace VampireSurvivors.Components
     {
         public float Value;
     }
+
+    /// <summary>
+    /// Transient event entity created by weapon systems when they deal damage to an enemy.
+    /// DamageNumberSystem reads these, calls DamageNumberRenderer.Spawn(), then destroys them.
+    /// One entity per hit — no pooling at the ECS level (renderer handles the pool).
+    /// </summary>
+    public struct DamageNumberEvent : IComponentData
+    {
+        public Unity.Mathematics.float3 WorldPosition;
+        public int                      Damage;
+    }
 }

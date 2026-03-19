@@ -38,20 +38,27 @@ namespace VampireSurvivors.Systems
             float dt = SystemAPI.Time.DeltaTime;
 
             var enemyQuery = SystemAPI.QueryBuilder()
-                .WithAll<EnemyTag, Health>().Build();
+                .WithAll<EnemyTag, LocalTransform, Health>().Build();
 
             if (enemyQuery.IsEmpty) return;
 
-            var enemyEntities = enemyQuery.ToEntityArray(Allocator.TempJob);
+            var enemyEntities   = enemyQuery.ToEntityArray(Allocator.TempJob);
+            var enemyTransforms = enemyQuery.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
+
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            var ecb          = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
             new StrikeJob
             {
-                EnemyEntities = enemyEntities,
-                HealthLookup  = _healthLookup,
-                DeltaTime     = dt
+                EnemyEntities   = enemyEntities,
+                EnemyTransforms = enemyTransforms,
+                HealthLookup    = _healthLookup,
+                DeltaTime       = dt,
+                Ecb             = ecb
             }.Run();
 
             enemyEntities.Dispose();
+            enemyTransforms.Dispose();
         }
 
         [BurstCompile]
@@ -59,9 +66,11 @@ namespace VampireSurvivors.Systems
         [WithNone(typeof(Downed))]
         partial struct StrikeJob : IJobEntity
         {
-            [ReadOnly] public NativeArray<Entity> EnemyEntities;
+            [ReadOnly] public NativeArray<Entity>         EnemyEntities;
+            [ReadOnly] public NativeArray<LocalTransform> EnemyTransforms;
             [NativeDisableParallelForRestriction] public ComponentLookup<Health> HealthLookup;
-            public float DeltaTime;
+            public float               DeltaTime;
+            public EntityCommandBuffer Ecb;
 
             void Execute(ref LightningRingState ring, in PlayerStats stats)
             {
@@ -82,6 +91,13 @@ namespace VampireSurvivors.Systems
                     var hp  = HealthLookup[EnemyEntities[idx]];
                     hp.Current -= damage;
                     HealthLookup[EnemyEntities[idx]] = hp;
+
+                    var dmgEvt = Ecb.CreateEntity();
+                    Ecb.AddComponent(dmgEvt, new DamageNumberEvent
+                    {
+                        WorldPosition = EnemyTransforms[idx].Position,
+                        Damage        = damage
+                    });
                 }
             }
         }

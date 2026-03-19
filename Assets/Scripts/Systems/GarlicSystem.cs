@@ -39,12 +39,16 @@ namespace VampireSurvivors.Systems
             var enemyEntities   = enemyQuery.ToEntityArray(Allocator.TempJob);
             var enemyTransforms = enemyQuery.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
 
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            var ecb          = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+
             new GarlicPulseJob
             {
                 EnemyEntities   = enemyEntities,
                 EnemyTransforms = enemyTransforms,
                 HealthLookup    = _healthLookup,
-                DeltaTime       = dt
+                DeltaTime       = dt,
+                Ecb             = ecb
             }.Run();
 
             enemyEntities.Dispose();
@@ -61,7 +65,8 @@ namespace VampireSurvivors.Systems
 
             [NativeDisableParallelForRestriction] public ComponentLookup<Health> HealthLookup;
 
-            public float DeltaTime;
+            public float               DeltaTime;
+            public EntityCommandBuffer Ecb;
 
             void Execute(ref GarlicState garlic, in LocalTransform transform, in PlayerStats stats)
             {
@@ -80,6 +85,13 @@ namespace VampireSurvivors.Systems
                     var hp = HealthLookup[EnemyEntities[i]];
                     hp.Current -= damage;
                     HealthLookup[EnemyEntities[i]] = hp;
+
+                    var dmgEvt = Ecb.CreateEntity();
+                    Ecb.AddComponent(dmgEvt, new DamageNumberEvent
+                    {
+                        WorldPosition = EnemyTransforms[i].Position,
+                        Damage        = damage
+                    });
                 }
             }
         }

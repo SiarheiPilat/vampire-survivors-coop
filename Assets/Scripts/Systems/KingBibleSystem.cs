@@ -41,12 +41,13 @@ namespace VampireSurvivors.Systems
 
             float dt = SystemAPI.Time.DeltaTime;
 
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            var ecb          = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+
             // ── Phase 1: Spawn bibles for players whose bibles haven't been created yet ──
             if (SystemAPI.HasSingleton<BulletPrefabData>())
             {
-                var prefab       = SystemAPI.GetSingleton<BulletPrefabData>().BulletPrefab;
-                var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
-                var ecb          = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+                var prefab = SystemAPI.GetSingleton<BulletPrefabData>().BulletPrefab;
 
                 foreach (var (bibleState, entity) in
                     SystemAPI.Query<RefRW<KingBibleState>>()
@@ -95,7 +96,8 @@ namespace VampireSurvivors.Systems
                 HealthLookup    = _healthLookup,
                 EnemyEntities   = enemyEntities,
                 EnemyTransforms = enemyTransforms,
-                DeltaTime       = dt
+                DeltaTime       = dt,
+                Ecb             = ecb
             }.Run();
 
             enemyEntities.Dispose();
@@ -111,7 +113,8 @@ namespace VampireSurvivors.Systems
             [ReadOnly] public NativeArray<Entity>         EnemyEntities;
             [ReadOnly] public NativeArray<LocalTransform> EnemyTransforms;
 
-            public float DeltaTime;
+            public float               DeltaTime;
+            public EntityCommandBuffer Ecb;
 
             void Execute(ref KingBibleOrbit orbit, ref LocalTransform transform)
             {
@@ -150,6 +153,13 @@ namespace VampireSurvivors.Systems
                         var hp = HealthLookup[EnemyEntities[i]];
                         hp.Current -= damage;
                         HealthLookup[EnemyEntities[i]] = hp;
+
+                        var dmgEvt = Ecb.CreateEntity();
+                        Ecb.AddComponent(dmgEvt, new DamageNumberEvent
+                        {
+                            WorldPosition = EnemyTransforms[i].Position,
+                            Damage        = damage
+                        });
                     }
 
                     orbit.HitTimer = orbit.HitCooldown;

@@ -73,6 +73,13 @@ namespace VampireSurvivors.Systems
                     hp.Current -= (int)proj.Damage;
                     HealthLookup[EnemyEntities[i]] = hp;
 
+                    var dmgEvt = Ecb.CreateEntity();
+                    Ecb.AddComponent(dmgEvt, new DamageNumberEvent
+                    {
+                        WorldPosition = EnemyTransforms[i].Position,
+                        Damage        = (int)proj.Damage
+                    });
+
                     Ecb.DestroyEntity(entity); // bolt hits once then disappears
                     return;
                 }

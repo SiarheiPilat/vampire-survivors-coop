@@ -93,6 +93,13 @@ namespace VampireSurvivors.Systems
                     var hp = HealthLookup[EnemyEntities[i]];
                     hp.Current -= damage;
                     HealthLookup[EnemyEntities[i]] = hp;
+
+                    var dmgEvt = Ecb.CreateEntity();
+                    Ecb.AddComponent(dmgEvt, new DamageNumberEvent
+                    {
+                        WorldPosition = EnemyTransforms[i].Position,
+                        Damage        = damage
+                    });
                 }
             }
         }
