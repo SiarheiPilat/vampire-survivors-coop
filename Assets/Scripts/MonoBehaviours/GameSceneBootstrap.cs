@@ -41,7 +41,10 @@ namespace VampireSurvivors.MonoBehaviours
                 int slot        = playerIndex.Value;
 
                 if (slot >= session.Slots.Length || !session.Slots[slot].Filled)
+                {
+                    em.DestroyEntity(entity);
                     continue;
+                }
 
                 var deviceId = session.Slots[slot].DeviceId;
 
