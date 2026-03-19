@@ -72,24 +72,25 @@ critical for maintaining 60fps with 500+ entities on screen.
 ### Core Systems
 
 - [x] Project initialized — DOTS/ECS, URP 2D, Input System
-- [x] ECSBootstrap proof-of-concept (spawns 5 test entities)
-- [ ] Player entity (movement, stats, authoring)
-- [ ] Input routing (map each gamepad/keyboard scheme to a player entity)
-- [ ] Camera system (centroid follow + dynamic zoom)
-- [ ] Enemy entity + movement AI (target nearest player)
-- [ ] Enemy spawner (wave definitions, spawn rates)
-- [ ] Weapon system (auto-fire, projectile logic)
+- [x] ECSBootstrap proof-of-concept (disabled — replaced by PlayerAuthoring)
+- [x] Player entity — PlayerAuthoring bakes PlayerTag, MoveInput, MoveSpeed, PlayerStats, Health, Invincible, WeaponState
+- [x] Input routing — WASD/Gamepad dev fallback; AssignedDeviceId stamped by GameSceneBootstrap from lobby
+- [x] Camera system — CameraFollow (centroid lerp + dynamic zoom)
+- [x] Enemy entity + movement AI — EnemyMovementSystem, Burst, chases nearest player
+- [x] Enemy spawner — EnemySpawnerSystem, 3s waves, 5-8 burst, r=12 from centroid
+- [x] Weapon system (Whip) — WhipSystem + HitArcSystem, 120° arc, 10 dmg, 0.5s CD
+- [x] Health + damage loop — Health/Invincible components, ContactDamageSystem, HealthSystem
+- [x] Main menu — Splash → PressToStart → Lobby (4-player device assignment, char cycling)
 - [ ] XP orb + leveling system
 - [ ] Level-up UI (weapon choice cards)
 - [ ] Pickup system (gold, health, magnets)
 - [ ] Player death + revive mechanic
-- [ ] HUD (per-player HP bars, timers, kill count)
-- [ ] Main menu / character select
+- [ ] HUD (per-player HP bars, timer, kill count)
 - [ ] Game over / win screen
 
 ### Weapons (clone priority order)
 
-- [ ] Whip
+- [x] Whip — WhipSystem/HitArcSystem, hardcoded to all players
 - [ ] Magic Wand
 - [ ] Garlic
 - [ ] King Bible

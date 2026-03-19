@@ -28,9 +28,10 @@
 - [x] Input routing — WASD/Gamepad dev fallback; lobby assigns devices by button-press (AssignedDeviceId)
 - [x] Camera system — centroid follow + dynamic zoom (CameraFollow)
 - [x] SubScene setup — Player_0–3 baked into ECS entities via Players.unity SubScene
-- [ ] Enemy entity + movement AI (target nearest player)
-- [ ] Enemy spawner (wave definitions, spawn rates)
-- [ ] Weapon system (auto-fire, projectile logic)
+- [x] Enemy entity + movement AI — EnemyMovementSystem chases nearest player (Burst)
+- [x] Enemy spawner — EnemySpawnerSystem, 3s waves, Bat/Zombie/Skeleton weighted random at r=12
+- [x] Weapon system (Whip) — WhipSystem + HitArcSystem, 120° arc, 0.5s cooldown, 10 dmg
+- [x] Health + damage loop — Health/Invincible components, ContactDamageSystem, HealthSystem
 - [ ] XP orb + leveling system
 - [ ] Level-up UI (weapon choice cards)
 - [ ] Pickup system (gold, health, magnets)
@@ -43,7 +44,7 @@
 
 ## Weapons (priority order)
 
-- [ ] Whip
+- [x] Whip — WhipSystem/HitArcSystem, 120°arc, 10dmg, 0.5s CD, 1.5 range
 - [ ] Magic Wand
 - [ ] Garlic
 - [ ] King Bible
@@ -67,9 +68,9 @@
 
 ## Enemies
 
-- [ ] Bat (basic — chases player)
-- [ ] Zombie (slow melee)
-- [ ] Skeleton (medium melee)
+- [x] Bat — hp=10, spd=2.5, dmg=10, xp=1 (red quad)
+- [x] Zombie — hp=40, spd=1.0, dmg=20, xp=5 (green quad)
+- [x] Skeleton — hp=75, spd=1.8, dmg=25, xp=10 (blue quad)
 - [ ] Slime (splits on death)
 - [ ] Bosses (after basics work)
 
@@ -90,7 +91,7 @@
 - [ ] Independent XP / leveling per player
 - [ ] Per-player level-up weapon choice
 - [ ] Player death + revive (hold interact near downed player)
-- [ ] Enemy aggro — target nearest player
+- [x] Enemy aggro — EnemyMovementSystem targets nearest player (Burst, XY-plane constrained)
 - [ ] Boss HP scaling (×1.5 per additional player)
 - [x] "Press button to join" device-assignment lobby — implemented in LobbyScene
 - [ ] Online co-op via Netcode for Entities (after local co-op is solid)
