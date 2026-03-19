@@ -9,6 +9,7 @@ namespace VampireSurvivors.Systems
     /// can take contact damage again.
     /// </summary>
     [BurstCompile]
+    [UpdateBefore(typeof(ContactDamageSystem))]
     public partial struct InvincibilitySystem : ISystem
     {
         [BurstCompile]

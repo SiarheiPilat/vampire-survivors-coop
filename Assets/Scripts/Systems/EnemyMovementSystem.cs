@@ -14,16 +14,22 @@ namespace VampireSurvivors.Systems
     [BurstCompile]
     public partial struct EnemyMovementSystem : ISystem
     {
+        EntityQuery _playerQuery;
+
+        [BurstCompile]
+        public void OnCreate(ref SystemState state)
+        {
+            _playerQuery = SystemAPI.QueryBuilder()
+                .WithAll<PlayerTag, LocalTransform>()
+                .Build();
+        }
+
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var playerQuery = SystemAPI.QueryBuilder()
-                .WithAll<PlayerTag, LocalTransform>()
-                .Build();
+            if (_playerQuery.IsEmpty) return;
 
-            if (playerQuery.IsEmpty) return;
-
-            var playerPositions = playerQuery.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
+            var playerPositions = _playerQuery.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
 
             var job = new MoveTowardPlayerJob
             {

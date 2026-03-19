@@ -42,7 +42,7 @@ namespace VampireSurvivors.Systems
                 EnemyEntities   = enemyEntities,
                 EnemyTransforms = enemyTransforms,
                 HealthLookup    = _healthLookup,
-                Ecb             = ecb.AsParallelWriter()
+                Ecb             = ecb
             }.Run(); // Single-threaded — multiple arcs could hit the same enemy
 
             enemyEntities.Dispose();
@@ -57,9 +57,9 @@ namespace VampireSurvivors.Systems
 
             [NativeDisableParallelForRestriction] public ComponentLookup<Health> HealthLookup;
 
-            public EntityCommandBuffer.ParallelWriter Ecb;
+            public EntityCommandBuffer Ecb;
 
-            void Execute(Entity entity, [ChunkIndexInQuery] int chunkIndex, in HitArc arc)
+            void Execute(Entity entity, in HitArc arc)
             {
                 float halfArcRad = math.radians(arc.ArcDegrees * 0.5f);
                 float2 dir       = math.normalizesafe(arc.Direction);
@@ -83,7 +83,7 @@ namespace VampireSurvivors.Systems
                     HealthLookup[EnemyEntities[i]] = hp;
                 }
 
-                Ecb.DestroyEntity(chunkIndex, entity);
+                Ecb.DestroyEntity(entity);
             }
         }
     }

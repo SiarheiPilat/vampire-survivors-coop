@@ -39,7 +39,7 @@ namespace VampireSurvivors.Systems
                 ecb.AddComponent(arcEntity, new HitArc
                 {
                     Damage     = ws.Damage,
-                    Direction  = math.normalize(dir),
+                    Direction  = math.normalizesafe(dir),
                     Range      = ws.Range,
                     ArcDegrees = ws.ArcDegrees,
                     Origin     = transform.ValueRO.Position
