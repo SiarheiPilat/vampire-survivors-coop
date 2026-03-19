@@ -33,7 +33,7 @@ namespace VampireSurvivors.Authoring
                     MaxHp         = authoring.maxHp,
                     Level         = 1,
                     Xp            = 0f,
-                    XpToNextLevel = 100f
+                    XpToNextLevel = 5f
                 });
                 AddComponent(entity, new AssignedDeviceId { Value = 0 });
                 AddComponent(entity, new Health { Current = authoring.maxHp, Max = authoring.maxHp });

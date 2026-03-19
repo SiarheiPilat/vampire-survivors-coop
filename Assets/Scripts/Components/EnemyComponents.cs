@@ -72,4 +72,13 @@ namespace VampireSurvivors.Components
         public float Timer;
         public Unity.Mathematics.Random Rng;
     }
+
+    /// <summary>
+    /// Marks an XP gem entity. Spawned at enemy death positions by HealthSystem.
+    /// XpGemSystem moves gems toward players in magnet radius and collects them on contact.
+    /// </summary>
+    public struct XpGem : IComponentData
+    {
+        public float Value;
+    }
 }
