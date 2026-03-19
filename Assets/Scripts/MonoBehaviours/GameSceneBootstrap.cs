@@ -97,18 +97,19 @@ namespace VampireSurvivors.MonoBehaviours
                     break;
 
                 case "pasqualina":
-                    // Runetracer not yet implemented — give Magic Wand, no bonus
+                    // Runetracer: bouncing projectile in facing direction
                     if (em.HasComponent<WeaponState>(entity))
                         em.RemoveComponent<WeaponState>(entity);
-                    em.AddComponentData(entity, new MagicWandState
+                    em.AddComponentData(entity, new RunetracerState
                     {
                         Timer    = 0f,
-                        Cooldown = 0.5f,
+                        Cooldown = 0.35f,
                         Damage   = 10f,
-                        Speed    = 10f,
-                        MaxRange = 15f
+                        Speed    = 8f,
+                        MaxRange = 10f,
+                        Bounces  = 3
                     });
-                    Debug.Log($"[GameSceneBootstrap] P{slot} Pasqualina: MagicWand (Runetracer TBD)");
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Pasqualina: Runetracer");
                     break;
 
                 case "gennaro":

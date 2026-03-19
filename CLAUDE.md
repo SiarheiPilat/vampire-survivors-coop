@@ -89,7 +89,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] HUD (per-player HP bars, XP bars, level text, timer) — HUDManager + HUDCanvas in 4_SampleScene
 - [x] Magic Wand weapon — MagicWandSystem + Projectile component + ProjectileMovementSystem + ProjectileHitSystem
 - [x] Fire Wand weapon — FireWandSystem, random-direction Projectile, per-player RNG
-- [x] Game over screen — GameOverPanel overlay, "GAME OVER" + survived time; HUDManager detects all-Downed
+- [x] Game over screen — GameOverPanel overlay, "GAME OVER" + survived time + kills + gold; SharedGold.EnemiesKilled tracked by HealthSystem; TriggerGameOver() appends stat lines programmatically
 
 ### Weapons (clone priority order)
 
@@ -103,6 +103,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] Cross — CrossSystem; returning boomerang via Projectile.TurnDistance+Returning+OwnerEntity; 50 dmg, 5.0s CD, speed=15, turn=8u; unlocked lv8
 - [x] Holy Water — HolyWaterSystem throws flask (random dir, lands at 4u); HolyWaterPuddleSystem ticks all enemies in 1.5u radius every 0.5s for 5s; 20 dmg/tick; unlocked lv9
 - [x] Lightning Ring — LightningRingSystem; instant hit-scan, picks Amount random enemies per Cooldown; 40 dmg, 0.6s CD, Amount=1; unlocked lv10
+- [x] Runetracer — RunetracerSystem; fires in FacingDirection; projectile bounces off virtual walls (direction flip when MaxRange exceeded); 10 dmg, 8 u/s, 0.35s CD, 3 bounces, MaxRange 10u; Pasqualina starter
 
 ### Characters
 
@@ -112,7 +113,7 @@ Characters are selected in the lobby (`LobbyManager`). `GameSceneBootstrap` read
 
 - [x] Antonio — Whip (baked default), Might +10% (1.1)
 - [x] Imelda — Magic Wand (replaces Whip at start), XpMult +10% (1.1)
-- [x] Pasqualina — Magic Wand (Runetracer TBD), no stat bonus
+- [x] Pasqualina — Runetracer (see Weapons list), no stat bonus
 - [x] Gennaro — Knife (replaces Whip at start), no stat bonus
 - [ ] *(others later)*
 

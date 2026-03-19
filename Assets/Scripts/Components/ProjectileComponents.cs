@@ -49,5 +49,13 @@ namespace VampireSurvivors.Components
         /// Entity.Null (default) means no homing.
         /// </summary>
         public Entity OwnerEntity;
+
+        /// <summary>
+        /// Remaining wall-bounces for Runetracer-style projectiles.
+        /// 0 = straight projectile (despawns at MaxRange as usual).
+        /// When > 0 and Traveled >= MaxRange: reflect Direction off the nearest
+        /// axis-aligned "wall" (dominant direction component) and decrement.
+        /// </summary>
+        public byte BounceCount;
     }
 }

@@ -93,9 +93,25 @@ namespace VampireSurvivors.Systems
                 transform.ValueRW.Position += new float3(move.x, move.y, 0f);
                 proj.ValueRW.Traveled      += math.length(move);
 
-                // Safety despawn for non-returning projectiles (or returning ones that lost their owner)
+                // Safety despawn / bounce for non-returning projectiles
                 if (!proj.ValueRO.Returning && proj.ValueRO.Traveled >= proj.ValueRO.MaxRange)
-                    ecb.DestroyEntity(entity);
+                {
+                    if (proj.ValueRO.BounceCount > 0)
+                    {
+                        // Reflect off whichever wall the dominant direction implies
+                        var dir = proj.ValueRO.Direction;
+                        if (math.abs(dir.x) >= math.abs(dir.y))
+                            proj.ValueRW.Direction = new float3(-dir.x, dir.y, 0f);  // side wall
+                        else
+                            proj.ValueRW.Direction = new float3(dir.x, -dir.y, 0f); // top/bottom
+                        proj.ValueRW.Traveled    = 0f;
+                        proj.ValueRW.BounceCount = (byte)(proj.ValueRO.BounceCount - 1);
+                    }
+                    else
+                    {
+                        ecb.DestroyEntity(entity);
+                    }
+                }
             }
         }
     }

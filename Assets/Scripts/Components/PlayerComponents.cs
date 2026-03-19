@@ -249,6 +249,23 @@ namespace VampireSurvivors.Components
     }
 
     /// <summary>
+    /// Per-player Runetracer weapon state.
+    /// Fires a projectile in the player's facing direction that bounces off
+    /// virtual walls (when MaxRange is exceeded, direction reflects off the
+    /// nearest axis-aligned surface) up to BounceCount times.
+    /// Wiki base stats: Damage 10, Speed 8 u/s, Cooldown 0.35 s, Bounces 3.
+    /// </summary>
+    public struct RunetracerState : IComponentData
+    {
+        public float Timer;
+        public float Cooldown;
+        public float Damage;
+        public float Speed;
+        public float MaxRange; // distance per bounce segment (screen-width approximation)
+        public byte  Bounces;  // wall bounces granted per projectile
+    }
+
+    /// <summary>
     /// Per-player King Bible weapon state.
     /// Bibles orbit the player permanently, damaging enemies on contact.
     /// KingBibleSystem spawns KingBibleOrbit entities when Spawned == false,
