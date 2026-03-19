@@ -34,8 +34,8 @@ namespace VampireSurvivors.Systems
             var ecb          = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
             var enemyQuery      = SystemAPI.QueryBuilder().WithAll<EnemyTag, LocalTransform, Health>().Build();
-            var enemyEntities   = enemyQuery.ToEntityArray(Allocator.TempJob);
-            var enemyTransforms = enemyQuery.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
+            var enemyEntities   = enemyQuery.ToEntityArray(Allocator.Temp);
+            var enemyTransforms = enemyQuery.ToComponentDataArray<LocalTransform>(Allocator.Temp);
 
             new ProcessHitArcJob
             {
