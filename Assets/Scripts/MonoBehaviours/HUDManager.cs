@@ -26,13 +26,20 @@ namespace VampireSurvivors.MonoBehaviours
         [Header("Timer")]
         [SerializeField] TMP_Text timerText;
 
-        static readonly Color HpColorHigh = new Color(0.20f, 0.80f, 0.20f, 1f);
-        static readonly Color HpColorMid  = new Color(0.90f, 0.80f, 0.10f, 1f);
-        static readonly Color HpColorLow  = new Color(0.85f, 0.15f, 0.15f, 1f);
+        static readonly Color HpColorHigh   = new Color(0.20f, 0.80f, 0.20f, 1f);
+        static readonly Color HpColorMid    = new Color(0.90f, 0.80f, 0.10f, 1f);
+        static readonly Color HpColorLow    = new Color(0.85f, 0.15f, 0.15f, 1f);
+        static readonly Color LevelUpColor  = new Color(1.00f, 0.95f, 0.10f, 1f);
+        static readonly Color LevelTextNorm = Color.white;
+
+        const float LevelUpFlashDuration = 1.5f;
 
         EntityQuery _playerQuery;
         bool        _queryCreated;
         float       _elapsedTime;
+
+        readonly int[]   _lastLevels     = new int[4];
+        readonly float[] _levelUpTimers  = new float[4];
 
         void Start()
         {
@@ -67,6 +74,7 @@ namespace VampireSurvivors.MonoBehaviours
         {
             _elapsedTime += Time.deltaTime;
             UpdateTimer();
+            TickLevelUpTimers();
 
             var world = World.DefaultGameObjectInjectionWorld;
             if (world == null || !_queryCreated) return;
@@ -117,7 +125,26 @@ namespace VampireSurvivors.MonoBehaviours
             }
 
             if (levelTexts[slot] != null)
-                levelTexts[slot].text = $"Lv {stats.Level}";
+            {
+                // Detect level-up and start flash
+                if (stats.Level > _lastLevels[slot] && _lastLevels[slot] > 0)
+                    _levelUpTimers[slot] = LevelUpFlashDuration;
+                _lastLevels[slot] = stats.Level;
+
+                levelTexts[slot].text  = _levelUpTimers[slot] > 0f
+                    ? $"LEVEL UP!"
+                    : $"Lv {stats.Level}";
+                levelTexts[slot].color = _levelUpTimers[slot] > 0f
+                    ? LevelUpColor
+                    : LevelTextNorm;
+            }
+        }
+
+        void TickLevelUpTimers()
+        {
+            for (int i = 0; i < 4; i++)
+                if (_levelUpTimers[i] > 0f)
+                    _levelUpTimers[i] = Mathf.Max(0f, _levelUpTimers[i] - Time.deltaTime);
         }
 
         void UpdateTimer()
