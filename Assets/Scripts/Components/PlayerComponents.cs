@@ -120,4 +120,21 @@ namespace VampireSurvivors.Components
         public float Speed;     // projectile speed in units/s — wiki base: ~10
         public float MaxRange;  // units before projectile despawns
     }
+
+    /// <summary>
+    /// Per-player King Bible weapon state.
+    /// Bibles orbit the player permanently, damaging enemies on contact.
+    /// KingBibleSystem spawns KingBibleOrbit entities when Spawned == false,
+    /// then sets Spawned = true so bibles are only created once.
+    /// Wiki base stats: Damage 10, orbit radius ~1.4 u, ~120°/s, 0.5s hit CD per bible.
+    /// </summary>
+    public struct KingBibleState : IComponentData
+    {
+        public float Damage;
+        public float Radius;       // orbit radius in units
+        public float AngularSpeed; // radians/s
+        public float HitCooldown;  // seconds between hits per bible
+        public int   Count;        // number of orbiting bibles (1 at base)
+        public bool  Spawned;      // set to true once bibles are instantiated
+    }
 }

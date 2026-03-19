@@ -97,7 +97,6 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [ ] King Bible
 - [x] Knife — KnifeSystem fires in FacingDirection (last movement dir); 10 dmg, 0.35s CD, speed=15
 - [ ] Fire Wand
-- [ ] Knife
 - [ ] Axe
 - [ ] Cross
 - [ ] Holy Water
@@ -121,9 +120,9 @@ critical for maintaining 60fps with 500+ entities on screen.
 
 ### Passive Items / Stats
 
-- [ ] Spinach (Might +10%)
+- [x] Spinach — PlayerStats.Might +0.1 per odd level (5,7,9…); all weapon systems multiply base damage by Might
+- [x] Pummarola — PlayerStats.HpRegen +0.2 HP/s per even level (6,8,10…); HpRegenSystem (Burst, fractional accumulator)
 - [ ] Armor (reduce incoming dmg)
-- [ ] Pummarola (HP regen)
 - [ ] Empty Tome (Cooldown -8%)
 - [ ] *(others later)*
 

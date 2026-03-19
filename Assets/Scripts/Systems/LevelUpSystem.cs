@@ -65,20 +65,32 @@ namespace VampireSurvivors.Systems
                                     Damage = 10f, Speed = 15f, MaxRange = 12f
                                 });
                             break;
+                        case 5:
+                            if (!SystemAPI.HasComponent<KingBibleState>(entity))
+                                ecb.AddComponent(entity, new KingBibleState
+                                {
+                                    Damage       = 10f,
+                                    Radius       = 1.4f,
+                                    AngularSpeed = 2.094f, // ~120°/s in radians
+                                    HitCooldown  = 0.5f,
+                                    Count        = 1,
+                                    Spawned      = false
+                                });
+                            break;
                     }
 
-                    // Passive items at level 5+ (alternating Spinach / Pummarola)
-                    // Level 5, 7, 9, 11 … → Spinach (+0.1 Might)
-                    // Level 6, 8, 10, 12 … → Pummarola (+0.2 HP/s)
-                    if (newLevel >= 5)
+                    // Passive items at level 6+ (alternating Spinach / Pummarola)
+                    // Level 6, 8, 10, 12 … → Spinach (+0.1 Might)
+                    // Level 7, 9, 11, 13 … → Pummarola (+0.2 HP/s)
+                    if (newLevel >= 6)
                     {
                         int pidx = SystemAPI.GetComponent<PlayerIndex>(entity).Value;
-                        if (newLevel % 2 == 1) // odd: Spinach
+                        if (newLevel % 2 == 0) // even: Spinach (lv6, 8, 10…)
                         {
                             stats.ValueRW.Might += 0.1f;
                             Debug.Log($"[LevelUpSystem] P{pidx} got Spinach! Might = {stats.ValueRO.Might:F1}x");
                         }
-                        else // even: Pummarola
+                        else // odd: Pummarola (lv7, 9, 11…)
                         {
                             stats.ValueRW.HpRegen += 0.2f;
                             Debug.Log($"[LevelUpSystem] P{pidx} got Pummarola! HpRegen = {stats.ValueRO.HpRegen:F1}/s");
