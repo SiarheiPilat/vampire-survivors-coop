@@ -61,6 +61,19 @@ namespace VampireSurvivors.Components
     }
 
     /// <summary>
+    /// Marks a big Slime enemy. On death, HealthSystem spawns 2 SmallSlime entities
+    /// at the death position instead of (or in addition to) the normal XP gem.
+    /// Wiki: Slime (large) splits into 2 smaller slimes on death.
+    /// </summary>
+    public struct SlimeTag : IComponentData { }
+
+    /// <summary>
+    /// Marks a small Slime (spawned when a big Slime dies).
+    /// Does NOT split further on death — behaves like a normal enemy.
+    /// </summary>
+    public struct SmallSlimeTag : IComponentData { }
+
+    /// <summary>
     /// Singleton component on the spawner entity. Baked by SpawnerAuthoring.
     /// Holds entity prefab references and mutable spawner state (timer, RNG, wave).
     ///
@@ -74,6 +87,8 @@ namespace VampireSurvivors.Components
         public Entity BatPrefab;
         public Entity ZombiePrefab;
         public Entity SkeletonPrefab;
+        public Entity BigSlimePrefab;
+        public Entity SmallSlimePrefab;
         public float  Timer;
         public Unity.Mathematics.Random Rng;
 

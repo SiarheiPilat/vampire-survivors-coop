@@ -117,7 +117,8 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] Bat — red quad, HP=10, speed=2.5, dmg=10, XP=1; 60% spawn weight
 - [x] Zombie — green quad, HP=40, speed=1, dmg=20, XP=5; 25% spawn weight
 - [x] Skeleton — blue quad, HP=75, speed=1.8, dmg=25, XP=10; 15% spawn weight
-- [ ] Slime (splits on death)
+- [x] Big Slime — purple quad (0.8×0.8), HP=60, speed=1.2, dmg=15, XP=8; SlimeTag; splits into 2 SmallSlimes on death; 8–15% spawn weight (grows each wave)
+- [x] Small Slime — yellow-green quad (0.45×0.45), HP=20, speed=2.0, dmg=8, XP=3; SmallSlimeTag; spawned by BigSlime split, no further split; BigSlimeMaterial/SmallSlimeMaterial distinguish visually
 - [ ] *(bosses after basics work)*
 
 ### Passive Items / Stats

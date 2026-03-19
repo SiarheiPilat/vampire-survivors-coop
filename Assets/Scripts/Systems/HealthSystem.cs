@@ -43,6 +43,21 @@ namespace VampireSurvivors.Systems
 
                 if (SystemAPI.HasComponent<EnemyTag>(entity))
                 {
+                    // Big Slime splits into 2 SmallSlimes before the normal death loot
+                    bool isSlime = SystemAPI.HasComponent<SlimeTag>(entity);
+                    if (isSlime && _transformLookup.HasComponent(entity) &&
+                        SystemAPI.TryGetSingleton<SpawnerData>(out var spawnerData) &&
+                        spawnerData.SmallSlimePrefab != Entity.Null)
+                    {
+                        var pos = _transformLookup[entity].Position;
+                        for (int s = 0; s < 2; s++)
+                        {
+                            var sm = ecb.Instantiate(spawnerData.SmallSlimePrefab);
+                            ecb.SetComponent(sm, LocalTransform.FromPosition(
+                                pos + new float3(s == 0 ? -0.4f : 0.4f, 0.2f, 0f)));
+                        }
+                    }
+
                     // Spawn XP gem, gold coin, and (rarely) a health pickup at death position
                     if (_enemyStatsLookup.HasComponent(entity) && _transformLookup.HasComponent(entity))
                     {

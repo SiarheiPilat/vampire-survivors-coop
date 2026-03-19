@@ -87,9 +87,12 @@ namespace VampireSurvivors.Systems
             int count   = spawner.Rng.NextInt(minSpawn, maxSpawn);
 
             // Weight distribution shifts over time:
-            // Early waves: Bat-heavy. Later waves: more Zombies and Skeletons.
-            float batWeight      = math.max(0.60f - (wave - 1) * 0.04f, 0.30f);
-            float zombieWeight   = math.min(0.25f + (wave - 1) * 0.02f, 0.40f);
+            // Early waves: Bat-heavy. Later waves: more Zombies, Skeletons, and Slimes.
+            float batWeight      = math.max(0.55f - (wave - 1) * 0.04f, 0.25f);
+            float zombieWeight   = math.min(0.22f + (wave - 1) * 0.02f, 0.35f);
+            float slimeWeight    = spawner.BigSlimePrefab != Entity.Null
+                                     ? math.min(0.08f + (wave - 1) * 0.01f, 0.15f)
+                                     : 0f;
             // skeleton fills remainder
 
             float mult = spawner.StatMultiplier;
@@ -104,11 +107,11 @@ namespace VampireSurvivors.Systems
                 );
 
                 float  roll   = spawner.Rng.NextFloat();
-                Entity prefab = roll < batWeight
-                    ? spawner.BatPrefab
-                    : roll < batWeight + zombieWeight
-                        ? spawner.ZombiePrefab
-                        : spawner.SkeletonPrefab;
+                Entity prefab;
+                if      (roll < batWeight)                              prefab = spawner.BatPrefab;
+                else if (roll < batWeight + zombieWeight)               prefab = spawner.ZombiePrefab;
+                else if (roll < batWeight + zombieWeight + slimeWeight) prefab = spawner.BigSlimePrefab;
+                else                                                    prefab = spawner.SkeletonPrefab;
 
                 var e = EntityManager.Instantiate(prefab);
                 EntityManager.SetComponentData(e, LocalTransform.FromPosition(spawnPos));

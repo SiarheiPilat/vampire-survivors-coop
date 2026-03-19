@@ -15,6 +15,8 @@ namespace VampireSurvivors.Authoring
         public GameObject batPrefab;
         public GameObject zombiePrefab;
         public GameObject skeletonPrefab;
+        public GameObject bigSlimePrefab;
+        public GameObject smallSlimePrefab;
 
         class Baker : Baker<SpawnerAuthoring>
         {
@@ -23,9 +25,11 @@ namespace VampireSurvivors.Authoring
                 var entity = GetEntity(TransformUsageFlags.None);
                 AddComponent(entity, new SpawnerData
                 {
-                    BatPrefab      = GetEntity(authoring.batPrefab,      TransformUsageFlags.Dynamic),
-                    ZombiePrefab   = GetEntity(authoring.zombiePrefab,   TransformUsageFlags.Dynamic),
-                    SkeletonPrefab = GetEntity(authoring.skeletonPrefab, TransformUsageFlags.Dynamic),
+                    BatPrefab        = GetEntity(authoring.batPrefab,      TransformUsageFlags.Dynamic),
+                    ZombiePrefab     = GetEntity(authoring.zombiePrefab,   TransformUsageFlags.Dynamic),
+                    SkeletonPrefab   = GetEntity(authoring.skeletonPrefab, TransformUsageFlags.Dynamic),
+                    BigSlimePrefab   = authoring.bigSlimePrefab   != null ? GetEntity(authoring.bigSlimePrefab,   TransformUsageFlags.Dynamic) : Entity.Null,
+                    SmallSlimePrefab = authoring.smallSlimePrefab != null ? GetEntity(authoring.smallSlimePrefab, TransformUsageFlags.Dynamic) : Entity.Null,
                     Timer          = 3f,
                     Rng            = Unity.Mathematics.Random.CreateFromIndex(42),
                     ElapsedTime    = 0f,

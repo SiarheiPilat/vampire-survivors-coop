@@ -16,6 +16,10 @@ namespace VampireSurvivors.Authoring
         public int contactDamage;
         public int xpValue;
 
+        [Header("Slime")]
+        public bool isSlime;       // big slime — splits on death
+        public bool isSmallSlime;  // small slime — no split
+
         class Baker : Baker<EnemyAuthoring>
         {
             public override void Bake(EnemyAuthoring authoring)
@@ -33,6 +37,8 @@ namespace VampireSurvivors.Authoring
                     Current = authoring.hp,
                     Max     = authoring.hp
                 });
+                if (authoring.isSlime)      AddComponent(entity, new SlimeTag());
+                if (authoring.isSmallSlime) AddComponent(entity, new SmallSlimeTag());
             }
         }
     }

@@ -1621,6 +1621,8 @@ MonoBehaviour:
   batPrefab: {fileID: 1509845159821908351, guid: aa188959d90f04c4ea70859013c88a92, type: 3}
   zombiePrefab: {fileID: 8937536109135202603, guid: 4567e8de27f606d4588f0a032a26f4a7, type: 3}
   skeletonPrefab: {fileID: 8448242909902688075, guid: 47821f6b0a2a6f14f8fcb7d38f31619c, type: 3}
+  bigSlimePrefab: {fileID: 1509845159821908351, guid: 27eb97116a04a2741ba27632b1bedd7c, type: 3}
+  smallSlimePrefab: {fileID: 1509845159821908351, guid: 40dbaf710f53e1342996ea104342c4d9, type: 3}
 --- !u!4 &774028992
 Transform:
   m_ObjectHideFlags: 0
