@@ -123,6 +123,26 @@ namespace VampireSurvivors.Components
     }
 
     /// <summary>
+    /// Per-player Holy Water weapon state.
+    /// Throws a flask in a random direction; on landing it creates a stationary
+    /// damage puddle that ticks all enemies within Radius every TickCooldown seconds.
+    /// Wiki base stats: Damage 20/tick, Cooldown 6.0 s, Radius 1.5 u,
+    ///   TickCooldown 0.5 s, PuddleLifetime 5.0 s.
+    /// </summary>
+    public struct HolyWaterState : IComponentData
+    {
+        public float  Timer;
+        public float  Cooldown;
+        public float  Damage;
+        public float  Speed;          // flask travel speed u/s
+        public float  MaxRange;       // flask travel distance before landing
+        public float  Radius;         // puddle radius
+        public float  PuddleLifetime;
+        public float  TickCooldown;
+        public Random Rng;
+    }
+
+    /// <summary>
     /// Per-player Cross weapon state.
     /// Fires a cross in the player's facing direction. The projectile travels out to
     /// TurnDistance, then reverses and homes back to the player (Projectile.Returning).
