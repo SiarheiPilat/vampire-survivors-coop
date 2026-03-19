@@ -1,7 +1,10 @@
 {
     "name": "VampireSurvivors.Menu",
     "rootNamespace": "VampireSurvivors.Menu",
-    "references": [],
+    "references": [
+        "Unity.InputSystem",
+        "Unity.TextMeshPro"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

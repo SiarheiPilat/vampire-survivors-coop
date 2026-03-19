@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Utilities;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -32,6 +34,8 @@ namespace VampireSurvivors.Menu
         readonly float[] _repeatTimerV = new float[4]; // vertical (char cycling)
         readonly float[] _repeatTimerH = new float[4]; // horizontal (customization)
 
+        IDisposable _anyButtonSub;
+
         const float DeadZone      = 0.5f;
         const float RepeatInterval = 0.25f;
 
@@ -44,14 +48,15 @@ namespace VampireSurvivors.Menu
 
         void OnEnable()
         {
-            InputSystem.onAnyButtonPress    += OnAnyButton;
-            InputSystem.onDeviceChange      += OnDeviceChange;
+            _anyButtonSub = InputSystem.onAnyButtonPress.Call(OnAnyButton);
+            InputSystem.onDeviceChange += OnDeviceChange;
         }
 
         void OnDisable()
         {
-            InputSystem.onAnyButtonPress    -= OnAnyButton;
-            InputSystem.onDeviceChange      -= OnDeviceChange;
+            _anyButtonSub?.Dispose();
+            _anyButtonSub = null;
+            InputSystem.onDeviceChange -= OnDeviceChange;
         }
 
         void Start()
