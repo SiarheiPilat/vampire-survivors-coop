@@ -56,6 +56,19 @@ namespace VampireSurvivors.Components
     public struct Downed : IComponentData { }
 
     /// <summary>
+    /// Per-player Garlic aura state.
+    /// Pulses every Cooldown seconds, damaging all enemies within Range.
+    /// Wiki base stats: Damage 10, Area 1.5 u, Cooldown 1.5 s.
+    /// </summary>
+    public struct GarlicState : IComponentData
+    {
+        public float Timer;
+        public float Cooldown; // seconds between pulses — wiki base: 1.5s
+        public float Damage;   // wiki base: 10
+        public float Range;    // radius in units — wiki base: ~1.5
+    }
+
+    /// <summary>
     /// Per-player Magic Wand weapon state.
     /// Timer counts down; when it hits 0 a projectile is fired at the nearest enemy
     /// and the timer resets to Cooldown.

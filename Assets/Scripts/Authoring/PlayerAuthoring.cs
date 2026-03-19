@@ -46,6 +46,13 @@ namespace VampireSurvivors.Authoring
                     Range         = 1.5f,
                     ArcDegrees    = 120f
                 });
+                AddComponent(entity, new GarlicState
+                {
+                    Timer    = 0f,
+                    Cooldown = 1.5f,
+                    Damage   = 10f,
+                    Range    = 1.5f
+                });
                 AddComponent(entity, new MagicWandState
                 {
                     Timer    = 0f,

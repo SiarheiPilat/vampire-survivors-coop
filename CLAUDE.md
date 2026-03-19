@@ -93,7 +93,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 
 - [x] Whip — WhipSystem/HitArcSystem, hardcoded to all players
 - [x] Magic Wand — MagicWandSystem fires Projectile at nearest enemy; 10 dmg, 0.5s CD, speed=10, range=15
-- [ ] Garlic
+- [x] Garlic — GarlicSystem aura pulse; 10 dmg, r=1.5, 1.5s CD, hits all enemies simultaneously
 - [ ] King Bible
 - [ ] Fire Wand
 - [ ] Knife
