@@ -91,6 +91,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] Fire Wand weapon — FireWandSystem, random-direction Projectile, per-player RNG
 - [x] Game over screen — GameOverPanel overlay, "GAME OVER" + survived time + kills + gold; SharedGold.EnemiesKilled tracked by HealthSystem; TriggerGameOver() appends stat lines programmatically
 - [x] Floating damage numbers — DamageNumberEvent IComponentData spawned by all weapon systems on hit; DamageNumberSystem bridges to DamageNumberRenderer MonoBehaviour (pool of 64 world-space TMP labels, float 1.5u up over 0.7s, fade out); color: white ≤10 dmg, yellow ≤30, orange >30; auto-creates via RuntimeInitializeOnLoadMethod
+- [x] Infinite tiling background — InfiniteBackground MonoBehaviour; 5×5 grid of 10×10 world-unit sprite tiles; two alternating dark-green shades (checkerboard) for movement reference; tiles snap to camera-grid each LateUpdate; sorting order -100; RuntimeInitializeOnLoadMethod auto-creates (no scene wiring)
 
 ### Weapons (clone priority order)
 
