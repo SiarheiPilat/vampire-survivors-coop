@@ -388,30 +388,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VampireSurvivors.MonoBehaviours.HUDManager
   panelRoots:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 619701849}
+  - {fileID: 1310849723}
+  - {fileID: 1762054749}
+  - {fileID: 1302898496}
   hpFillImages:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 1683334859}
+  - {fileID: 1962583549}
+  - {fileID: 1684319965}
+  - {fileID: 92868455}
   xpFillImages:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 1838901091}
+  - {fileID: 1910344652}
+  - {fileID: 1828075639}
+  - {fileID: 1863344758}
   levelTexts:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 334931834}
+  - {fileID: 917456998}
+  - {fileID: 823537628}
+  - {fileID: 1822154963}
   playerLabels:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 1833268952}
+  - {fileID: 1867866073}
+  - {fileID: 685093868}
+  - {fileID: 1532418}
   timerText: {fileID: 1493933677}
 --- !u!114 &47171765
 MonoBehaviour:

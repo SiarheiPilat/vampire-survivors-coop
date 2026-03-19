@@ -29,6 +29,10 @@ namespace VampireSurvivors.Systems
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
+            // InvincibilitySystem schedules a parallel job on Invincible; complete it
+            // before we read/write Invincible in ContactDamageJob.
+            state.Dependency.Complete();
+
             _healthLookup.Update(ref state);
             _invincibleLookup.Update(ref state);
 
@@ -39,8 +43,8 @@ namespace VampireSurvivors.Systems
 
             if (playerQuery.IsEmpty) return;
 
-            var playerEntities   = playerQuery.ToEntityArray(Allocator.Temp);
-            var playerTransforms = playerQuery.ToComponentDataArray<LocalTransform>(Allocator.Temp);
+            var playerEntities   = playerQuery.ToEntityArray(Allocator.TempJob);
+            var playerTransforms = playerQuery.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
 
             new ContactDamageJob
             {

@@ -14,6 +14,7 @@ namespace VampireSurvivors.Systems
     /// Runs single-threaded to avoid write races on shared PlayerStats.
     /// </summary>
     [BurstCompile]
+    [UpdateBefore(typeof(TransformSystemGroup))]
     public partial struct XpGemSystem : ISystem
     {
         ComponentLookup<PlayerStats> _statsLookup;
@@ -35,8 +36,8 @@ namespace VampireSurvivors.Systems
 
             if (playerQuery.IsEmpty) return;
 
-            var playerEntities   = playerQuery.ToEntityArray(Allocator.Temp);
-            var playerTransforms = playerQuery.ToComponentDataArray<LocalTransform>(Allocator.Temp);
+            var playerEntities   = playerQuery.ToEntityArray(Allocator.TempJob);
+            var playerTransforms = playerQuery.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
 
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             var ecb          = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);

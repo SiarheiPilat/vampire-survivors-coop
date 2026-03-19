@@ -16,7 +16,7 @@ namespace VampireSurvivors.Systems
         public void OnUpdate(ref SystemState state)
         {
             float dt = SystemAPI.Time.DeltaTime;
-            new TickInvincibleJob { DeltaTime = dt }.ScheduleParallel();
+            state.Dependency = new TickInvincibleJob { DeltaTime = dt }.ScheduleParallel(state.Dependency);
         }
 
         [BurstCompile]
