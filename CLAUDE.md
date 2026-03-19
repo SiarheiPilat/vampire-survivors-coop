@@ -102,7 +102,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] Axe — AxeSystem; parabolic arc via Projectile.Gravity+Velocity; 20 dmg, 1.25s CD, ~60° elevation, Gravity=12 u/s²; unlocked at lv7
 - [x] Cross — CrossSystem; returning boomerang via Projectile.TurnDistance+Returning+OwnerEntity; 50 dmg, 5.0s CD, speed=15, turn=8u; unlocked lv8
 - [x] Holy Water — HolyWaterSystem throws flask (random dir, lands at 4u); HolyWaterPuddleSystem ticks all enemies in 1.5u radius every 0.5s for 5s; 20 dmg/tick; unlocked lv9
-- [ ] Lightning Ring
+- [x] Lightning Ring — LightningRingSystem; instant hit-scan, picks Amount random enemies per Cooldown; 40 dmg, 0.6s CD, Amount=1; unlocked lv10
 
 ### Characters
 
