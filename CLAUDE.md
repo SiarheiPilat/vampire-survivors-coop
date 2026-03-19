@@ -84,7 +84,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] XP orb + leveling system — XpGem component, XpGemSystem (magnet r=30, collect r=0.5, speed=8), LevelUpSystem (wiki formula 5+(level-1)*10, 2s iframes)
 - [ ] Level-up UI (weapon choice cards)
 - [ ] Pickup system (gold, health, magnets)
-- [ ] Player death + revive mechanic
+- [ ] Player death + revive mechanic — Downed component + state added; revive interaction is future work
 - [ ] HUD (per-player HP bars, timer, kill count) — HUDManager.cs done; scene setup pending Unity editor reconnect
 - [ ] Game over / win screen
 
