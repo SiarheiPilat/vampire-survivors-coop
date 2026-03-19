@@ -98,7 +98,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] King Bible — KingBibleSystem; orbiting entity (KingBibleOrbit), radius=1.4u, 120°/s, 10 dmg, 0.5s hit CD; unlocked at lv5
 - [x] Knife — KnifeSystem fires in FacingDirection (last movement dir); 10 dmg, 0.35s CD, speed=15
 - [x] Fire Wand — FireWandSystem fires Projectile in random direction; 10 dmg, 0.4s CD, speed=11; per-player RNG via Unity.Mathematics.Random
-- [ ] Axe
+- [x] Axe — AxeSystem; parabolic arc via Projectile.Gravity+Velocity; 20 dmg, 1.25s CD, ~60° elevation, Gravity=12 u/s²; unlocked at lv7
 - [ ] Cross
 - [ ] Holy Water
 - [ ] Lightning Ring
