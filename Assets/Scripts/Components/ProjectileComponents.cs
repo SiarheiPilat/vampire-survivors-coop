@@ -31,5 +31,23 @@ namespace VampireSurvivors.Components
         /// Ignored (zero) for straight projectiles.
         /// </summary>
         public float3 Velocity;
+
+        // ── Returning projectile fields (Cross, Boomerang, …) ─────────────────
+
+        /// <summary>
+        /// Distance (in units traveled) at which the projectile reverses and homes
+        /// back toward OwnerEntity. 0 = never turn (straight or arc only).
+        /// </summary>
+        public float  TurnDistance;
+
+        /// <summary>True once the projectile has turned and is heading back.</summary>
+        public bool   Returning;
+
+        /// <summary>
+        /// Player entity this projectile belongs to.
+        /// Used for homing direction when Returning == true.
+        /// Entity.Null (default) means no homing.
+        /// </summary>
+        public Entity OwnerEntity;
     }
 }

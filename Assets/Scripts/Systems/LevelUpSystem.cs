@@ -10,8 +10,8 @@ namespace VampireSurvivors.Systems
     /// On level-up:
     ///   - Increments Level, resets Xp, updates XpToNextLevel (wiki formula)
     ///   - Grants 2 s invincibility
-    ///   - Lv2=MagicWand, Lv3=Garlic, Lv4=Knife, Lv5=KingBible, Lv6=FireWand, Lv7=Axe
-    ///   - Lv8+: (lv-8)%2==0 → Spinach (+0.1 Might), else → Pummarola (+0.2 HpRegen)
+    ///   - Lv2=MagicWand, Lv3=Garlic, Lv4=Knife, Lv5=KingBible, Lv6=FireWand, Lv7=Axe, Lv8=Cross
+    ///   - Lv9+: (lv-9)%2==0 → Spinach (+0.1 Might), else → Pummarola (+0.2 HpRegen)
     /// Weapon systems activate once their state component is present (structural change via ECB).
     /// Not Burst-compiled — calls Debug.Log and uses ECB for structural changes.
     /// </summary>
@@ -101,20 +101,31 @@ namespace VampireSurvivors.Systems
                                     MaxRange = 12f
                                 });
                             break;
+                        case 8:
+                            if (!SystemAPI.HasComponent<CrossState>(entity))
+                                ecb.AddComponent(entity, new CrossState
+                                {
+                                    Timer        = 0f,
+                                    Cooldown     = 5.0f,
+                                    Damage       = 50f,
+                                    Speed        = 15f,
+                                    TurnDistance = 8f
+                                });
+                            break;
                     }
 
-                    // Passive items at level 8+ (alternating Spinach / Pummarola)
-                    // Level 8, 10, 12 … → Spinach (+0.1 Might)
-                    // Level 9, 11, 13 … → Pummarola (+0.2 HP/s)
-                    if (newLevel >= 8)
+                    // Passive items at level 9+ (alternating Spinach / Pummarola)
+                    // Level 9, 11, 13 … → Spinach (+0.1 Might)
+                    // Level 10, 12, 14 … → Pummarola (+0.2 HP/s)
+                    if (newLevel >= 9)
                     {
                         int pidx = SystemAPI.GetComponent<PlayerIndex>(entity).Value;
-                        if ((newLevel - 8) % 2 == 0) // lv8, 10, 12… → Spinach
+                        if ((newLevel - 9) % 2 == 0) // lv9, 11, 13… → Spinach
                         {
                             stats.ValueRW.Might += 0.1f;
                             Debug.Log($"[LevelUpSystem] P{pidx} got Spinach! Might = {stats.ValueRO.Might:F1}x");
                         }
-                        else // lv9, 11, 13… → Pummarola
+                        else // lv10, 12, 14… → Pummarola
                         {
                             stats.ValueRW.HpRegen += 0.2f;
                             Debug.Log($"[LevelUpSystem] P{pidx} got Pummarola! HpRegen = {stats.ValueRO.HpRegen:F1}/s");

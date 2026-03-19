@@ -123,6 +123,22 @@ namespace VampireSurvivors.Components
     }
 
     /// <summary>
+    /// Per-player Cross weapon state.
+    /// Fires a cross in the player's facing direction. The projectile travels out to
+    /// TurnDistance, then reverses and homes back to the player (Projectile.Returning).
+    /// High damage, slow cooldown — reward for staying still and letting it orbit back.
+    /// Wiki base stats: Damage 50, Cooldown 5.0 s, Speed 15 u/s.
+    /// </summary>
+    public struct CrossState : IComponentData
+    {
+        public float Timer;
+        public float Cooldown;      // wiki: 5.0 s
+        public float Damage;        // wiki: 50
+        public float Speed;         // u/s
+        public float TurnDistance;  // units before reversing
+    }
+
+    /// <summary>
     /// Per-player Axe weapon state.
     /// Fires a heavy axe in a parabolic arc (upward then falling).
     /// Uses Projectile.Gravity/Velocity for arcing movement.
