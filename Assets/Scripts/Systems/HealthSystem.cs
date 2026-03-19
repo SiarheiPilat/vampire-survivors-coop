@@ -35,6 +35,10 @@ namespace VampireSurvivors.Systems
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             var ecb          = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
+            // Grab run-stats singleton so we can count kills (updated directly on main thread)
+            bool hasRunStats = SystemAPI.TryGetSingletonEntity<SharedGold>(out var runStatsEntity);
+            var  runStats    = hasRunStats ? SystemAPI.GetSingleton<SharedGold>() : default;
+
             // WithNone<Downed> — skip already-downed players so this doesn't re-trigger
             foreach (var (health, entity) in
                 SystemAPI.Query<RefRO<Health>>().WithNone<Downed>().WithEntityAccess())
@@ -94,6 +98,7 @@ namespace VampireSurvivors.Systems
                                 transform.Position + new float3(0f, 0.5f, 0f)));
                         }
                     }
+                    if (hasRunStats) runStats.EnemiesKilled++;
                     ecb.DestroyEntity(entity);
                 }
                 else if (SystemAPI.HasComponent<PlayerTag>(entity))
@@ -106,9 +111,14 @@ namespace VampireSurvivors.Systems
                 }
                 else
                 {
+                    if (hasRunStats) runStats.EnemiesKilled++;
                     ecb.DestroyEntity(entity);
                 }
             }
+
+            // Write kill count back to the singleton
+            if (hasRunStats)
+                state.EntityManager.SetComponentData(runStatsEntity, runStats);
         }
     }
 }

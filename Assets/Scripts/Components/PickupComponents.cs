@@ -30,12 +30,14 @@ namespace VampireSurvivors.Components
     public struct MagnetPickup : IComponentData { }
 
     /// <summary>
-    /// Singleton — total gold accumulated by the whole team this run.
+    /// Singleton — team-wide run statistics.
     /// Created by SharedGoldBootstrapSystem on world startup.
-    /// Written by GoldCoinSystem; read by HUDManager for display.
+    /// Written by GoldCoinSystem (Total) and HealthSystem (EnemiesKilled).
+    /// Read by HUDManager for gold display and game-over stats screen.
     /// </summary>
     public struct SharedGold : IComponentData
     {
-        public int Total;
+        public int Total;         // gold accumulated by the team
+        public int EnemiesKilled; // total enemies destroyed this run
     }
 }

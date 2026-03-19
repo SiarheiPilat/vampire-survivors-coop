@@ -221,12 +221,46 @@ namespace VampireSurvivors.MonoBehaviours
         void TriggerGameOver()
         {
             _gameOver = true;
-            if (gameOverPanel != null)  gameOverPanel.SetActive(true);
+            if (gameOverPanel == null) return;
+            gameOverPanel.SetActive(true);
+
             if (gameOverTimeText != null)
             {
                 int total = Mathf.FloorToInt(_elapsedTime);
                 gameOverTimeText.text = $"Survived  {total / 60:00}:{total % 60:00}";
             }
+
+            // Append run stats (kills, gold) as text lines inside the game-over panel
+            var goWorld = World.DefaultGameObjectInjectionWorld;
+            if (goWorld != null)
+            {
+                using var gq = goWorld.EntityManager.CreateEntityQuery(
+                    ComponentType.ReadOnly<SharedGold>());
+                if (gq.CalculateEntityCount() > 0)
+                {
+                    using var arr = gq.ToComponentDataArray<SharedGold>(Unity.Collections.Allocator.Temp);
+                    var gs = arr[0];
+                    AddStatLine(gameOverPanel, $"Enemies Killed  {gs.EnemiesKilled}", -50f);
+                    AddStatLine(gameOverPanel, $"Gold Earned  {gs.Total}", -90f);
+                }
+            }
+        }
+
+        static void AddStatLine(GameObject panel, string text, float yOffset)
+        {
+            var go  = new GameObject("StatLine");
+            go.transform.SetParent(panel.transform, false);
+            var rt  = go.AddComponent<RectTransform>();
+            rt.anchorMin        = new Vector2(0.5f, 0.5f);
+            rt.anchorMax        = new Vector2(0.5f, 0.5f);
+            rt.pivot            = new Vector2(0.5f, 0.5f);
+            rt.sizeDelta        = new Vector2(400f, 36f);
+            rt.anchoredPosition = new Vector2(0f, yOffset);
+            var tmp = go.AddComponent<TMPro.TextMeshProUGUI>();
+            tmp.text      = text;
+            tmp.fontSize  = 22f;
+            tmp.color     = Color.white;
+            tmp.alignment = TMPro.TextAlignmentOptions.Center;
         }
 
         static Color HpColor(float ratio)
