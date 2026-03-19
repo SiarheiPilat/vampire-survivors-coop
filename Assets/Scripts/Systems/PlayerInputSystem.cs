@@ -6,11 +6,18 @@ using VampireSurvivors.Components;
 namespace VampireSurvivors.Systems
 {
     /// <summary>
-    /// Reads input for each player and writes it into MoveInput.
-    /// Keyboard + gamepad are additive and normalized, so either works at any time.
-    ///   Player 0 — WASD + Gamepad[0]
-    ///   Player 1 — Arrow keys + Gamepad[1]
-    ///   Player 2+ — Gamepad[n] only
+    /// Reads input for each player entity and writes it into MoveInput.
+    ///
+    /// Device lookup priority:
+    ///   1. If the entity has AssignedDeviceId (set by GameSceneBootstrap from
+    ///      GameSession), look up that specific device via InputSystem.GetDeviceById.
+    ///   2. Otherwise fall back to Gamepad.all[PlayerIndex] — used during dev when
+    ///      the game scene is loaded directly without going through the lobby.
+    ///
+    /// Keyboard fallback (always active regardless of device assignment):
+    ///   Player 0 — WASD
+    ///   Player 1 — Arrow keys
+    ///
     /// Not Burst-compiled — reads managed Input System APIs.
     /// Runs before PlayerMovementSystem.
     /// </summary>
@@ -21,13 +28,14 @@ namespace VampireSurvivors.Systems
         {
             var keyboard = Keyboard.current;
 
-            foreach (var (index, moveInput) in
-                SystemAPI.Query<RefRO<PlayerIndex>, RefRW<MoveInput>>())
+            foreach (var (index, assignedDevice, moveInput) in
+                SystemAPI.Query<RefRO<PlayerIndex>, RefRO<AssignedDeviceId>, RefRW<MoveInput>>()
+                         .WithOptions(EntityQueryOptions.Default))
             {
                 int i = index.ValueRO.Value;
                 float2 dir = float2.zero;
 
-                // Keyboard input
+                // Keyboard fallback
                 if (keyboard != null)
                 {
                     if (i == 0)
@@ -46,11 +54,20 @@ namespace VampireSurvivors.Systems
                     }
                 }
 
-                // Gamepad input — additive on top of keyboard
-                if (Gamepad.all.Count > i)
+                // Assigned device (from GameSession via GameSceneBootstrap)
+                int deviceId = assignedDevice.ValueRO.Value;
+                if (deviceId != 0)
+                {
+                    var device = InputSystem.GetDeviceById(deviceId);
+                    if (device is Gamepad gamepad)
+                        dir += (float2)gamepad.leftStick.ReadValue();
+                }
+                else if (Gamepad.all.Count > i)
+                {
+                    // Dev fallback: no session, use Gamepad.all[i]
                     dir += (float2)Gamepad.all[i].leftStick.ReadValue();
+                }
 
-                // Normalize so diagonal keyboard + any gamepad drift stays unit length
                 moveInput.ValueRW.Value = math.lengthsq(dir) > 1f ? math.normalize(dir) : dir;
             }
         }
