@@ -23,7 +23,16 @@ namespace VampireSurvivors.Menu
         [SerializeField] GameObject     settingsPanel;
 
         // Characters available — replace with CharacterRegistry ScriptableObject later
-        static readonly string[] Characters = { "antonio", "imelda", "pasqualina", "gennaro" };
+        static readonly string[] Characters =
+        {
+            "antonio",   // Whip
+            "imelda",    // Magic Wand
+            "pasqualina",// Runetracer
+            "gennaro",   // Knife
+            "arca",      // Garlic
+            "porta",     // Lightning Ring
+            "lama",      // Axe
+        };
 
         // Per-slot state
         readonly InputDevice[] _slotDevice = new InputDevice[4];

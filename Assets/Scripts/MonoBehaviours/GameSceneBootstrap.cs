@@ -129,6 +129,60 @@ namespace VampireSurvivors.MonoBehaviours
                     Debug.Log($"[GameSceneBootstrap] P{slot} Gennaro: Knife, HP=100, Speed=7.7");
                     break;
 
+                case "arca":
+                    // Wiki: Garlic starter, HP 130, Speed 7.0, -5% cooldown bonus
+                    SetBaseStats(em, entity, hp: 130, speed: 7.0f);
+                    if (em.HasComponent<WeaponState>(entity))
+                        em.RemoveComponent<WeaponState>(entity);
+                    em.AddComponentData(entity, new GarlicState
+                    {
+                        Timer    = 0f,
+                        Cooldown = 1.5f,
+                        Damage   = 10f,
+                        Range    = 1.5f
+                    });
+                    var arcaStats = em.GetComponentData<PlayerStats>(entity);
+                    arcaStats.CooldownMult = 0.95f; // -5% cooldown at start
+                    em.SetComponentData(entity, arcaStats);
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Arca: Garlic, HP=130, CooldownMult=0.95");
+                    break;
+
+                case "porta":
+                    // Wiki: Lightning Ring starter, HP 100, Speed 7.5, no stat bonus
+                    SetBaseStats(em, entity, hp: 100, speed: 7.5f);
+                    if (em.HasComponent<WeaponState>(entity))
+                        em.RemoveComponent<WeaponState>(entity);
+                    em.AddComponentData(entity, new LightningRingState
+                    {
+                        Timer    = 0f,
+                        Cooldown = 0.6f,
+                        Damage   = 40f,
+                        Amount   = 1,
+                        Rng      = Unity.Mathematics.Random.CreateFromIndex((uint)(slot * 97 + 13))
+                    });
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Porta: Lightning Ring, HP=100, Speed=7.5");
+                    break;
+
+                case "lama":
+                    // Wiki: Axe starter, HP 130, Speed 6.5, Might +10%
+                    SetBaseStats(em, entity, hp: 130, speed: 6.5f);
+                    if (em.HasComponent<WeaponState>(entity))
+                        em.RemoveComponent<WeaponState>(entity);
+                    em.AddComponentData(entity, new AxeState
+                    {
+                        Timer    = 0f,
+                        Cooldown = 1.25f,
+                        Damage   = 20f,
+                        Speed    = 15f,
+                        Gravity  = 12f,
+                        MaxRange = 10f
+                    });
+                    var lamaStats = em.GetComponentData<PlayerStats>(entity);
+                    lamaStats.Might = 1.1f;
+                    em.SetComponentData(entity, lamaStats);
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Lama: Axe, HP=130, Might=1.1");
+                    break;
+
                 default:
                     Debug.LogWarning($"[GameSceneBootstrap] Unknown character '{charId}' for P{slot} — keeping Whip.");
                     break;
