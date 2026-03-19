@@ -27,7 +27,7 @@ namespace VampireSurvivors.Authoring
                     ZombiePrefab   = GetEntity(authoring.zombiePrefab,   TransformUsageFlags.Dynamic),
                     SkeletonPrefab = GetEntity(authoring.skeletonPrefab, TransformUsageFlags.Dynamic),
                     Timer          = 3f,
-                    Rng            = Random.CreateFromIndex(42)
+                    Rng            = Unity.Mathematics.Random.CreateFromIndex(42)
                 });
             }
         }
