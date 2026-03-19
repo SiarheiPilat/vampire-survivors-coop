@@ -1,5 +1,6 @@
 {
     "name": "VampireSurvivors.Menu",
+    "rootNamespace": "VampireSurvivors.Menu",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
