@@ -22,6 +22,9 @@ namespace VampireSurvivors.Systems
         {
             float dt = SystemAPI.Time.DeltaTime;
 
+            if (!SystemAPI.HasSingleton<BulletPrefabData>()) return;
+            var bulletPrefab = SystemAPI.GetSingleton<BulletPrefabData>().BulletPrefab;
+
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             var ecb          = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
@@ -39,7 +42,7 @@ namespace VampireSurvivors.Systems
                     ? math.normalize(facing.ValueRO.Value)
                     : new float2(1f, 0f); // default right
 
-                var bullet = ecb.CreateEntity();
+                var bullet = ecb.Instantiate(bulletPrefab);
                 ecb.AddComponent(bullet, new Projectile
                 {
                     Damage    = knife.ValueRO.Damage,
@@ -48,7 +51,8 @@ namespace VampireSurvivors.Systems
                     MaxRange  = knife.ValueRO.MaxRange,
                     Traveled  = 0f
                 });
-                ecb.AddComponent(bullet, LocalTransform.FromPosition(transform.ValueRO.Position));
+                ecb.SetComponent(bullet, LocalTransform.FromPositionRotationScale(
+                    transform.ValueRO.Position, quaternion.identity, 0.2f));
             }
         }
     }

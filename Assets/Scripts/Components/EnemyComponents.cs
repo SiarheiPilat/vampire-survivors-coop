@@ -74,6 +74,15 @@ namespace VampireSurvivors.Components
     }
 
     /// <summary>
+    /// Singleton — baked by BulletPrefabAuthoring.
+    /// Holds the entity prefab reference used by projectile weapons (Magic Wand, Knife, …).
+    /// </summary>
+    public struct BulletPrefabData : IComponentData
+    {
+        public Entity BulletPrefab;
+    }
+
+    /// <summary>
     /// Marks an XP gem entity. Spawned at enemy death positions by HealthSystem.
     /// XpGemSystem moves gems toward players in magnet radius and collects them on contact.
     /// </summary>

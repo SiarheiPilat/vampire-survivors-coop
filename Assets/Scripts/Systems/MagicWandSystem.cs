@@ -31,6 +31,9 @@ namespace VampireSurvivors.Systems
 
             var enemyTransforms = enemyQuery.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
 
+            if (!SystemAPI.HasSingleton<BulletPrefabData>()) return;
+            var bulletPrefab = SystemAPI.GetSingleton<BulletPrefabData>().BulletPrefab;
+
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             var ecb          = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
@@ -64,7 +67,7 @@ namespace VampireSurvivors.Systems
                 float3 dir = math.normalizesafe(
                     enemyTransforms[nearestIdx].Position - transform.ValueRO.Position);
 
-                var bullet = ecb.CreateEntity();
+                var bullet = ecb.Instantiate(bulletPrefab);
                 ecb.AddComponent(bullet, new Projectile
                 {
                     Damage    = wand.ValueRO.Damage,
@@ -73,7 +76,8 @@ namespace VampireSurvivors.Systems
                     MaxRange  = wand.ValueRO.MaxRange,
                     Traveled  = 0f
                 });
-                ecb.AddComponent(bullet, LocalTransform.FromPosition(transform.ValueRO.Position));
+                ecb.SetComponent(bullet, LocalTransform.FromPositionRotationScale(
+                    transform.ValueRO.Position, quaternion.identity, 0.2f));
             }
 
             enemyTransforms.Dispose();
