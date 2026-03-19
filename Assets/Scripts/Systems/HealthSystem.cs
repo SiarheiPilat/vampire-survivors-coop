@@ -39,6 +39,18 @@ namespace VampireSurvivors.Systems
             bool hasRunStats = SystemAPI.TryGetSingletonEntity<SharedGold>(out var runStatsEntity);
             var  runStats    = hasRunStats ? SystemAPI.GetSingleton<SharedGold>() : default;
 
+            // Average Luck across living players — scales enemy drop probabilities
+            float avgLuck = 0f;
+            int   playerCount = 0;
+            foreach (var stats in SystemAPI.Query<RefRO<PlayerStats>>()
+                .WithAll<PlayerTag>().WithNone<Downed>())
+            {
+                avgLuck += stats.ValueRO.Luck;
+                playerCount++;
+            }
+            if (playerCount > 0) avgLuck /= playerCount;
+            float luckMult = 1f + avgLuck; // Luck=0 → 1×, Luck=0.1 → 1.1×, Luck=1.0 → 2×
+
             // WithNone<Downed> — skip already-downed players so this doesn't re-trigger
             foreach (var (health, entity) in
                 SystemAPI.Query<RefRO<Health>>().WithNone<Downed>().WithEntityAccess())
@@ -80,8 +92,8 @@ namespace VampireSurvivors.Systems
                         ecb.AddComponent(coinEntity, LocalTransform.FromPosition(
                             transform.Position + new float3(-0.3f, 0.3f, 0f)));
 
-                        // Health pickup (~10% chance) — restores 30 HP to the collector
-                        if (UnityEngine.Random.value < 0.10f)
+                        // Health pickup (~10% base chance, scaled by team Luck) — restores 30 HP to the collector
+                        if (UnityEngine.Random.value < 0.10f * luckMult)
                         {
                             var healEntity = ecb.CreateEntity();
                             ecb.AddComponent(healEntity, new HealthPickup { HealAmount = 30 });
@@ -89,8 +101,8 @@ namespace VampireSurvivors.Systems
                                 transform.Position + new float3(0.3f, -0.3f, 0f)));
                         }
 
-                        // Magnet pickup (~3% chance) — vacuums all XP gems on screen
-                        if (UnityEngine.Random.value < 0.03f)
+                        // Magnet pickup (~3% base chance, scaled by team Luck) — vacuums all XP gems on screen
+                        if (UnityEngine.Random.value < 0.03f * luckMult)
                         {
                             var magEntity = ecb.CreateEntity();
                             ecb.AddComponent(magEntity, new MagnetPickup());

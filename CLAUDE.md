@@ -111,10 +111,10 @@ Characters are selected in the lobby (`LobbyManager`). `GameSceneBootstrap` read
 `GameSession.Slots[i].CharacterId` and swaps the baked Whip for the correct starting weapon.
 `LevelUpSystem` already guards with `!HasComponent<X>` so it won't re-grant starting weapons.
 
-- [x] Antonio — Whip (baked default), Might +10% (1.1)
-- [x] Imelda — Magic Wand (replaces Whip at start), XpMult +10% (1.1)
-- [x] Pasqualina — Runetracer (see Weapons list), no stat bonus
-- [x] Gennaro — Knife (replaces Whip at start), no stat bonus
+- [x] Antonio — Whip (baked default), HP=120, speed=7.0, Might=1.1
+- [x] Imelda — Magic Wand (replaces Whip at start), HP=100, speed=7.0, XpMult=1.1
+- [x] Pasqualina — Runetracer (replaces Whip at start), HP=130, speed=7.0, no stat bonus
+- [x] Gennaro — Knife (replaces Whip at start), HP=100, speed=7.7, no stat bonus
 - [ ] *(others later)*
 
 ### Enemies
@@ -130,9 +130,10 @@ Characters are selected in the lobby (`LobbyManager`). `GameSceneBootstrap` read
 
 - [x] Spinach — PlayerStats.Might +0.1 per odd level (5,7,9…); all weapon systems multiply base damage by Might
 - [x] Pummarola — PlayerStats.HpRegen +0.2 HP/s per even level (6,8,10…); HpRegenSystem (Burst, fractional accumulator)
-- [x] Armor — PlayerStats.Armor int; ContactDamageSystem applies max(1, contactDamage - Armor); granted via level-up choice UI at lv11+ (Armor choice = index 2)
+- [x] Armor — PlayerStats.Armor int; ContactDamageSystem applies max(1, contactDamage - Armor); 3rd choice in level-up UI
 - [x] Empty Tome — PlayerStats.CooldownMult ×0.92 per level (min 0.5); all weapon systems apply at fire time; 4th choice in level-up UI
 - [x] Crown — PlayerStats.XpMult ×1.08 per level; applied in XpGemSystem at collect time; 5th choice in level-up UI
+- [x] Clover — PlayerStats.Luck +0.1 per level; scales enemy drop chances in HealthSystem; 6th choice in level-up UI
 - [x] Magnet pickup — MagnetPickup floor item dropped by enemies (3% chance); MagnetPickupSystem vacuums all XP gems to collector instantly; uses XpMult
 - [ ] *(others later)*
 

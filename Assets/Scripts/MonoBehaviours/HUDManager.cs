@@ -422,10 +422,11 @@ namespace VampireSurvivors.MonoBehaviours
                 "Pummarola\n+0.2 HP/s regen",
                 "Armor\n+1 flat damage reduction",
                 "Empty Tome\n-8% weapon cooldown",
-                "Crown\n+8% XP gain"
+                "Crown\n+8% XP gain",
+                "Clover\n+10% Luck (better drops)"
             };
-            float[] yPos = { 95f, 30f, -35f, -100f, -165f };
-            for (int i = 0; i < 5; i++)
+            float[] yPos = { 120f, 60f, 0f, -60f, -120f, -180f };
+            for (int i = 0; i < 6; i++)
             {
                 int capturedIdx = i;
 
@@ -532,6 +533,10 @@ namespace VampireSurvivors.MonoBehaviours
                 case 4:
                     stats.XpMult *= 1.08f;
                     Debug.Log($"[HUDManager] P{pidx} chose Crown — XpMult = {stats.XpMult:F3}×");
+                    break;
+                case 5:
+                    stats.Luck += 0.1f;
+                    Debug.Log($"[HUDManager] P{pidx} chose Clover — Luck = {stats.Luck:F1}");
                     break;
             }
 

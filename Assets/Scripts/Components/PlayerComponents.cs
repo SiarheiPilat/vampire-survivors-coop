@@ -87,6 +87,13 @@ namespace VampireSurvivors.Components
         /// Wiki: Empty Tome grants -8% Cooldown per level (multiplicative, capped at lv5 ≈ 0.659×).
         /// </summary>
         public float CooldownMult;
+
+        /// <summary>
+        /// Luck stat. Default 0. Each Clover pickup adds +0.1.
+        /// Applied in HealthSystem: dropChance scales by (1 + Luck × nearest-player-luck).
+        /// Wiki: Clover increases Luck which affects item find and critical hit chance.
+        /// </summary>
+        public float Luck;
     }
 
     /// <summary>

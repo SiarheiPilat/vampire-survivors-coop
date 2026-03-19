@@ -71,15 +71,15 @@ namespace VampireSurvivors.MonoBehaviours
             switch (charId)
             {
                 case "antonio":
-                    // Whip is already baked as WeaponState — just apply the Might bonus
+                    SetBaseStats(em, entity, hp: 120, speed: 7.0f);
                     var antonioStats = em.GetComponentData<PlayerStats>(entity);
                     antonioStats.Might = 1.1f;
                     em.SetComponentData(entity, antonioStats);
-                    Debug.Log($"[GameSceneBootstrap] P{slot} Antonio: Whip, Might=1.1");
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Antonio: Whip, HP=120, Might=1.1");
                     break;
 
                 case "imelda":
-                    // Replace Whip with Magic Wand; +10% XP gain
+                    SetBaseStats(em, entity, hp: 100, speed: 7.0f);
                     if (em.HasComponent<WeaponState>(entity))
                         em.RemoveComponent<WeaponState>(entity);
                     em.AddComponentData(entity, new MagicWandState
@@ -93,11 +93,11 @@ namespace VampireSurvivors.MonoBehaviours
                     var imeldaStats = em.GetComponentData<PlayerStats>(entity);
                     imeldaStats.XpMult = 1.1f;
                     em.SetComponentData(entity, imeldaStats);
-                    Debug.Log($"[GameSceneBootstrap] P{slot} Imelda: MagicWand, XpMult=1.1");
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Imelda: MagicWand, HP=100, XpMult=1.1");
                     break;
 
                 case "pasqualina":
-                    // Runetracer: bouncing projectile in facing direction
+                    SetBaseStats(em, entity, hp: 130, speed: 7.0f);
                     if (em.HasComponent<WeaponState>(entity))
                         em.RemoveComponent<WeaponState>(entity);
                     em.AddComponentData(entity, new RunetracerState
@@ -109,11 +109,11 @@ namespace VampireSurvivors.MonoBehaviours
                         MaxRange = 10f,
                         Bounces  = 3
                     });
-                    Debug.Log($"[GameSceneBootstrap] P{slot} Pasqualina: Runetracer");
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Pasqualina: Runetracer, HP=130");
                     break;
 
                 case "gennaro":
-                    // Replace Whip with Knife; wiki: +1 projectile count (deferred)
+                    SetBaseStats(em, entity, hp: 100, speed: 7.7f);
                     if (em.HasComponent<WeaponState>(entity))
                         em.RemoveComponent<WeaponState>(entity);
                     em.AddComponentData(entity, new KnifeState
@@ -124,13 +124,23 @@ namespace VampireSurvivors.MonoBehaviours
                         Speed    = 15f,
                         MaxRange = 12f
                     });
-                    Debug.Log($"[GameSceneBootstrap] P{slot} Gennaro: Knife");
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Gennaro: Knife, HP=100, Speed=7.7");
                     break;
 
                 default:
                     Debug.LogWarning($"[GameSceneBootstrap] Unknown character '{charId}' for P{slot} — keeping Whip.");
                     break;
             }
+        }
+        static void SetBaseStats(EntityManager em, Entity entity, int hp, float speed)
+        {
+            em.SetComponentData(entity, new Health { Current = hp, Max = hp });
+            var ps = em.GetComponentData<PlayerStats>(entity);
+            ps.Hp    = hp;
+            ps.MaxHp = hp;
+            em.SetComponentData(entity, ps);
+            if (em.HasComponent<MoveSpeed>(entity))
+                em.SetComponentData(entity, new MoveSpeed { Value = speed });
         }
     }
 }
