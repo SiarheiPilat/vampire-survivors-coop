@@ -2,13 +2,21 @@
 
 ## Session Notes (2026-03-19)
 
-- [ ] **Gamepad device assignment** — `Gamepad.all` order is connection order, not port.
-      If a controller is unplugged/replugged mid-session it can swap player indices.
-      Fix later with a "press button to join" device-assignment lobby screen.
 - [ ] **Delete the one-shot editor script** (`Assets/Scripts/Editor/CreatePlayerSubScene.cs`)
       once the SubScene setup is stable — it's not needed at runtime.
 - [ ] **MeshCollider on player Quads** — Quad primitive adds a MeshCollider automatically.
       Remove it from Player_0–3 (players don't need physics colliders yet).
+
+## Menu / Lobby Follow-ups
+
+- [ ] **CharacterRegistry ScriptableObject** — replace the hard-coded `Characters[]` array in
+      `LobbyManager` with a proper registry asset that holds name, sprite, starting weapon.
+- [ ] **Real customization/skin data** — `PlayerSlotUI` currently shows a slot index; wire up
+      actual skin sprites/names when art assets exist.
+- [ ] **Apple TV Remote support** — tvOS Siri Remote shows up as a non-Gamepad `InputDevice`.
+      `LobbyManager.Update()` skips non-Gamepad devices; add MFi / Apple TV remote handling.
+- [ ] **Back-navigation from Lobby** — pressing B/Circle with no joined players should return
+      to PressToStartScene instead of doing nothing.
 
 ---
 
@@ -17,7 +25,7 @@
 - [x] Project initialized — DOTS/ECS, URP 2D, Input System
 - [x] ECSBootstrap proof-of-concept (disabled — replaced by PlayerAuthoring)
 - [x] Player entity — PlayerAuthoring, MoveInput, MoveSpeed, PlayerStats, PlayerTag, PlayerIndex
-- [x] Input routing — WASD (P0), Arrow keys (P1), Gamepad[n] for all players
+- [x] Input routing — WASD/Gamepad dev fallback; lobby assigns devices by button-press (AssignedDeviceId)
 - [x] Camera system — centroid follow + dynamic zoom (CameraFollow)
 - [x] SubScene setup — Player_0–3 baked into ECS entities via Players.unity SubScene
 - [ ] Enemy entity + movement AI (target nearest player)
@@ -28,7 +36,7 @@
 - [ ] Pickup system (gold, health, magnets)
 - [ ] Player death + revive mechanic
 - [ ] HUD (per-player HP bars, timer, kill count)
-- [ ] Main menu / character select
+- [x] Main menu / character select — Splash → PressToStart → Lobby (4-player device assignment, char cycling, persistence)
 - [ ] Game over / win screen
 
 ---
@@ -84,5 +92,5 @@
 - [ ] Player death + revive (hold interact near downed player)
 - [ ] Enemy aggro — target nearest player
 - [ ] Boss HP scaling (×1.5 per additional player)
-- [ ] "Press button to join" device-assignment lobby
+- [x] "Press button to join" device-assignment lobby — implemented in LobbyScene
 - [ ] Online co-op via Netcode for Entities (after local co-op is solid)

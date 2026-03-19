@@ -35,6 +35,17 @@ namespace VampireSurvivors.Authoring
                     Xp            = 0f,
                     XpToNextLevel = 100f
                 });
+                AddComponent(entity, new AssignedDeviceId { Value = 0 });
+                AddComponent(entity, new Health { Current = authoring.maxHp, Max = authoring.maxHp });
+                AddComponent(entity, new Invincible { Timer = 0f });
+                AddComponent(entity, new WeaponState
+                {
+                    SwingTimer    = 0f,
+                    SwingCooldown = 0.5f,
+                    Damage        = 10f,
+                    Range         = 1.5f,
+                    ArcDegrees    = 120f
+                });
             }
         }
     }
