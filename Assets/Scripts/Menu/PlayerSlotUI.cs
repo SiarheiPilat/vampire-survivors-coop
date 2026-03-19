@@ -11,7 +11,6 @@ namespace VampireSurvivors.Menu
     {
         [Header("Empty State")]
         [SerializeField] GameObject emptyPanel;
-        [SerializeField] TMP_Text   emptyLabel;   // "Press any button to join"
 
         [Header("Joined State")]
         [SerializeField] GameObject joinedPanel;
@@ -31,8 +30,10 @@ namespace VampireSurvivors.Menu
         {
             emptyPanel.SetActive(false);
             joinedPanel.SetActive(true);
-            playerLabel.text      = $"P{SlotIndex + 1}";
-            characterName.text    = char.ToUpper(character[0]) + character[1..];
+            playerLabel.text       = $"P{SlotIndex + 1}";
+            characterName.text     = string.IsNullOrEmpty(character)
+                ? "Unknown"
+                : char.ToUpper(character[0]) + (character.Length > 1 ? character[1..] : "");
             customizationName.text = $"Skin {customizationIndex + 1}";
         }
     }

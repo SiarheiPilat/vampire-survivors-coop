@@ -20,6 +20,12 @@ namespace VampireSurvivors.Menu
 
         void OnEnable()
         {
+            if (masterSlider == null || musicSlider == null || sfxSlider == null)
+            {
+                Debug.LogError("[SettingsPanel] One or more slider fields not assigned in Inspector.");
+                return;
+            }
+
             masterSlider.value = PlayerPrefs.GetFloat(KeyMaster, 100f);
             musicSlider.value  = PlayerPrefs.GetFloat(KeyMusic,  100f);
             sfxSlider.value    = PlayerPrefs.GetFloat(KeySFX,    100f);
