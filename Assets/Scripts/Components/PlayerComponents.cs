@@ -123,6 +123,21 @@ namespace VampireSurvivors.Components
     }
 
     /// <summary>
+    /// Per-player Lightning Ring weapon state.
+    /// Instant-hits up to Amount random enemies every Cooldown seconds.
+    /// No projectile — damage is applied immediately to selected targets.
+    /// Wiki base stats: Damage 40, Cooldown 0.6 s, Amount 1 enemy/strike.
+    /// </summary>
+    public struct LightningRingState : IComponentData
+    {
+        public float  Timer;
+        public float  Cooldown;
+        public float  Damage;
+        public int    Amount;  // enemies struck per activation
+        public Random Rng;
+    }
+
+    /// <summary>
     /// Per-player Holy Water weapon state.
     /// Throws a flask in a random direction; on landing it creates a stationary
     /// damage puddle that ticks all enemies within Radius every TickCooldown seconds.
