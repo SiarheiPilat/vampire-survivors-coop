@@ -4,10 +4,9 @@
 
 ## Next Up (priority order)
 
-- [ ] Hollow Heart passive (+10% max HP) + Bloody Tear evolution (Whip + Hollow Heart)
 - [ ] Chest/treasure system: enemies drop chests on death, reward on contact (weapon/passive/gold)
-- [ ] Chest/treasure system: enemies drop chests on death, reward on contact (weapon/passive/gold)
-- [ ] Weapon amount upgrades for Whip, Axe, Cross, HolyWater, LightningRing in level-up pool
+- [ ] Weapon amount upgrades for Whip, Axe, HolyWater in level-up pool (add Amount fields)
+- [ ] Duplicator passive (+1 Amount to all weapons) + Thunder Loop (Lightning Ring + Duplicator)
 - [ ] More characters: Mortaccio (Bone), Yatta Cavallo (Santa Water)
 - [ ] Thunder Loop evolution (Lightning Ring + Duplicator passive)
 - [ ] Duplicator passive (+1 Amount to all weapons)
@@ -15,6 +14,12 @@
 - [ ] Back-navigation from Lobby (B/Circle with no joined players → PressToStart)
 
 ## Completed
+
+### 2026-03-20 (Session 3 — ~10:XX)
+
+- [x] **Hollow Heart** passive: `PlayerStats.MaxHpBonus` +10% of current MaxHp; heals same amount on pickup
+- [x] **Bloody Tear** evolution (Whip + Hollow Heart): 20 dmg, heals 1 HP per enemy struck, 0.45s CD; `HitArc.OwnerEntity` + `HealPerHit`; `WeaponState.IsEvolved`
+- [x] **Lightning Ring Amount** upgrade in level-up pool (up to 5 strikes/activation)
 
 ### 2026-03-20 (Session 2 — ~10:XX)
 
