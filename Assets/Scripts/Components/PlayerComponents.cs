@@ -223,6 +223,7 @@ namespace VampireSurvivors.Components
         public float  Radius;         // puddle radius
         public float  PuddleLifetime;
         public float  TickCooldown;
+        public int    Amount;    // flasks thrown per cooldown (1=default); each in independent random direction
         public Random Rng;
     }
 
@@ -258,6 +259,7 @@ namespace VampireSurvivors.Components
         public float Speed;     // launch speed (u/s)
         public float Gravity;   // downward accel (u/s²)
         public float MaxRange;  // path length before despawn
+        public int   Amount;    // axes fired per cooldown (1=default); fan spread 20° between axes
     }
 
     /// <summary>

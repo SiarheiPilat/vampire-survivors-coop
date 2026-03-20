@@ -44,27 +44,43 @@ namespace VampireSurvivors.Systems
 
                 axe.ValueRW.Timer = axe.ValueRO.Cooldown * stats.ValueRO.CooldownMult;
 
-                // Horizontal component follows facing direction; always launches upward
                 float facingX = math.lengthsq(facing.ValueRO.Value) > 0.001f
                     ? math.normalize(facing.ValueRO.Value).x
                     : 1f;
 
-                float spd      = axe.ValueRO.Speed * stats.ValueRO.ProjectileSpeedMult;
-                var   initVel  = new float3(facingX * spd * 0.5f, spd * 0.866f, 0f); // ~60° elevation
+                float spd    = axe.ValueRO.Speed * stats.ValueRO.ProjectileSpeedMult;
+                float damage = axe.ValueRO.Damage * stats.ValueRO.Might;
+                int   amount = math.max(1, axe.ValueRO.Amount);
 
-                var bullet = ecb.Instantiate(bulletPrefab);
-                ecb.AddComponent(bullet, new Projectile
+                // Fan-spread: axes spaced 25° apart, centred on ~60° launch direction
+                float2 baseDir2  = math.normalizesafe(new float2(facingX * 0.5f, 0.866f));
+                float  stepRad   = 25f * math.PI / 180f;
+                float  centreOff = -(amount - 1) * 0.5f * stepRad;
+
+                for (int a = 0; a < amount; a++)
                 {
-                    Damage    = axe.ValueRO.Damage * stats.ValueRO.Might,
-                    Speed     = spd,
-                    Direction = math.normalizesafe(initVel),
-                    MaxRange  = axe.ValueRO.MaxRange,
-                    Traveled  = 0f,
-                    Gravity   = axe.ValueRO.Gravity,
-                    Velocity  = initVel
-                });
-                ecb.SetComponent(bullet, LocalTransform.FromPositionRotationScale(
-                    transform.ValueRO.Position, quaternion.identity, 0.3f)); // slightly larger than bullet
+                    float  offset = centreOff + a * stepRad;
+                    float  cosO   = math.cos(offset);
+                    float  sinO   = math.sin(offset);
+                    float2 fanDir = new float2(
+                        baseDir2.x * cosO - baseDir2.y * sinO,
+                        baseDir2.x * sinO + baseDir2.y * cosO);
+                    var initVel = new float3(fanDir.x * spd, fanDir.y * spd, 0f);
+
+                    var bullet = ecb.Instantiate(bulletPrefab);
+                    ecb.AddComponent(bullet, new Projectile
+                    {
+                        Damage    = damage,
+                        Speed     = spd,
+                        Direction = math.normalizesafe(initVel),
+                        MaxRange  = axe.ValueRO.MaxRange,
+                        Traveled  = 0f,
+                        Gravity   = axe.ValueRO.Gravity,
+                        Velocity  = initVel
+                    });
+                    ecb.SetComponent(bullet, LocalTransform.FromPositionRotationScale(
+                        transform.ValueRO.Position, quaternion.identity, 0.3f));
+                }
             }
         }
     }

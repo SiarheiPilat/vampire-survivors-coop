@@ -175,7 +175,8 @@ namespace VampireSurvivors.MonoBehaviours
                         Damage   = 20f,
                         Speed    = 15f,
                         Gravity  = 12f,
-                        MaxRange = 10f
+                        MaxRange = 10f,
+                        Amount   = 1
                     });
                     var lamaStats = em.GetComponentData<PlayerStats>(entity);
                     lamaStats.Might = 1.1f;

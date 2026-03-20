@@ -63,7 +63,7 @@ namespace VampireSurvivors.MonoBehaviours
         enum UpgradeType
         {
             Spinach, Pummarola, Armor, EmptyTome, Crown, Clover, Bracer, HollowHeart,
-            WandAmount, KnifeAmount, FireAmount, LightningAmount,
+            WandAmount, KnifeAmount, FireAmount, LightningAmount, WhipAmount, AxeAmount, HolyWaterAmount,
             HolyWandEvolution,     // Magic Wand + Empty Tome
             SoulEaterEvolution,    // Garlic + Pummarola
             HeavenSwordEvolution,  // Cross + Clover
@@ -79,6 +79,9 @@ namespace VampireSurvivors.MonoBehaviours
             (UpgradeType.KnifeAmount,     "Knife +1 blade\nThrow an extra Knife per volley"),
             (UpgradeType.FireAmount,      "Fire Wand +1 flame\nLaunch an extra fireball per burst"),
             (UpgradeType.LightningAmount, "Lightning Ring +1 strike\nHit an extra enemy per activation"),
+            (UpgradeType.WhipAmount,      "Whip +1 arc\nSwing an extra Whip in a new direction"),
+            (UpgradeType.AxeAmount,       "Axe +1 blade\nThrow an extra Axe per volley"),
+            (UpgradeType.HolyWaterAmount, "Holy Water +1 flask\nThrow an extra flask per volley"),
         };
         static readonly (UpgradeType type, string label)[] k_PassiveUpgrades =
         {
@@ -623,6 +626,28 @@ namespace VampireSurvivors.MonoBehaviours
                             canAdd = curAmt < 5;
                         }
                         break;
+                    case UpgradeType.WhipAmount:
+                        if (em.HasComponent<WeaponState>(_pendingUpgradeEntity))
+                        {
+                            var ws2 = em.GetComponentData<WeaponState>(_pendingUpgradeEntity);
+                            curAmt = Unity.Mathematics.math.max(1, ws2.Amount);
+                            canAdd = curAmt < 5 && !ws2.IsEvolved;
+                        }
+                        break;
+                    case UpgradeType.AxeAmount:
+                        if (em.HasComponent<AxeState>(_pendingUpgradeEntity))
+                        {
+                            curAmt = Unity.Mathematics.math.max(1, em.GetComponentData<AxeState>(_pendingUpgradeEntity).Amount);
+                            canAdd = curAmt < 5;
+                        }
+                        break;
+                    case UpgradeType.HolyWaterAmount:
+                        if (em.HasComponent<HolyWaterState>(_pendingUpgradeEntity))
+                        {
+                            curAmt = Unity.Mathematics.math.max(1, em.GetComponentData<HolyWaterState>(_pendingUpgradeEntity).Amount);
+                            canAdd = curAmt < 5;
+                        }
+                        break;
                 }
                 if (canAdd) pool.Add((type, label + $"  ({curAmt}→{curAmt + 1})"));
             }
@@ -780,6 +805,33 @@ namespace VampireSurvivors.MonoBehaviours
                         ring.Amount++;
                         em.SetComponentData(_pendingUpgradeEntity, ring);
                         Debug.Log($"[HUDManager] P{pidx} chose Lightning Ring +1 — Amount = {ring.Amount}");
+                    }
+                    break;
+                case UpgradeType.WhipAmount:
+                    if (em.HasComponent<WeaponState>(_pendingUpgradeEntity))
+                    {
+                        var ws2 = em.GetComponentData<WeaponState>(_pendingUpgradeEntity);
+                        ws2.Amount = Unity.Mathematics.math.max(1, ws2.Amount) + 1;
+                        em.SetComponentData(_pendingUpgradeEntity, ws2);
+                        Debug.Log($"[HUDManager] P{pidx} chose Whip +1 — Amount = {ws2.Amount}");
+                    }
+                    break;
+                case UpgradeType.AxeAmount:
+                    if (em.HasComponent<AxeState>(_pendingUpgradeEntity))
+                    {
+                        var axe2 = em.GetComponentData<AxeState>(_pendingUpgradeEntity);
+                        axe2.Amount = Unity.Mathematics.math.max(1, axe2.Amount) + 1;
+                        em.SetComponentData(_pendingUpgradeEntity, axe2);
+                        Debug.Log($"[HUDManager] P{pidx} chose Axe +1 — Amount = {axe2.Amount}");
+                    }
+                    break;
+                case UpgradeType.HolyWaterAmount:
+                    if (em.HasComponent<HolyWaterState>(_pendingUpgradeEntity))
+                    {
+                        var hw2 = em.GetComponentData<HolyWaterState>(_pendingUpgradeEntity);
+                        hw2.Amount = Unity.Mathematics.math.max(1, hw2.Amount) + 1;
+                        em.SetComponentData(_pendingUpgradeEntity, hw2);
+                        Debug.Log($"[HUDManager] P{pidx} chose Holy Water +1 — Amount = {hw2.Amount}");
                     }
                     break;
 

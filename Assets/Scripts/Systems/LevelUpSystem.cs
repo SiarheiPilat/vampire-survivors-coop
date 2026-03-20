@@ -100,7 +100,8 @@ namespace VampireSurvivors.Systems
                                     Damage   = 20f,
                                     Speed    = 8f,
                                     Gravity  = 12f,
-                                    MaxRange = 12f
+                                    MaxRange = 12f,
+                                    Amount   = 1
                                 });
                             break;
                         case 8:
@@ -118,15 +119,16 @@ namespace VampireSurvivors.Systems
                             if (!SystemAPI.HasComponent<HolyWaterState>(entity))
                                 ecb.AddComponent(entity, new HolyWaterState
                                 {
-                                    Timer         = 0f,
-                                    Cooldown      = 6.0f,
-                                    Damage        = 20f,
-                                    Speed         = 8f,
-                                    MaxRange      = 4f,
-                                    Radius        = 1.5f,
+                                    Timer          = 0f,
+                                    Cooldown       = 6.0f,
+                                    Damage         = 20f,
+                                    Speed          = 8f,
+                                    MaxRange       = 4f,
+                                    Radius         = 1.5f,
                                     PuddleLifetime = 5.0f,
-                                    TickCooldown  = 0.5f,
-                                    Rng           = new Unity.Mathematics.Random((uint)(entity.Index * 1234567891u + 7u))
+                                    TickCooldown   = 0.5f,
+                                    Amount         = 1,
+                                    Rng            = new Unity.Mathematics.Random((uint)(entity.Index * 1234567891u + 7u))
                                 });
                             break;
                         case 10:

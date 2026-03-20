@@ -46,25 +46,29 @@ namespace VampireSurvivors.Systems
 
                 hw.ValueRW.Timer = hw.ValueRO.Cooldown * stats.ValueRO.CooldownMult;
 
-                float angle = hw.ValueRW.Rng.NextFloat(0f, 2f * math.PI);
-                var   dir2  = new float2(math.cos(angle), math.sin(angle));
-
                 float damage = hw.ValueRO.Damage * stats.ValueRO.Might;
+                int   amount = math.max(1, hw.ValueRO.Amount);
 
-                var flask = ecb.Instantiate(bulletPrefab);
-                ecb.AddComponent(flask, new HolyWaterProjectile
+                for (int a = 0; a < amount; a++)
                 {
-                    Direction     = dir2,
-                    Speed         = hw.ValueRO.Speed,
-                    Traveled      = 0f,
-                    MaxRange      = hw.ValueRO.MaxRange,
-                    Damage        = damage,
-                    PuddleRadius  = hw.ValueRO.Radius,
-                    PuddleLifetime = hw.ValueRO.PuddleLifetime,
-                    TickCooldown  = hw.ValueRO.TickCooldown
-                });
-                ecb.SetComponent(flask, LocalTransform.FromPositionRotationScale(
-                    transform.ValueRO.Position, quaternion.identity, 0.25f));
+                    float  angle = hw.ValueRW.Rng.NextFloat(0f, 2f * math.PI);
+                    float2 dir2  = new float2(math.cos(angle), math.sin(angle));
+
+                    var flask = ecb.Instantiate(bulletPrefab);
+                    ecb.AddComponent(flask, new HolyWaterProjectile
+                    {
+                        Direction      = dir2,
+                        Speed          = hw.ValueRO.Speed,
+                        Traveled       = 0f,
+                        MaxRange       = hw.ValueRO.MaxRange,
+                        Damage         = damage,
+                        PuddleRadius   = hw.ValueRO.Radius,
+                        PuddleLifetime = hw.ValueRO.PuddleLifetime,
+                        TickCooldown   = hw.ValueRO.TickCooldown
+                    });
+                    ecb.SetComponent(flask, LocalTransform.FromPositionRotationScale(
+                        transform.ValueRO.Position, quaternion.identity, 0.25f));
+                }
             }
 
             // ── Pass 2: move flasks and land them ────────────────────────────

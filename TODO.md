@@ -1,10 +1,10 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-20 ~11:30
+> Last updated: 2026-03-20 ~12:00
 
 ## Next Up (priority order)
 
-- [ ] Weapon amount upgrades for Whip, Axe, HolyWater in level-up pool (add Amount fields)
+- [ ] Duplicator passive (+1 Amount to all weapons)
 - [ ] Duplicator passive (+1 Amount to all weapons) + Thunder Loop (Lightning Ring + Duplicator)
 - [ ] More characters: Mortaccio (Bone), Yatta Cavallo (Santa Water)
 - [ ] Thunder Loop evolution (Lightning Ring + Duplicator passive)
@@ -13,6 +13,16 @@
 - [ ] Back-navigation from Lobby (B/Circle with no joined players → PressToStart)
 
 ## Completed
+
+### 2026-03-20 (Session 5 — ~12:00)
+
+- [x] **Weapon Amount upgrades for Whip, Axe, Holy Water** in level-up pool
+  - Added `Amount` field to `WeaponState` (Whip), `AxeState`, `HolyWaterState`
+  - `WhipSystem`: fires `Amount` HitArcs evenly distributed around 360° from facing direction
+  - `AxeSystem`: fires `Amount` axes in a 25° fan spread centred on facing direction
+  - `HolyWaterSystem`: fires `Amount` flasks in independent random directions
+  - `HUDManager`: `WhipAmount`, `AxeAmount`, `HolyWaterAmount` in upgrade pool (cap 5, Whip blocked when evolved)
+  - All default to Amount=1; `PlayerAuthoring`, `LevelUpSystem`, `GameSceneBootstrap` updated
 
 ### 2026-03-20 (Session 4 — ~11:30)
 

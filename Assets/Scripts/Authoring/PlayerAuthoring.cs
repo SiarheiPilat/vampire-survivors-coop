@@ -51,7 +51,8 @@ namespace VampireSurvivors.Authoring
                     SwingCooldown = 0.5f,
                     Damage        = 10f,
                     Range         = 1.5f,
-                    ArcDegrees    = 120f
+                    ArcDegrees    = 120f,
+                    Amount        = 1
                 });
                 AddComponent(entity, new FacingDirection { Value = new float2(1f, 0f) });
                 // Weapons are unlocked by LevelUpSystem as the player levels up:

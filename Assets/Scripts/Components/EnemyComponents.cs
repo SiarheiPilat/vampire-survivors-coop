@@ -51,6 +51,7 @@ namespace VampireSurvivors.Components
         public float Damage;
         public float Range;
         public float ArcDegrees;
+        public int   Amount;      // simultaneous arcs per swing (1=default); each offset by 360/Amount degrees
         public bool  IsEvolved;   // true = Bloody Tear: double dmg, heals on hit
         public float HealPerHit;  // HP restored to owner per enemy struck (Bloody Tear)
     }

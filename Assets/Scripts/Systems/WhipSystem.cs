@@ -35,17 +35,27 @@ namespace VampireSurvivors.Systems
                 if (math.lengthsq(dir) < 0.01f)
                     dir = new float2(1f, 0f); // default right when player is idle
 
-                var arcEntity = ecb.CreateEntity();
-                ecb.AddComponent(arcEntity, new HitArc
+                float  baseDamage = ws.Damage * stats.ValueRO.Might;
+                int    amount     = math.max(1, ws.Amount);
+                float  baseAngle  = math.atan2(dir.y, dir.x);
+                float  stepRad    = 2f * math.PI / amount;
+
+                for (int a = 0; a < amount; a++)
                 {
-                    Damage      = ws.Damage * stats.ValueRO.Might,
-                    Direction   = math.normalizesafe(dir),
-                    Range       = ws.Range,
-                    ArcDegrees  = ws.ArcDegrees,
-                    Origin      = transform.ValueRO.Position,
-                    OwnerEntity = ws.IsEvolved ? entity : Entity.Null,
-                    HealPerHit  = ws.HealPerHit
-                });
+                    float  angle    = baseAngle + a * stepRad;
+                    float2 arcDir   = new float2(math.cos(angle), math.sin(angle));
+                    var    arcEntity = ecb.CreateEntity();
+                    ecb.AddComponent(arcEntity, new HitArc
+                    {
+                        Damage      = baseDamage,
+                        Direction   = arcDir,
+                        Range       = ws.Range,
+                        ArcDegrees  = ws.ArcDegrees,
+                        Origin      = transform.ValueRO.Position,
+                        OwnerEntity = ws.IsEvolved ? entity : Entity.Null,
+                        HealPerHit  = ws.HealPerHit
+                    });
+                }
 
                 ws.SwingTimer = ws.SwingCooldown * stats.ValueRO.CooldownMult;
             }
