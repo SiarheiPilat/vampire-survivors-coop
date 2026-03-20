@@ -40,21 +40,27 @@ namespace VampireSurvivors.Systems
 
             var enemyQuery = SystemAPI.QueryBuilder()
                 .WithAll<EnemyTag, LocalTransform, Health>().Build();
+            var playerQuery = SystemAPI.QueryBuilder()
+                .WithAll<PlayerTag, LocalTransform>()
+                .WithNone<Downed>().Build();
 
-            var enemyEntities   = enemyQuery.ToEntityArray(Allocator.TempJob);
-            var enemyTransforms = enemyQuery.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
+            var enemyEntities    = enemyQuery.ToEntityArray(Allocator.TempJob);
+            var enemyTransforms  = enemyQuery.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
+            var playerTransforms = playerQuery.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
 
             new PuddleTickJob
             {
-                EnemyEntities   = enemyEntities,
-                EnemyTransforms = enemyTransforms,
-                HealthLookup    = _healthLookup,
-                DeltaTime       = dt,
-                Ecb             = ecb
+                EnemyEntities    = enemyEntities,
+                EnemyTransforms  = enemyTransforms,
+                PlayerTransforms = playerTransforms,
+                HealthLookup     = _healthLookup,
+                DeltaTime        = dt,
+                Ecb              = ecb
             }.Run();
 
             enemyEntities.Dispose();
             enemyTransforms.Dispose();
+            playerTransforms.Dispose();
         }
 
         [BurstCompile]
@@ -62,17 +68,34 @@ namespace VampireSurvivors.Systems
         {
             [ReadOnly] public NativeArray<Entity>         EnemyEntities;
             [ReadOnly] public NativeArray<LocalTransform> EnemyTransforms;
+            [ReadOnly] public NativeArray<LocalTransform> PlayerTransforms;
             [NativeDisableParallelForRestriction] public ComponentLookup<Health> HealthLookup;
             public EntityCommandBuffer Ecb;
             public float DeltaTime;
 
-            void Execute(ref HolyWaterPuddle puddle, in LocalTransform transform, Entity entity)
+            const float FollowSpeed = 2.0f; // La Borra puddle creep speed (u/s)
+
+            void Execute(ref HolyWaterPuddle puddle, ref LocalTransform transform, Entity entity)
             {
                 puddle.Lifetime -= DeltaTime;
                 if (puddle.Lifetime <= 0f)
                 {
                     Ecb.DestroyEntity(entity);
                     return;
+                }
+
+                // La Borra: creep toward nearest non-downed player
+                if (puddle.FollowsPlayer && PlayerTransforms.Length > 0)
+                {
+                    float3 nearest   = PlayerTransforms[0].Position;
+                    float  minDistSq = math.distancesq(transform.Position, nearest);
+                    for (int p = 1; p < PlayerTransforms.Length; p++)
+                    {
+                        float d = math.distancesq(transform.Position, PlayerTransforms[p].Position);
+                        if (d < minDistSq) { minDistSq = d; nearest = PlayerTransforms[p].Position; }
+                    }
+                    float3 dir = math.normalizesafe(nearest - transform.Position);
+                    transform.Position += dir * FollowSpeed * DeltaTime;
                 }
 
                 puddle.TickTimer -= DeltaTime;

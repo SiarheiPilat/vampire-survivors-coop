@@ -18,6 +18,8 @@ namespace VampireSurvivors.Components
         public float  PuddleRadius;
         public float  PuddleLifetime;
         public float  TickCooldown;
+        /// <summary>True when fired by an evolved (La Borra) Holy Water. Passed to HolyWaterPuddle on landing.</summary>
+        public bool   FollowsPlayer;
     }
 
     /// <summary>
@@ -33,5 +35,7 @@ namespace VampireSurvivors.Components
         public float Radius;
         public float TickTimer;
         public float TickCooldown;
+        /// <summary>If true (La Borra evolution), the puddle slowly creeps toward the nearest player.</summary>
+        public bool  FollowsPlayer;
     }
 }

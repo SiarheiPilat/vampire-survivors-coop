@@ -75,6 +75,8 @@ namespace VampireSurvivors.MonoBehaviours
             UnholyVespersEvolution,// King Bible + Spellbinder
             NoFutureEvolution,     // Runetracer + Armor
             DeathSpiralEvolution,  // Axe + Candelabrador
+            HellfireEvolution,     // Fire Wand + Spinach
+            LaBorraEvolution,      // Holy Water + Attractorb
         }
         readonly UpgradeType[] _currentChoices = new UpgradeType[3];
         readonly TMP_Text[]    _btnLabels       = new TMP_Text[3];
@@ -681,7 +683,7 @@ namespace VampireSurvivors.MonoBehaviours
                         {
                             var fw2 = em.GetComponentData<FireWandState>(_pendingUpgradeEntity);
                             curAmt = fw2.Amount;
-                            canAdd = curAmt < 5 && !fw2.IsEvolved;
+                            canAdd = curAmt < 5 && !fw2.IsEvolved && !fw2.IsHellfire;
                         }
                         break;
                     case UpgradeType.LightningAmount:
@@ -710,8 +712,9 @@ namespace VampireSurvivors.MonoBehaviours
                     case UpgradeType.HolyWaterAmount:
                         if (em.HasComponent<HolyWaterState>(_pendingUpgradeEntity))
                         {
-                            curAmt = Unity.Mathematics.math.max(1, em.GetComponentData<HolyWaterState>(_pendingUpgradeEntity).Amount);
-                            canAdd = curAmt < 5;
+                            var hw2 = em.GetComponentData<HolyWaterState>(_pendingUpgradeEntity);
+                            curAmt = Unity.Mathematics.math.max(1, hw2.Amount);
+                            canAdd = curAmt < 5 && !hw2.IsEvolved;
                         }
                         break;
                     case UpgradeType.BoneAmount:
@@ -806,6 +809,24 @@ namespace VampireSurvivors.MonoBehaviours
                 if (!axe2.IsEvolved && playerStats.AreaMult > 1.0f)
                     pool.Add((UpgradeType.DeathSpiralEvolution,
                         "★ Death Spiral\nAxe + Candelabrador — 9 piercing scythes, 60 dmg, 4s CD"));
+            }
+
+            // Hellfire = Fire Wand + Spinach (Might > 1 means spinach was taken)
+            if (em.HasComponent<FireWandState>(_pendingUpgradeEntity))
+            {
+                var fw3 = em.GetComponentData<FireWandState>(_pendingUpgradeEntity);
+                if (!fw3.IsEvolved && !fw3.IsHellfire && playerStats.Might > 1.0f)
+                    pool.Add((UpgradeType.HellfireEvolution,
+                        "★ Hellfire\nFire Wand + Spinach — 2 slow pierce meteors, 100 dmg, 3s CD"));
+            }
+
+            // La Borra = Holy Water + Attractorb (MagnetRadiusMult > 1 means attractorb was taken)
+            if (em.HasComponent<HolyWaterState>(_pendingUpgradeEntity))
+            {
+                var hw3 = em.GetComponentData<HolyWaterState>(_pendingUpgradeEntity);
+                if (!hw3.IsEvolved && playerStats.MagnetRadiusMult > 1.0f)
+                    pool.Add((UpgradeType.LaBorraEvolution,
+                        "★ La Borra\nHoly Water + Attractorb — puddles follow player, 40 dmg, 4 flasks"));
             }
 
             // NO FUTURE = Runetracer + Armor (Armor > 0 means armor was taken)
@@ -922,8 +943,7 @@ namespace VampireSurvivors.MonoBehaviours
                     if (em.HasComponent<FireWandState>(_pendingUpgradeEntity))
                     {
                         var w = em.GetComponentData<FireWandState>(_pendingUpgradeEntity);
-                        w.Amount++;
-                        em.SetComponentData(_pendingUpgradeEntity, w);
+                        if (!w.IsEvolved && !w.IsHellfire) { w.Amount++; em.SetComponentData(_pendingUpgradeEntity, w); }
                     }
                     if (em.HasComponent<LightningRingState>(_pendingUpgradeEntity))
                     {
@@ -939,8 +959,7 @@ namespace VampireSurvivors.MonoBehaviours
                     if (em.HasComponent<HolyWaterState>(_pendingUpgradeEntity))
                     {
                         var w = em.GetComponentData<HolyWaterState>(_pendingUpgradeEntity);
-                        w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1;
-                        em.SetComponentData(_pendingUpgradeEntity, w);
+                        if (!w.IsEvolved) { w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1; em.SetComponentData(_pendingUpgradeEntity, w); }
                     }
                     if (em.HasComponent<BoneState>(_pendingUpgradeEntity))
                     {
@@ -1187,11 +1206,39 @@ namespace VampireSurvivors.MonoBehaviours
                         axe3.IsEvolved = true;
                         axe3.Damage    = 60f;    // wiki: 60 dmg
                         axe3.Cooldown  = 4.0f;   // wiki: 4.0s CD (slower, but fires 9 at once)
-                        // Speed and Amount used differently in evolved mode;
-                        // AxeSystem reads Speed only for base projectile mult — set a neutral value
-                        axe3.Gravity  = 0f;      // no gravity needed when evolved
+                        axe3.Gravity   = 0f;     // no gravity needed when evolved
                         em.SetComponentData(_pendingUpgradeEntity, axe3);
                         Debug.Log($"[HUDManager] P{pidx} evolved Axe → Death Spiral");
+                    }
+                    break;
+
+                case UpgradeType.HellfireEvolution:
+                    if (em.HasComponent<FireWandState>(_pendingUpgradeEntity))
+                    {
+                        var fw4       = em.GetComponentData<FireWandState>(_pendingUpgradeEntity);
+                        fw4.IsHellfire = true;
+                        fw4.Damage     = 100f;  // wiki: 100 dmg
+                        fw4.Speed      = 1.5f;  // wiki: very slow (speed ~1)
+                        fw4.Amount     = 2;     // wiki: 2 meteors per volley
+                        fw4.MaxRange   = 25f;   // long range since slow
+                        fw4.Cooldown   = 3.0f;  // wiki: 3.0s CD
+                        em.SetComponentData(_pendingUpgradeEntity, fw4);
+                        Debug.Log($"[HUDManager] P{pidx} evolved Fire Wand → Hellfire");
+                    }
+                    break;
+
+                case UpgradeType.LaBorraEvolution:
+                    if (em.HasComponent<HolyWaterState>(_pendingUpgradeEntity))
+                    {
+                        var hw4          = em.GetComponentData<HolyWaterState>(_pendingUpgradeEntity);
+                        hw4.IsEvolved    = true;
+                        hw4.Damage       = 40f;   // wiki: 40 dmg/tick
+                        hw4.Cooldown     = 4.0f;  // wiki: 4.0s CD
+                        hw4.Amount       = 4;     // wiki: 4 puddles per throw
+                        hw4.Radius       = 3.0f;  // wiki: 200% area ≈ 2× radius (base 1.5)
+                        hw4.PuddleLifetime = 4.0f; // wiki: 4.0s duration
+                        em.SetComponentData(_pendingUpgradeEntity, hw4);
+                        Debug.Log($"[HUDManager] P{pidx} evolved Holy Water → La Borra");
                     }
                     break;
             }

@@ -1,18 +1,22 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~02:30
+> Last updated: 2026-03-21 ~03:00
 
 ## Next Up (priority order)
 
 - [ ] CharacterRegistry ScriptableObject (replace hard-coded array in LobbyManager)
 - [ ] New characters: Pugnala (needs Phiera Der Tuphello + Eight The Sparrow weapons), Giovanna (needs Gatti Amari weapon)
 - [ ] Map variety: second stage tileset + different enemy spawns
-- [ ] Hellfire evolution (Fire Wand + Spinach) — wiki: 100 dmg, 3s CD, 2 amount, slow pierce projectiles, fires randomly; NOTE: O'Sole Meeo (Fire Wand + Candelabrador) we shipped is non-canon but keep it
-- [ ] La Borra evolution (Holy Water + Attractorb passive) — needs Attractorb passive item first
-- [ ] Crimson Shroud (Garlic + Pummarola → Soul Eater already done; check if Crimson Shroud is different weapon)
-- [ ] New characters: Pugnala (needs Phiera + Eight The Sparrow twin pistols), Giovanna (needs Gatti Amari)
+- [ ] Crimson Shroud (check wiki — separate weapon or misnamed evo?)
+- [ ] New characters: Pugnala (needs Phiera Der Tuphello + Eight The Sparrow twin pistols), Giovanna (needs Gatti Amari)
+- [ ] Second map/stage — different background tile set + spawn weights (more skeletons/ghouls, fewer bats)
 
 ## Completed
+
+### 2026-03-21 (Session 15 — ~03:00)
+
+- [x] **Hellfire evolution** (Fire Wand + Spinach) — `FireWandState.IsHellfire=true`; 100 dmg, speed=1.5 u/s, 2 meteors/volley, MaxRange=25u, 3.0s CD, `Piercing=true`, random direction; `FireWandSystem` branches on `IsHellfire` (larger 0.45u visual scale); gate: `Might > 1.0`; FireAmount + Duplicator Fire increment blocked when IsHellfire; coexists with O'Sole Meeo (uses separate bool)
+- [x] **La Borra evolution** (Holy Water + Attractorb) — `HolyWaterState.IsEvolved=true`; 40 dmg/tick, 4.0s CD, 4 flasks/volley, radius=3.0u (200%), lifetime=4.0s; `HolyWaterPuddle.FollowsPlayer=true` set via flask → puddle chain; `HolyWaterPuddleSystem` creeps following puddles toward nearest player at 2 u/s; gate: `MagnetRadiusMult > 1.0`; HolyWaterAmount + Duplicator blocked when evolved
 
 ### 2026-03-21 (Session 14 — ~02:30)
 

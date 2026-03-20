@@ -64,7 +64,8 @@ namespace VampireSurvivors.Systems
                         Damage         = damage,
                         PuddleRadius   = hw.ValueRO.Radius   * stats.ValueRO.AreaMult,
                         PuddleLifetime = hw.ValueRO.PuddleLifetime * stats.ValueRO.DurationMult,
-                        TickCooldown   = hw.ValueRO.TickCooldown
+                        TickCooldown   = hw.ValueRO.TickCooldown,
+                        FollowsPlayer  = hw.ValueRO.IsEvolved,
                     });
                     ecb.SetComponent(flask, LocalTransform.FromPositionRotationScale(
                         transform.ValueRO.Position, quaternion.identity, 0.25f));
@@ -86,11 +87,12 @@ namespace VampireSurvivors.Systems
                 var puddle = ecb.CreateEntity();
                 ecb.AddComponent(puddle, new HolyWaterPuddle
                 {
-                    Lifetime     = flask.ValueRO.PuddleLifetime,
-                    Damage       = flask.ValueRO.Damage,
-                    Radius       = flask.ValueRO.PuddleRadius,
-                    TickTimer    = 0f,
-                    TickCooldown = flask.ValueRO.TickCooldown
+                    Lifetime      = flask.ValueRO.PuddleLifetime,
+                    Damage        = flask.ValueRO.Damage,
+                    Radius        = flask.ValueRO.PuddleRadius,
+                    TickTimer     = 0f,
+                    TickCooldown  = flask.ValueRO.TickCooldown,
+                    FollowsPlayer = flask.ValueRO.FollowsPlayer,
                 });
                 ecb.AddComponent(puddle, LocalTransform.FromPosition(transform.ValueRO.Position));
 

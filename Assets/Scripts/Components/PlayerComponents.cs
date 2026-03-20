@@ -271,6 +271,8 @@ namespace VampireSurvivors.Components
         public float  TickCooldown;
         public int    Amount;    // flasks thrown per cooldown (1=default); each in independent random direction
         public Random Rng;
+        /// <summary>True = La Borra (Holy Water + Attractorb): puddles follow player, 2× radius, 40 dmg.</summary>
+        public bool   IsEvolved;
     }
 
     /// <summary>
@@ -326,7 +328,10 @@ namespace VampireSurvivors.Components
         public float  MaxRange;
         public Random Rng; // per-player RNG so all players fire independently
         public int    Amount; // fireballs per trigger; 1 = default; each fires in independent random direction
-        public bool   IsEvolved;  // true = O'Sole Meeo: 8 fireballs, 20 dmg
+        /// <summary>True = O'Sole Meeo (Fire Wand + Candelabrador): 8 fireballs, 20 dmg.</summary>
+        public bool   IsEvolved;
+        /// <summary>True = Hellfire (Fire Wand + Spinach): 2 slow piercing meteors, 100 dmg, 3s CD.</summary>
+        public bool   IsHellfire;
     }
 
     /// <summary>
