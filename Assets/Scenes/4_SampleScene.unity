@@ -1628,6 +1628,7 @@ MonoBehaviour:
   goldCoinPrefab: {fileID: 6200000000000001, guid: 6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c, type: 3}
   healthPickupPrefab: {fileID: 6300000000000001, guid: 7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d, type: 3}
   magnetPickupPrefab: {fileID: 6400000000000001, guid: 8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e, type: 3}
+  chestPrefab: {fileID: 8678776594609913577, guid: c942ea81f786b9344804ebb3f01994d8, type: 3}
 --- !u!4 &774028992
 Transform:
   m_ObjectHideFlags: 0

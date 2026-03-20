@@ -30,6 +30,20 @@ namespace VampireSurvivors.Components
     public struct MagnetPickup : IComponentData { }
 
     /// <summary>
+    /// Treasure chest dropped by enemies. When collected by a player it awards one
+    /// of four rewards determined by RNG at the moment of collection:
+    ///   40% → Gold bonus (100–200 gold to team pool)
+    ///   30% → Full HP restore for collecting player
+    ///   20% → XP burst (+100 XP for collecting player)
+    ///   10% → Invincibility surge (8 seconds for collecting player)
+    /// RNG is seeded at spawn time so each chest has independent variance.
+    /// </summary>
+    public struct Chest : IComponentData
+    {
+        public Unity.Mathematics.Random Rng;
+    }
+
+    /// <summary>
     /// Singleton — team-wide run statistics.
     /// Created by SharedGoldBootstrapSystem on world startup.
     /// Written by GoldCoinSystem (Total) and HealthSystem (EnemiesKilled).

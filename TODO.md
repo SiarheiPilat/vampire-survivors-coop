@@ -1,10 +1,9 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-20
+> Last updated: 2026-03-20 ~11:30
 
 ## Next Up (priority order)
 
-- [ ] Chest/treasure system: enemies drop chests on death, reward on contact (weapon/passive/gold)
 - [ ] Weapon amount upgrades for Whip, Axe, HolyWater in level-up pool (add Amount fields)
 - [ ] Duplicator passive (+1 Amount to all weapons) + Thunder Loop (Lightning Ring + Duplicator)
 - [ ] More characters: Mortaccio (Bone), Yatta Cavallo (Santa Water)
@@ -14,6 +13,16 @@
 - [ ] Back-navigation from Lobby (B/Circle with no joined players → PressToStart)
 
 ## Completed
+
+### 2026-03-20 (Session 4 — ~11:30)
+
+- [x] **Chest/Treasure System**: enemies drop chests on death (5% base chance, Luck-scaled)
+  - `Chest` IComponentData with per-chest `Random Rng` seed
+  - `PickupAuthoring.PickupKind.Chest` baker case
+  - `SpawnerData.ChestPrefab` entity ref; `SpawnerAuthoring.chestPrefab` field wired
+  - `HealthSystem`: instantiates ChestPrefab at death position with unique RNG seed
+  - `ChestPickupSystem`: walk-over collect r=0.6u; 4 rewards: 40% gold (100–200), 30% full HP, 20% XP burst (+100), 10% invincibility (8s)
+  - Yellow-orange quad prefab (0.4u) at `Assets/Prefabs/Pickups/ChestPrefab.prefab`
 
 ### 2026-03-20 (Session 3 — ~10:XX)
 
@@ -59,7 +68,8 @@
 - Show "YOU SURVIVED!" screen with same stats as game over
 - Optional: spawn unkillable Death boss at 30:00 (deferred)
 
-### Chest System
-- HealthSystem: 5% chance on enemy death to drop a `Chest` entity (yellow-green quad 0.4u)
-- `ChestPickupSystem`: walk-over collect (r=0.5u), award random item from weighted table
-  - 40% gold (25–100), 30% passive item, 20% weapon upgrade, 10% full HP restore
+### Chest System (COMPLETE)
+- `HealthSystem`: 5% base drop chance on enemy death, scaled by team Luck; seeds RNG from position + kill count
+- `ChestPickupSystem`: walk-over collect r=0.6u; per-chest `Random` for independent variance
+  - 40% gold bonus (100–200 → SharedGold), 30% full HP restore, 20% XP burst (+100), 10% invincibility 8s
+- Prefab: yellow-orange Quad 0.4u at `Assets/Prefabs/Pickups/ChestPrefab.prefab`

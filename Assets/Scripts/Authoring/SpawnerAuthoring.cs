@@ -24,6 +24,7 @@ namespace VampireSurvivors.Authoring
         public GameObject goldCoinPrefab;
         public GameObject healthPickupPrefab;
         public GameObject magnetPickupPrefab;
+        public GameObject chestPrefab;
 
         class Baker : Baker<SpawnerAuthoring>
         {
@@ -42,6 +43,7 @@ namespace VampireSurvivors.Authoring
                     GoldCoinPrefab   = authoring.goldCoinPrefab      != null ? GetEntity(authoring.goldCoinPrefab,      TransformUsageFlags.Dynamic) : Entity.Null,
                     HealthPickupPrefab = authoring.healthPickupPrefab != null ? GetEntity(authoring.healthPickupPrefab, TransformUsageFlags.Dynamic) : Entity.Null,
                     MagnetPickupPrefab = authoring.magnetPickupPrefab != null ? GetEntity(authoring.magnetPickupPrefab, TransformUsageFlags.Dynamic) : Entity.Null,
+                    ChestPrefab        = authoring.chestPrefab        != null ? GetEntity(authoring.chestPrefab,        TransformUsageFlags.Dynamic) : Entity.Null,
                     Timer          = 3f,
                     BossTimer      = 45f,
                     Rng            = Unity.Mathematics.Random.CreateFromIndex(42),

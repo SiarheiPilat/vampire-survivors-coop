@@ -148,6 +148,21 @@ namespace VampireSurvivors.Systems
                                     transform.Position + new float3(0f, 0.5f, 0f)));
                             }
                         }
+
+                        // Chest (~5% base chance, scaled by team Luck) — random reward on collect
+                        if (UnityEngine.Random.value < 0.05f * luckMult &&
+                            hasPrefabs && pickupSpawner.ChestPrefab != Entity.Null)
+                        {
+                            var chest = ecb.Instantiate(pickupSpawner.ChestPrefab);
+                            ecb.SetComponent(chest, LocalTransform.FromPosition(
+                                transform.Position + new float3(0.3f, 0.5f, 0f)));
+                            ecb.SetComponent(chest, new Chest
+                            {
+                                Rng = Unity.Mathematics.Random.CreateFromIndex(
+                                    (uint)(transform.Position.x * 1000f + transform.Position.y * 37f +
+                                           (uint)runStats.EnemiesKilled))
+                            });
+                        }
                     }
                     if (hasRunStats) runStats.EnemiesKilled++;
                     ecb.DestroyEntity(entity);
