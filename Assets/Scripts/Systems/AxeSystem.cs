@@ -52,34 +52,67 @@ namespace VampireSurvivors.Systems
                 float damage = axe.ValueRO.Damage * stats.ValueRO.Might;
                 int   amount = math.max(1, axe.ValueRO.Amount);
 
-                // Fan-spread: axes spaced 25° apart, centred on ~60° launch direction
-                float2 baseDir2  = math.normalizesafe(new float2(facingX * 0.5f, 0.866f));
-                float  stepRad   = 25f * math.PI / 180f;
-                float  centreOff = -(amount - 1) * 0.5f * stepRad;
-
-                for (int a = 0; a < amount; a++)
+                if (axe.ValueRO.IsEvolved)
                 {
-                    float  offset = centreOff + a * stepRad;
-                    float  cosO   = math.cos(offset);
-                    float  sinO   = math.sin(offset);
-                    float2 fanDir = new float2(
-                        baseDir2.x * cosO - baseDir2.y * sinO,
-                        baseDir2.x * sinO + baseDir2.y * cosO);
-                    var initVel = new float3(fanDir.x * spd, fanDir.y * spd, 0f);
+                    // ── Death Spiral: 9 piercing scythes fanned evenly around 360° ──
+                    // Wiki stats: 60 dmg, 4.0s CD (already applied above), speed 0.8, pierce
+                    const int   ScytheCount = 9;
+                    const float SpiralSpeed = 0.8f;
+                    const float SpiralRange = 20f; // slow + long range = stays on screen
+                    float  spiralDmg     = damage; // Might already applied
+                    float  spiralSpd     = SpiralSpeed * stats.ValueRO.ProjectileSpeedMult;
+                    float  angleStep     = (math.PI * 2f) / ScytheCount;
 
-                    var bullet = ecb.Instantiate(bulletPrefab);
-                    ecb.AddComponent(bullet, new Projectile
+                    for (int a = 0; a < ScytheCount; a++)
                     {
-                        Damage    = damage,
-                        Speed     = spd,
-                        Direction = math.normalizesafe(initVel),
-                        MaxRange  = axe.ValueRO.MaxRange,
-                        Traveled  = 0f,
-                        Gravity   = axe.ValueRO.Gravity,
-                        Velocity  = initVel
-                    });
-                    ecb.SetComponent(bullet, LocalTransform.FromPositionRotationScale(
-                        transform.ValueRO.Position, quaternion.identity, 0.3f));
+                        float  angle = a * angleStep;
+                        float3 dir   = new float3(math.cos(angle), math.sin(angle), 0f);
+                        var bullet = ecb.Instantiate(bulletPrefab);
+                        ecb.AddComponent(bullet, new Projectile
+                        {
+                            Damage    = spiralDmg,
+                            Speed     = spiralSpd,
+                            Direction = dir,
+                            MaxRange  = SpiralRange,
+                            Traveled  = 0f,
+                            Gravity   = 0f,
+                            Piercing  = true,
+                        });
+                        ecb.SetComponent(bullet, LocalTransform.FromPositionRotationScale(
+                            transform.ValueRO.Position, quaternion.identity, 0.35f));
+                    }
+                }
+                else
+                {
+                    // ── Normal Axe: parabolic arc fan ──────────────────────────────
+                    float2 baseDir2  = math.normalizesafe(new float2(facingX * 0.5f, 0.866f));
+                    float  stepRad   = 25f * math.PI / 180f;
+                    float  centreOff = -(amount - 1) * 0.5f * stepRad;
+
+                    for (int a = 0; a < amount; a++)
+                    {
+                        float  offset = centreOff + a * stepRad;
+                        float  cosO   = math.cos(offset);
+                        float  sinO   = math.sin(offset);
+                        float2 fanDir = new float2(
+                            baseDir2.x * cosO - baseDir2.y * sinO,
+                            baseDir2.x * sinO + baseDir2.y * cosO);
+                        var initVel = new float3(fanDir.x * spd, fanDir.y * spd, 0f);
+
+                        var bullet = ecb.Instantiate(bulletPrefab);
+                        ecb.AddComponent(bullet, new Projectile
+                        {
+                            Damage    = damage,
+                            Speed     = spd,
+                            Direction = math.normalizesafe(initVel),
+                            MaxRange  = axe.ValueRO.MaxRange,
+                            Traveled  = 0f,
+                            Gravity   = axe.ValueRO.Gravity,
+                            Velocity  = initVel
+                        });
+                        ecb.SetComponent(bullet, LocalTransform.FromPositionRotationScale(
+                            transform.ValueRO.Position, quaternion.identity, 0.3f));
+                    }
                 }
             }
         }

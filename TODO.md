@@ -1,17 +1,22 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~01:45
+> Last updated: 2026-03-21 ~02:10
 
 ## Next Up (priority order)
 
 - [ ] CharacterRegistry ScriptableObject (replace hard-coded array in LobbyManager)
 - [ ] New characters: Pugnala (needs Phiera Der Tuphello + Eight The Sparrow weapons), Giovanna (needs Gatti Amari weapon)
 - [ ] Map variety: second stage tileset + different enemy spawns
-- [ ] Crimson Shroud evolution (check wiki — requires Garlic + Armor? or different weapon?)
-- [ ] Victory Sword evolution (Cross + Clover → Heaven Sword already done; check remaining Cross evo)
-- [ ] New characters: Pugnala, Giovanna
+- [ ] Hellfire evolution (Fire Wand + Spinach) — wiki: 100 dmg, 3s CD, 2 amount, slow pierce projectiles, fires randomly; NOTE: O'Sole Meeo (Fire Wand + Candelabrador) we shipped is non-canon but keep it
+- [ ] La Borra evolution (Holy Water + Attractorb passive) — needs Attractorb passive item first
+- [ ] Crimson Shroud (Garlic + Pummarola → Soul Eater already done; check if Crimson Shroud is different weapon)
+- [ ] New characters: Pugnala (needs Phiera + Eight The Sparrow twin pistols), Giovanna (needs Gatti Amari)
 
 ## Completed
+
+### 2026-03-21 (Session 13 — ~02:10)
+
+- [x] **Death Spiral evolution** (Axe + Candelabrador) — `AxeState.IsEvolved=true`; 60 dmg, 4.0s CD; AxeSystem fires 9 piercing scythes in full 360° radial fan (40° apart) at speed 0.8 u/s, MaxRange 20u, `Piercing=true`, no gravity; existing `ProjectileHitSystem` handles pierce-through naturally; `AxeAmount` upgrade blocked when evolved; evolution gate: `AreaMult > 1`
 
 ### 2026-03-21 (Session 12 — ~01:45)
 

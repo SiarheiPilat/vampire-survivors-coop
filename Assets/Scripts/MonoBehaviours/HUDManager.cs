@@ -74,6 +74,7 @@ namespace VampireSurvivors.MonoBehaviours
             OsoleMeeoEvolution,    // Fire Wand + Candelabrador
             UnholyVespersEvolution,// King Bible + Spellbinder
             NoFutureEvolution,     // Runetracer + Armor
+            DeathSpiralEvolution,  // Axe + Candelabrador
         }
         readonly UpgradeType[] _currentChoices = new UpgradeType[3];
         readonly TMP_Text[]    _btnLabels       = new TMP_Text[3];
@@ -699,8 +700,9 @@ namespace VampireSurvivors.MonoBehaviours
                     case UpgradeType.AxeAmount:
                         if (em.HasComponent<AxeState>(_pendingUpgradeEntity))
                         {
-                            curAmt = Unity.Mathematics.math.max(1, em.GetComponentData<AxeState>(_pendingUpgradeEntity).Amount);
-                            canAdd = curAmt < 5;
+                            var axe2 = em.GetComponentData<AxeState>(_pendingUpgradeEntity);
+                            curAmt = Unity.Mathematics.math.max(1, axe2.Amount);
+                            canAdd = curAmt < 5 && !axe2.IsEvolved;
                         }
                         break;
                     case UpgradeType.HolyWaterAmount:
@@ -793,6 +795,15 @@ namespace VampireSurvivors.MonoBehaviours
                 if (!fw.IsEvolved && playerStats.AreaMult > 1.0f)
                     pool.Add((UpgradeType.OsoleMeeoEvolution,
                         "★ O'Sole Meeo\nFire Wand + Candelabrador — 8 fireballs, 20 dmg, 0.4s CD"));
+            }
+
+            // Death Spiral = Axe + Candelabrador (AreaMult > 1 means candelabrador was taken)
+            if (em.HasComponent<AxeState>(_pendingUpgradeEntity))
+            {
+                var axe2 = em.GetComponentData<AxeState>(_pendingUpgradeEntity);
+                if (!axe2.IsEvolved && playerStats.AreaMult > 1.0f)
+                    pool.Add((UpgradeType.DeathSpiralEvolution,
+                        "★ Death Spiral\nAxe + Candelabrador — 9 piercing scythes, 60 dmg, 4s CD"));
             }
 
             // NO FUTURE = Runetracer + Armor (Armor > 0 means armor was taken)
@@ -921,8 +932,7 @@ namespace VampireSurvivors.MonoBehaviours
                     if (em.HasComponent<AxeState>(_pendingUpgradeEntity))
                     {
                         var w = em.GetComponentData<AxeState>(_pendingUpgradeEntity);
-                        w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1;
-                        em.SetComponentData(_pendingUpgradeEntity, w);
+                        if (!w.IsEvolved) { w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1; em.SetComponentData(_pendingUpgradeEntity, w); }
                     }
                     if (em.HasComponent<HolyWaterState>(_pendingUpgradeEntity))
                     {
@@ -1157,6 +1167,21 @@ namespace VampireSurvivors.MonoBehaviours
                         rt3.Cooldown  = 0.35f;         // keep same CD
                         em.SetComponentData(_pendingUpgradeEntity, rt3);
                         Debug.Log($"[HUDManager] P{pidx} evolved Runetracer → NO FUTURE");
+                    }
+                    break;
+
+                case UpgradeType.DeathSpiralEvolution:
+                    if (em.HasComponent<AxeState>(_pendingUpgradeEntity))
+                    {
+                        var axe3      = em.GetComponentData<AxeState>(_pendingUpgradeEntity);
+                        axe3.IsEvolved = true;
+                        axe3.Damage    = 60f;    // wiki: 60 dmg
+                        axe3.Cooldown  = 4.0f;   // wiki: 4.0s CD (slower, but fires 9 at once)
+                        // Speed and Amount used differently in evolved mode;
+                        // AxeSystem reads Speed only for base projectile mult — set a neutral value
+                        axe3.Gravity  = 0f;      // no gravity needed when evolved
+                        em.SetComponentData(_pendingUpgradeEntity, axe3);
+                        Debug.Log($"[HUDManager] P{pidx} evolved Axe → Death Spiral");
                     }
                     break;
             }

@@ -292,6 +292,8 @@ namespace VampireSurvivors.Components
         public float Gravity;   // downward accel (u/s²)
         public float MaxRange;  // path length before despawn
         public int   Amount;    // axes fired per cooldown (1=default); fan spread 20° between axes
+        /// <summary>True after Death Spiral evolution. Fires 9 piercing scythes radially instead of arcing axes.</summary>
+        public bool  IsEvolved;
     }
 
     /// <summary>
