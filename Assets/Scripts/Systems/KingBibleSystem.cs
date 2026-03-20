@@ -49,18 +49,29 @@ namespace VampireSurvivors.Systems
             {
                 var prefab = SystemAPI.GetSingleton<BulletPrefabData>().BulletPrefab;
 
-                foreach (var (bibleState, entity) in
-                    SystemAPI.Query<RefRW<KingBibleState>>()
+                // Pre-collect existing orbit entities so we can destroy stale ones on re-spawn
+                var orbitQuery     = SystemAPI.QueryBuilder().WithAll<KingBibleOrbit>().Build();
+                var orbitEntities  = orbitQuery.ToEntityArray(Allocator.Temp);
+                var orbitData      = orbitQuery.ToComponentDataArray<KingBibleOrbit>(Allocator.Temp);
+
+                foreach (var (bibleState, playerStats, entity) in
+                    SystemAPI.Query<RefRW<KingBibleState>, RefRO<PlayerStats>>()
                         .WithAll<PlayerTag>()
                         .WithNone<Downed>()
                         .WithEntityAccess())
                 {
                     if (bibleState.ValueRO.Spawned) continue;
 
+                    // Destroy any existing orbit entities for this player (handles re-spawn on evolution)
+                    for (int o = 0; o < orbitData.Length; o++)
+                        if (orbitData[o].Owner == entity)
+                            ecb.DestroyEntity(orbitEntities[o]);
+
                     bibleState.ValueRW.Spawned = true;
 
                     int   n         = bibleState.ValueRO.Count;
                     float angleStep = 2f * math.PI / n;
+                    float radius    = bibleState.ValueRO.Radius * playerStats.ValueRO.AreaMult;
 
                     for (int i = 0; i < n; i++)
                     {
@@ -69,7 +80,7 @@ namespace VampireSurvivors.Systems
                         {
                             Owner        = entity,
                             Angle        = i * angleStep,
-                            Radius       = bibleState.ValueRO.Radius,
+                            Radius       = radius,
                             AngularSpeed = bibleState.ValueRO.AngularSpeed,
                             Damage       = bibleState.ValueRO.Damage,
                             HitTimer     = 0f,
@@ -80,6 +91,9 @@ namespace VampireSurvivors.Systems
                             float3.zero, quaternion.identity, 0.35f));
                     }
                 }
+
+                orbitEntities.Dispose();
+                orbitData.Dispose();
             }
 
             // ── Phase 2: Orbit update + hit detection ──

@@ -1,15 +1,25 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-20 ~13:00
+> Last updated: 2026-03-21 ~00:00
 
 ## Next Up (priority order)
 
 - [ ] CharacterRegistry ScriptableObject (replace hard-coded array in LobbyManager)
 - [ ] Back-navigation from Lobby (B/Circle with no joined players → PressToStart)
-- [ ] Weapon evolutions: Unholy Vespers (King Bible + Spellbinder passive), O'Sole Meeo (Fire Wand + Candelabrador)
-- [ ] New weapons: Bone available for all (LevelUpSystem level 5), Runetracer Amount upgrade
+- [ ] New characters: Pugnala (Fire Wand + Fire Wand starter), Giovanna (Santa Water starter), Krochi (Cross starter)
+- [ ] New enemies: Ghost (intangible, passes through walls), Medusa (petrify debuff)
+- [ ] Map variety: second stage tileset + different enemy spawns
 
 ## Completed
+
+### 2026-03-21 (Session 8 — ~00:00)
+
+- [x] **Candelabrador passive** — `PlayerStats.AreaMult` ×1.1 per pickup; applied to Garlic range, Whip HitArc range, Holy Water puddle radius, King Bible orbit radius at spawn
+- [x] **Spellbinder passive** — `PlayerStats.DurationMult` ×1.1 per pickup; applied to Holy Water puddle lifetime
+- [x] **O'Sole Meeo evolution** (Fire Wand + Candelabrador) — `FireWandState.IsEvolved=true`, Amount=8, Damage=20, 0.4s CD; FireAmount upgrade blocked when evolved; gate: `AreaMult > 1`
+- [x] **Unholy Vespers evolution** (King Bible + Spellbinder) — `KingBibleState.IsEvolved=true`, Damage=30, Radius=1.75, Count=3; `Spawned=false` triggers re-spawn; cleanup destroys old orbit entities before spawning new ones; gate: `DurationMult > 1`
+- [x] **Bone at level 5** — `LevelUpSystem` grants `BoneState` at level 5 for all characters (Mortaccio already has it, guard prevents double-grant); `KingBibleState` still also granted at lv5
+- [x] **Runetracer Amount upgrade** — `RunetracerState.Amount` field added (default 1); `RunetracerSystem` fans Amount tracers in 20° spread; `RunetracerAmount` in upgrade pool (cap 5); Duplicator applies to Runetracer; `GameSceneBootstrap` sets Amount=1 for Pasqualina
 
 ### 2026-03-20 (Session 7 — ~13:00)
 

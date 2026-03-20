@@ -63,39 +63,45 @@ namespace VampireSurvivors.MonoBehaviours
         enum UpgradeType
         {
             Spinach, Pummarola, Armor, EmptyTome, Crown, Clover, Bracer, HollowHeart, Duplicator,
-            WandAmount, KnifeAmount, FireAmount, LightningAmount, WhipAmount, AxeAmount, HolyWaterAmount, BoneAmount,
+            Candelabrador, Spellbinder,
+            WandAmount, KnifeAmount, FireAmount, LightningAmount, WhipAmount, AxeAmount, HolyWaterAmount, BoneAmount, RunetracerAmount,
             HolyWandEvolution,     // Magic Wand + Empty Tome
             SoulEaterEvolution,    // Garlic + Pummarola
             HeavenSwordEvolution,  // Cross + Clover
             ThousandEdgeEvolution, // Knife + Bracer
             BloodyTearEvolution,   // Whip + Hollow Heart
             ThunderLoopEvolution,  // Lightning Ring + Duplicator
+            OsoleMeeoEvolution,    // Fire Wand + Candelabrador
+            UnholyVespersEvolution,// King Bible + Spellbinder
         }
         readonly UpgradeType[] _currentChoices = new UpgradeType[3];
         readonly TMP_Text[]    _btnLabels       = new TMP_Text[3];
 
         static readonly (UpgradeType type, string label)[] k_WeaponUpgrades =
         {
-            (UpgradeType.WandAmount,      "Magic Wand +1 shot\nFire an extra Wand projectile"),
-            (UpgradeType.KnifeAmount,     "Knife +1 blade\nThrow an extra Knife per volley"),
-            (UpgradeType.FireAmount,      "Fire Wand +1 flame\nLaunch an extra fireball per burst"),
-            (UpgradeType.LightningAmount, "Lightning Ring +1 strike\nHit an extra enemy per activation"),
-            (UpgradeType.WhipAmount,      "Whip +1 arc\nSwing an extra Whip in a new direction"),
-            (UpgradeType.AxeAmount,       "Axe +1 blade\nThrow an extra Axe per volley"),
-            (UpgradeType.HolyWaterAmount, "Holy Water +1 flask\nThrow an extra flask per volley"),
-            (UpgradeType.BoneAmount,      "Bone +1 bone\nFire an extra bouncing Bone per volley"),
+            (UpgradeType.WandAmount,       "Magic Wand +1 shot\nFire an extra Wand projectile"),
+            (UpgradeType.KnifeAmount,      "Knife +1 blade\nThrow an extra Knife per volley"),
+            (UpgradeType.FireAmount,       "Fire Wand +1 flame\nLaunch an extra fireball per burst"),
+            (UpgradeType.LightningAmount,  "Lightning Ring +1 strike\nHit an extra enemy per activation"),
+            (UpgradeType.WhipAmount,       "Whip +1 arc\nSwing an extra Whip in a new direction"),
+            (UpgradeType.AxeAmount,        "Axe +1 blade\nThrow an extra Axe per volley"),
+            (UpgradeType.HolyWaterAmount,  "Holy Water +1 flask\nThrow an extra flask per volley"),
+            (UpgradeType.BoneAmount,       "Bone +1 bone\nFire an extra bouncing Bone per volley"),
+            (UpgradeType.RunetracerAmount, "Runetracer +1 tracer\nFire an extra bouncing Runetracer"),
         };
         static readonly (UpgradeType type, string label)[] k_PassiveUpgrades =
         {
-            (UpgradeType.Spinach,     "Spinach\n+10% Might (weapon damage)"),
-            (UpgradeType.Pummarola,   "Pummarola\n+0.2 HP/s regen"),
-            (UpgradeType.Armor,       "Armor\n+1 flat damage reduction"),
-            (UpgradeType.EmptyTome,   "Empty Tome\n-8% weapon cooldown"),
-            (UpgradeType.Crown,       "Crown\n+8% XP gain"),
-            (UpgradeType.Clover,      "Clover\n+10% Luck (better drops)"),
-            (UpgradeType.Bracer,      "Bracer\n+10% projectile speed"),
-            (UpgradeType.HollowHeart, "Hollow Heart\n+10% Max HP"),
-            (UpgradeType.Duplicator,  "Duplicator\n+1 Amount to all weapons"),
+            (UpgradeType.Spinach,       "Spinach\n+10% Might (weapon damage)"),
+            (UpgradeType.Pummarola,     "Pummarola\n+0.2 HP/s regen"),
+            (UpgradeType.Armor,         "Armor\n+1 flat damage reduction"),
+            (UpgradeType.EmptyTome,     "Empty Tome\n-8% weapon cooldown"),
+            (UpgradeType.Crown,         "Crown\n+8% XP gain"),
+            (UpgradeType.Clover,        "Clover\n+10% Luck (better drops)"),
+            (UpgradeType.Bracer,        "Bracer\n+10% projectile speed"),
+            (UpgradeType.HollowHeart,   "Hollow Heart\n+10% Max HP"),
+            (UpgradeType.Duplicator,    "Duplicator\n+1 Amount to all weapons"),
+            (UpgradeType.Candelabrador, "Candelabrador\n+10% Area (weapon range/radius)"),
+            (UpgradeType.Spellbinder,   "Spellbinder\n+10% Duration (effect lifetimes)"),
         };
 
         // Gold display (created programmatically)
@@ -618,8 +624,9 @@ namespace VampireSurvivors.MonoBehaviours
                     case UpgradeType.FireAmount:
                         if (em.HasComponent<FireWandState>(_pendingUpgradeEntity))
                         {
-                            curAmt = em.GetComponentData<FireWandState>(_pendingUpgradeEntity).Amount;
-                            canAdd = curAmt < 5;
+                            var fw2 = em.GetComponentData<FireWandState>(_pendingUpgradeEntity);
+                            curAmt = fw2.Amount;
+                            canAdd = curAmt < 5 && !fw2.IsEvolved;
                         }
                         break;
                     case UpgradeType.LightningAmount:
@@ -655,6 +662,13 @@ namespace VampireSurvivors.MonoBehaviours
                         if (em.HasComponent<BoneState>(_pendingUpgradeEntity))
                         {
                             curAmt = Unity.Mathematics.math.max(1, em.GetComponentData<BoneState>(_pendingUpgradeEntity).Amount);
+                            canAdd = curAmt < 5;
+                        }
+                        break;
+                    case UpgradeType.RunetracerAmount:
+                        if (em.HasComponent<RunetracerState>(_pendingUpgradeEntity))
+                        {
+                            curAmt = Unity.Mathematics.math.max(1, em.GetComponentData<RunetracerState>(_pendingUpgradeEntity).Amount);
                             canAdd = curAmt < 5;
                         }
                         break;
@@ -717,6 +731,24 @@ namespace VampireSurvivors.MonoBehaviours
                 if (!lr.IsEvolved && playerStats.DuplicatorStacks > 0)
                     pool.Add((UpgradeType.ThunderLoopEvolution,
                         "★ Thunder Loop\nLightning Ring + Duplicator — 65 dmg, 6 targets, 0.5s CD"));
+            }
+
+            // O'Sole Meeo = Fire Wand + Candelabrador (AreaMult > 1 means candelabrador was taken)
+            if (em.HasComponent<FireWandState>(_pendingUpgradeEntity))
+            {
+                var fw = em.GetComponentData<FireWandState>(_pendingUpgradeEntity);
+                if (!fw.IsEvolved && playerStats.AreaMult > 1.0f)
+                    pool.Add((UpgradeType.OsoleMeeoEvolution,
+                        "★ O'Sole Meeo\nFire Wand + Candelabrador — 8 fireballs, 20 dmg, 0.4s CD"));
+            }
+
+            // Unholy Vespers = King Bible + Spellbinder (DurationMult > 1 means spellbinder was taken)
+            if (em.HasComponent<KingBibleState>(_pendingUpgradeEntity))
+            {
+                var kb = em.GetComponentData<KingBibleState>(_pendingUpgradeEntity);
+                if (!kb.IsEvolved && playerStats.DurationMult > 1.0f)
+                    pool.Add((UpgradeType.UnholyVespersEvolution,
+                        "★ Unholy Vespers\nKing Bible + Spellbinder — 30 dmg, r=1.75u, 3 bibles"));
             }
 
             // Fisher-Yates shuffle using UnityEngine.Random (unscaled, so fine while paused)
@@ -842,6 +874,12 @@ namespace VampireSurvivors.MonoBehaviours
                         w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1;
                         em.SetComponentData(_pendingUpgradeEntity, w);
                     }
+                    if (em.HasComponent<RunetracerState>(_pendingUpgradeEntity))
+                    {
+                        var w = em.GetComponentData<RunetracerState>(_pendingUpgradeEntity);
+                        w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1;
+                        em.SetComponentData(_pendingUpgradeEntity, w);
+                    }
                     Debug.Log($"[HUDManager] P{pidx} chose Duplicator — +1 Amount to all weapons (stacks={stats.DuplicatorStacks})");
                     break;
                 }
@@ -916,6 +954,23 @@ namespace VampireSurvivors.MonoBehaviours
                         em.SetComponentData(_pendingUpgradeEntity, bone2);
                         Debug.Log($"[HUDManager] P{pidx} chose Bone +1 — Amount = {bone2.Amount}");
                     }
+                    break;
+                case UpgradeType.RunetracerAmount:
+                    if (em.HasComponent<RunetracerState>(_pendingUpgradeEntity))
+                    {
+                        var rt2 = em.GetComponentData<RunetracerState>(_pendingUpgradeEntity);
+                        rt2.Amount = Unity.Mathematics.math.max(1, rt2.Amount) + 1;
+                        em.SetComponentData(_pendingUpgradeEntity, rt2);
+                        Debug.Log($"[HUDManager] P{pidx} chose Runetracer +1 — Amount = {rt2.Amount}");
+                    }
+                    break;
+                case UpgradeType.Candelabrador:
+                    stats.AreaMult *= 1.1f;
+                    Debug.Log($"[HUDManager] P{pidx} chose Candelabrador — AreaMult = {stats.AreaMult:F3}×");
+                    break;
+                case UpgradeType.Spellbinder:
+                    stats.DurationMult *= 1.1f;
+                    Debug.Log($"[HUDManager] P{pidx} chose Spellbinder — DurationMult = {stats.DurationMult:F3}×");
                     break;
 
                 case UpgradeType.HolyWandEvolution:
@@ -998,6 +1053,33 @@ namespace VampireSurvivors.MonoBehaviours
                         lr.Cooldown  = 0.5f;
                         em.SetComponentData(_pendingUpgradeEntity, lr);
                         Debug.Log($"[HUDManager] P{pidx} evolved Lightning Ring → Thunder Loop");
+                    }
+                    break;
+
+                case UpgradeType.OsoleMeeoEvolution:
+                    if (em.HasComponent<FireWandState>(_pendingUpgradeEntity))
+                    {
+                        var fw       = em.GetComponentData<FireWandState>(_pendingUpgradeEntity);
+                        fw.IsEvolved = true;
+                        fw.Amount    = 8;
+                        fw.Damage    = 20f;
+                        fw.Cooldown  = 0.4f; // wiki: same CD, just more fireballs
+                        em.SetComponentData(_pendingUpgradeEntity, fw);
+                        Debug.Log($"[HUDManager] P{pidx} evolved Fire Wand → O'Sole Meeo");
+                    }
+                    break;
+
+                case UpgradeType.UnholyVespersEvolution:
+                    if (em.HasComponent<KingBibleState>(_pendingUpgradeEntity))
+                    {
+                        var kb       = em.GetComponentData<KingBibleState>(_pendingUpgradeEntity);
+                        kb.IsEvolved = true;
+                        kb.Damage    = 30f;
+                        kb.Radius    = 1.75f;
+                        kb.Count     = 3;
+                        kb.Spawned   = false; // triggers re-spawn with new stats
+                        em.SetComponentData(_pendingUpgradeEntity, kb);
+                        Debug.Log($"[HUDManager] P{pidx} evolved King Bible → Unholy Vespers");
                     }
                     break;
             }

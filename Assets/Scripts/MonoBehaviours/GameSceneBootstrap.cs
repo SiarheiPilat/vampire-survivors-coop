@@ -108,7 +108,8 @@ namespace VampireSurvivors.MonoBehaviours
                         Damage   = 10f,
                         Speed    = 8f,
                         MaxRange = 10f,
-                        Bounces  = 3
+                        Bounces  = 3,
+                        Amount   = 1
                     });
                     Debug.Log($"[GameSceneBootstrap] P{slot} Pasqualina: Runetracer, HP=130");
                     break;

@@ -10,7 +10,7 @@ namespace VampireSurvivors.Systems
     /// On level-up:
     ///   - Increments Level, resets Xp, updates XpToNextLevel (wiki formula)
     ///   - Grants 2 s invincibility
-    ///   - Lv2 MagicWand, Lv3 Garlic, Lv4 Knife, Lv5 KingBible, Lv6 FireWand,
+    ///   - Lv2 MagicWand, Lv3 Garlic, Lv4 Knife, Lv5 KingBible+Bone, Lv6 FireWand,
     ///     Lv7 Axe, Lv8 Cross, Lv9 HolyWater, Lv10 LightningRing
     ///   - Lv11+: (lv-11)%3: 0→Spinach (+0.1 Might), 1→Pummarola (+0.2 HpRegen), 2→Armor (+1)
     /// Weapon systems activate once their state component is present (structural change via ECB).
@@ -76,6 +76,18 @@ namespace VampireSurvivors.Systems
                                     HitCooldown  = 0.5f,
                                     Count        = 1,
                                     Spawned      = false
+                                });
+                            // Bone also unlocks at level 5 for non-Mortaccio characters
+                            if (!SystemAPI.HasComponent<BoneState>(entity))
+                                ecb.AddComponent(entity, new BoneState
+                                {
+                                    Timer    = 0f,
+                                    Cooldown = 0.5f,
+                                    Damage   = 30f,
+                                    Speed    = 8f,
+                                    MaxRange = 12f,
+                                    Bounces  = 2,
+                                    Amount   = 1
                                 });
                             break;
                         case 6:

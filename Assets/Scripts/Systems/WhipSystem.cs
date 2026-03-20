@@ -49,7 +49,7 @@ namespace VampireSurvivors.Systems
                     {
                         Damage      = baseDamage,
                         Direction   = arcDir,
-                        Range       = ws.Range,
+                        Range       = ws.Range * stats.ValueRO.AreaMult,
                         ArcDegrees  = ws.ArcDegrees,
                         Origin      = transform.ValueRO.Position,
                         OwnerEntity = ws.IsEvolved ? entity : Entity.Null,

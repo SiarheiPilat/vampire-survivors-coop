@@ -115,6 +115,20 @@ namespace VampireSurvivors.Components
         /// Wiki: Duplicator — +1 Amount per level, max 2 levels.
         /// </summary>
         public int DuplicatorStacks;
+
+        /// <summary>
+        /// Area-of-effect size multiplier. Default 1.0. Each Candelabrador pickup multiplies by 1.1.
+        /// Applied to: Garlic range, Whip hit arc range, Holy Water puddle radius, King Bible orbit radius.
+        /// Wiki: Candelabrador grants +10% Area per level.
+        /// </summary>
+        public float AreaMult;
+
+        /// <summary>
+        /// Effect duration multiplier. Default 1.0. Each Spellbinder pickup multiplies by 1.1.
+        /// Applied to: Holy Water puddle lifetime.
+        /// Wiki: Spellbinder grants +10% Duration per level.
+        /// </summary>
+        public float DurationMult;
     }
 
     /// <summary>
@@ -286,6 +300,7 @@ namespace VampireSurvivors.Components
         public float  MaxRange;
         public Random Rng; // per-player RNG so all players fire independently
         public int    Amount; // fireballs per trigger; 1 = default; each fires in independent random direction
+        public bool   IsEvolved;  // true = O'Sole Meeo: 8 fireballs, 20 dmg
     }
 
     /// <summary>
@@ -303,6 +318,7 @@ namespace VampireSurvivors.Components
         public float Speed;
         public float MaxRange; // distance per bounce segment (screen-width approximation)
         public byte  Bounces;  // wall bounces granted per projectile
+        public int   Amount;   // projectiles fired per cooldown (1=default); fan spread 20° between
     }
 
     /// <summary>
@@ -337,5 +353,6 @@ namespace VampireSurvivors.Components
         public float HitCooldown;  // seconds between hits per bible
         public int   Count;        // number of orbiting bibles (1 at base)
         public bool  Spawned;      // set to true once bibles are instantiated
+        public bool  IsEvolved;    // true = Unholy Vespers: Damage=30, Radius=1.75, Count=3
     }
 }

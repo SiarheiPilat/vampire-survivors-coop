@@ -88,7 +88,7 @@ namespace VampireSurvivors.Systems
                 for (int i = 0; i < EnemyEntities.Length; i++)
                 {
                     float dist = math.distance(transform.Position.xy, EnemyTransforms[i].Position.xy);
-                    if (dist > garlic.Range) continue;
+                    if (dist > garlic.Range * stats.AreaMult) continue;
 
                     var hp = HealthLookup[EnemyEntities[i]];
                     hp.Current -= damage;

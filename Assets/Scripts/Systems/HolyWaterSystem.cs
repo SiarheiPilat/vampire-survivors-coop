@@ -62,8 +62,8 @@ namespace VampireSurvivors.Systems
                         Traveled       = 0f,
                         MaxRange       = hw.ValueRO.MaxRange,
                         Damage         = damage,
-                        PuddleRadius   = hw.ValueRO.Radius,
-                        PuddleLifetime = hw.ValueRO.PuddleLifetime,
+                        PuddleRadius   = hw.ValueRO.Radius   * stats.ValueRO.AreaMult,
+                        PuddleLifetime = hw.ValueRO.PuddleLifetime * stats.ValueRO.DurationMult,
                         TickCooldown   = hw.ValueRO.TickCooldown
                     });
                     ecb.SetComponent(flask, LocalTransform.FromPositionRotationScale(

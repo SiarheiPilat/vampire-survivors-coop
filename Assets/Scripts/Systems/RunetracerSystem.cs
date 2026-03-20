@@ -34,23 +34,34 @@ namespace VampireSurvivors.Systems
 
                 weapon.ValueRW.Timer = weapon.ValueRO.Cooldown * stats.ValueRO.CooldownMult;
 
-                // Fire in the player's facing direction
-                float2 dir2   = math.normalizesafe(facing.ValueRO.Value);
-                float3 dir    = new float3(dir2.x, dir2.y, 0f);
-                float  damage = weapon.ValueRO.Damage * stats.ValueRO.Might;
-                float  spd    = weapon.ValueRO.Speed * stats.ValueRO.ProjectileSpeedMult;
+                // Fire in the player's facing direction (fan spread 20° between tracers if Amount > 1)
+                float2 baseDir2  = math.normalizesafe(facing.ValueRO.Value);
+                if (math.lengthsq(baseDir2) < 0.001f) baseDir2 = new float2(1f, 0f);
+                float  damage    = weapon.ValueRO.Damage * stats.ValueRO.Might;
+                float  spd       = weapon.ValueRO.Speed  * stats.ValueRO.ProjectileSpeedMult;
+                int    amount    = math.max(1, weapon.ValueRO.Amount);
 
-                var proj = ecb.CreateEntity();
-                ecb.AddComponent(proj, new Projectile
+                float baseAngle = math.atan2(baseDir2.y, baseDir2.x);
+                float stepRad   = 20f * math.PI / 180f;
+                float centreOff = -(amount - 1) * 0.5f * stepRad;
+
+                for (int a = 0; a < amount; a++)
                 {
-                    Damage     = damage,
-                    Speed      = spd,
-                    Direction  = dir,
-                    MaxRange   = weapon.ValueRO.MaxRange,
-                    Traveled   = 0f,
-                    BounceCount = weapon.ValueRO.Bounces
-                });
-                ecb.AddComponent(proj, LocalTransform.FromPosition(transform.ValueRO.Position));
+                    float  angle = baseAngle + centreOff + a * stepRad;
+                    float3 dir   = new float3(math.cos(angle), math.sin(angle), 0f);
+
+                    var proj = ecb.CreateEntity();
+                    ecb.AddComponent(proj, new Projectile
+                    {
+                        Damage      = damage,
+                        Speed       = spd,
+                        Direction   = dir,
+                        MaxRange    = weapon.ValueRO.MaxRange,
+                        Traveled    = 0f,
+                        BounceCount = weapon.ValueRO.Bounces
+                    });
+                    ecb.AddComponent(proj, LocalTransform.FromPosition(transform.ValueRO.Position));
+                }
             }
         }
     }
