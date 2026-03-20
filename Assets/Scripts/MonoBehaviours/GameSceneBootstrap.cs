@@ -224,6 +224,44 @@ namespace VampireSurvivors.MonoBehaviours
                     Debug.Log($"[GameSceneBootstrap] P{slot} Yatta Cavallo: Holy Water, HP=100, Speed=7.0");
                     break;
 
+                case "krochi":
+                    // Wiki: Cross starter, HP=100, Speed=7.0×1.3=9.1, starts with 1 ReviveStock
+                    SetBaseStats(em, entity, hp: 100, speed: 9.1f);
+                    if (em.HasComponent<WeaponState>(entity))
+                        em.RemoveComponent<WeaponState>(entity);
+                    em.AddComponentData(entity, new CrossState
+                    {
+                        Timer        = 0f,
+                        Cooldown     = 5.0f,
+                        Damage       = 50f,
+                        Speed        = 15f,
+                        TurnDistance = 8f
+                    });
+                    em.AddComponentData(entity, new ReviveStocks { Count = 1 });
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Krochi: Cross, HP=100, Speed=9.1, ReviveStocks=1");
+                    break;
+
+                case "dommario":
+                    // Wiki: King Bible starter, HP=100, Speed=7.0×0.6=4.2, +40% Duration+Speed, -40% Move
+                    SetBaseStats(em, entity, hp: 100, speed: 4.2f);
+                    if (em.HasComponent<WeaponState>(entity))
+                        em.RemoveComponent<WeaponState>(entity);
+                    em.AddComponentData(entity, new KingBibleState
+                    {
+                        Damage       = 10f,
+                        Radius       = 1.4f,
+                        AngularSpeed = 2.094f,
+                        HitCooldown  = 0.5f,
+                        Count        = 1,
+                        Spawned      = false
+                    });
+                    var dommarioStats = em.GetComponentData<PlayerStats>(entity);
+                    dommarioStats.DurationMult       = 1.4f;
+                    dommarioStats.ProjectileSpeedMult = 1.4f;
+                    em.SetComponentData(entity, dommarioStats);
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Dommario: King Bible, HP=100, Speed=4.2, Duration+Speed×1.4");
+                    break;
+
                 default:
                     Debug.LogWarning($"[GameSceneBootstrap] Unknown character '{charId}' for P{slot} — keeping Whip.");
                     break;

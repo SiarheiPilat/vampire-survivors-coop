@@ -154,6 +154,15 @@ namespace VampireSurvivors.Systems
                                     Rng      = new Unity.Mathematics.Random((uint)(entity.Index * 987654321u + 3u))
                                 });
                             break;
+                        // Krochi level 33 bonus: +1 ReviveStock (only if character has ReviveStocks)
+                        case 33:
+                            if (SystemAPI.HasComponent<ReviveStocks>(entity))
+                            {
+                                var stocks = SystemAPI.GetComponent<ReviveStocks>(entity);
+                                stocks.Count++;
+                                ecb.SetComponent(entity, stocks);
+                            }
+                            break;
                     }
 
                     // Passive items at level 11+: pause and let the player choose.

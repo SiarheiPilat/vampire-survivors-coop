@@ -1,16 +1,23 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~00:00
+> Last updated: 2026-03-21 ~00:30
 
 ## Next Up (priority order)
 
 - [ ] CharacterRegistry ScriptableObject (replace hard-coded array in LobbyManager)
 - [ ] Back-navigation from Lobby (B/Circle with no joined players → PressToStart)
-- [ ] New characters: Pugnala (Fire Wand + Fire Wand starter), Giovanna (Santa Water starter), Krochi (Cross starter)
+- [ ] New characters: Pugnala (needs Phiera+Eight The Sparrow weapons), Giovanna (needs Gatti Amari weapon)
 - [ ] New enemies: Ghost (intangible, passes through walls), Medusa (petrify debuff)
 - [ ] Map variety: second stage tileset + different enemy spawns
+- [ ] HUD: show ReviveStocks count on player panel (skull icon × N)
 
 ## Completed
+
+### 2026-03-21 (Session 9 — ~00:30)
+
+- [x] **Krochi Freetto** character — Cross starter, HP=100, Speed=9.1 (+30%), `ReviveStocks{Count=1}` auto-revive; +1 ReviveStock at level 33; added to LobbyManager roster
+- [x] **Dommario** character — King Bible starter, HP=100, Speed=4.2 (-40%), DurationMult=1.4, ProjectileSpeedMult=1.4 (+40% Duration+Speed); added to LobbyManager roster
+- [x] **ReviveStocks** `IComponentData` — `HealthSystem` checks before marking Downed: if Count>0 auto-revives at 50% HP + 3s iframes and decrements Count; teammate revive still works for characters with Count=0
 
 ### 2026-03-21 (Session 8 — ~00:00)
 

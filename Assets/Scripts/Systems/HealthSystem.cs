@@ -169,11 +169,38 @@ namespace VampireSurvivors.Systems
                 }
                 else if (SystemAPI.HasComponent<PlayerTag>(entity))
                 {
-                    // Player down — preserve entity for revive, mark as Downed
                     var idx = SystemAPI.GetComponent<PlayerIndex>(entity);
-                    Debug.Log($"[HealthSystem] Player {idx.Value} went down.");
-                    ecb.AddComponent<Downed>(entity);
-                    // Note: entity is NOT destroyed — ReviveSystem (future) removes Downed on revive
+
+                    // Krochi auto-revive: consume a ReviveStock instead of going Downed
+                    bool autoRevived = false;
+                    if (SystemAPI.HasComponent<ReviveStocks>(entity))
+                    {
+                        var stocks = SystemAPI.GetComponent<ReviveStocks>(entity);
+                        if (stocks.Count > 0)
+                        {
+                            stocks.Count--;
+                            ecb.SetComponent(entity, stocks);
+
+                            // Restore 50% max HP
+                            var hp   = SystemAPI.GetComponent<Health>(entity);
+                            hp.Current = math.max(1, hp.Max / 2);
+                            ecb.SetComponent(entity, hp);
+
+                            // 3 seconds of invincibility
+                            var inv = SystemAPI.GetComponent<Invincible>(entity);
+                            inv.Timer = math.max(inv.Timer, 3f);
+                            ecb.SetComponent(entity, inv);
+
+                            Debug.Log($"[HealthSystem] P{idx.Value} auto-revived via ReviveStock (remaining: {stocks.Count})");
+                            autoRevived = true;
+                        }
+                    }
+
+                    if (!autoRevived)
+                    {
+                        Debug.Log($"[HealthSystem] Player {idx.Value} went down.");
+                        ecb.AddComponent<Downed>(entity);
+                    }
                 }
                 else
                 {

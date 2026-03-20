@@ -132,6 +132,16 @@ namespace VampireSurvivors.Components
     }
 
     /// <summary>
+    /// Krochi's signature: automatic self-revive stocks.
+    /// When HP drops to 0 and Count > 0, HealthSystem auto-revives the player (50% HP, 3s iframes)
+    /// instead of applying Downed. Count starts at 1 for Krochi, +1 more at level 33.
+    /// </summary>
+    public struct ReviveStocks : IComponentData
+    {
+        public int Count; // remaining auto-revives
+    }
+
+    /// <summary>
     /// Added to a player entity when a passive-item level-up is pending player input.
     /// LevelUpSystem stops auto-granting and breaks its XP loop.
     /// HUDManager detects this, pauses time, and shows upgrade choice cards.
