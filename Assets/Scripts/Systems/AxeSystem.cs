@@ -49,7 +49,7 @@ namespace VampireSurvivors.Systems
                     ? math.normalize(facing.ValueRO.Value).x
                     : 1f;
 
-                float spd      = axe.ValueRO.Speed;
+                float spd      = axe.ValueRO.Speed * stats.ValueRO.ProjectileSpeedMult;
                 var   initVel  = new float3(facingX * spd * 0.5f, spd * 0.866f, 0f); // ~60° elevation
 
                 var bullet = ecb.Instantiate(bulletPrefab);

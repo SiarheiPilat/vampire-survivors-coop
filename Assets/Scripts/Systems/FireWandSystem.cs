@@ -41,6 +41,7 @@ namespace VampireSurvivors.Systems
                 wand.ValueRW.Timer = wand.ValueRO.Cooldown * stats.ValueRO.CooldownMult;
 
                 float dmg    = wand.ValueRO.Damage * stats.ValueRO.Might;
+                float spd    = wand.ValueRO.Speed * stats.ValueRO.ProjectileSpeedMult;
                 int   amount = math.max(1, wand.ValueRO.Amount);
 
                 // Each fireball fires in an independent random direction
@@ -52,7 +53,7 @@ namespace VampireSurvivors.Systems
                     ecb.AddComponent(bullet, new Projectile
                     {
                         Damage    = dmg,
-                        Speed     = wand.ValueRO.Speed,
+                        Speed     = spd,
                         Direction = dir,
                         MaxRange  = wand.ValueRO.MaxRange,
                         Traveled  = 0f

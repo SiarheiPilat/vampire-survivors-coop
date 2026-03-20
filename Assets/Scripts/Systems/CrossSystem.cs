@@ -47,6 +47,8 @@ namespace VampireSurvivors.Systems
                     ? math.normalize(facing.ValueRO.Value)
                     : new float2(1f, 0f);
 
+                float crossSpd = cross.ValueRO.Speed * stats.ValueRO.ProjectileSpeedMult;
+
                 if (cross.ValueRO.IsEvolved)
                 {
                     // Heaven Sword: fire Count (2) piercing swords at ±15° from facing, no return
@@ -67,7 +69,7 @@ namespace VampireSurvivors.Systems
                         ecb.AddComponent(sword, new Projectile
                         {
                             Damage        = cross.ValueRO.Damage * stats.ValueRO.Might,
-                            Speed         = cross.ValueRO.Speed,
+                            Speed         = crossSpd,
                             Direction     = new float3(dir2.x, dir2.y, 0f),
                             MaxRange      = 20f,
                             Traveled      = 0f,
@@ -85,7 +87,7 @@ namespace VampireSurvivors.Systems
                     ecb.AddComponent(bullet, new Projectile
                     {
                         Damage       = cross.ValueRO.Damage * stats.ValueRO.Might,
-                        Speed        = cross.ValueRO.Speed,
+                        Speed        = crossSpd,
                         Direction    = new float3(baseDir.x, baseDir.y, 0f),
                         MaxRange     = 30f,
                         Traveled     = 0f,

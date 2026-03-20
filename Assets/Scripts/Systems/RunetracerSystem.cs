@@ -38,12 +38,13 @@ namespace VampireSurvivors.Systems
                 float2 dir2   = math.normalizesafe(facing.ValueRO.Value);
                 float3 dir    = new float3(dir2.x, dir2.y, 0f);
                 float  damage = weapon.ValueRO.Damage * stats.ValueRO.Might;
+                float  spd    = weapon.ValueRO.Speed * stats.ValueRO.ProjectileSpeedMult;
 
                 var proj = ecb.CreateEntity();
                 ecb.AddComponent(proj, new Projectile
                 {
                     Damage     = damage,
-                    Speed      = weapon.ValueRO.Speed,
+                    Speed      = spd,
                     Direction  = dir,
                     MaxRange   = weapon.ValueRO.MaxRange,
                     Traveled   = 0f,

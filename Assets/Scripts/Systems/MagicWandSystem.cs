@@ -74,6 +74,7 @@ namespace VampireSurvivors.Systems
                 float halfSpread  = (amount - 1) * 0.5f * spreadRad;
 
                 float dmg = wand.ValueRO.Damage * stats.ValueRO.Might;
+                float spd = wand.ValueRO.Speed * stats.ValueRO.ProjectileSpeedMult;
                 for (int s = 0; s < amount; s++)
                 {
                     float a      = baseAngle - halfSpread + s * spreadRad;
@@ -82,7 +83,7 @@ namespace VampireSurvivors.Systems
                     ecb.AddComponent(bullet, new Projectile
                     {
                         Damage    = dmg,
-                        Speed     = wand.ValueRO.Speed,
+                        Speed     = spd,
                         Direction = dir,
                         MaxRange  = wand.ValueRO.MaxRange,
                         Traveled  = 0f

@@ -38,8 +38,9 @@ namespace VampireSurvivors.Authoring
                     HpRegen       = 0.0f,
                     HpRegenAccum  = 0.0f,
                     XpMult        = 1.0f,  // Crown increases this by ×1.08 per pickup
-                    CooldownMult  = 1.0f,  // Empty Tome reduces this by ×0.92 per pickup
-                    Luck          = 0.0f,  // Clover adds +0.1 per pickup; scales enemy drop rates
+                    CooldownMult       = 1.0f,  // Empty Tome reduces this by ×0.92 per pickup
+                    Luck               = 0.0f,  // Clover adds +0.1 per pickup; scales enemy drop rates
+                    ProjectileSpeedMult= 1.0f,  // Bracer multiplies by 1.1 per pickup
                 });
                 AddComponent(entity, new AssignedDeviceId { Value = 0 });
                 AddComponent(entity, new Health { Current = authoring.maxHp, Max = authoring.maxHp });

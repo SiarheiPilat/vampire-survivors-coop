@@ -94,6 +94,13 @@ namespace VampireSurvivors.Components
         /// Wiki: Clover increases Luck which affects item find and critical hit chance.
         /// </summary>
         public float Luck;
+
+        /// <summary>
+        /// Projectile speed multiplier. Default 1.0. Each Bracer pickup multiplies by 1.1.
+        /// Applied by projectile weapon systems at fire time: finalSpeed = baseSpeed * ProjectileSpeedMult.
+        /// Wiki: Bracer grants +10% Projectile Speed per level.
+        /// </summary>
+        public float ProjectileSpeedMult;
     }
 
     /// <summary>
@@ -142,7 +149,8 @@ namespace VampireSurvivors.Components
         public float Damage;
         public float Speed;
         public float MaxRange;
-        public int   Amount;  // knives per throw; 1 = default; fan spread, 20° between blades
+        public int   Amount;     // knives per throw; 1 = default; fan spread, 20° between blades
+        public bool  IsEvolved;  // true = Thousand Edge: 5 knives, speed 20, 0.15s CD, 15 dmg
     }
 
     /// <summary>

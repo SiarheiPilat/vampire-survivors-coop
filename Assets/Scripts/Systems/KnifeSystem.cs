@@ -42,12 +42,13 @@ namespace VampireSurvivors.Systems
                     ? math.normalize(facing.ValueRO.Value)
                     : new float2(1f, 0f); // default right
 
-                // Fan spread: 20° between blades, centered on facing direction
-                float baseAngle  = math.atan2(dir2.y, dir2.x);
-                float spreadRad  = math.radians(20f);
+                // Thousand Edge: tight 10° fan, 5 blades; base: 20° fan
+                float spreadRad  = knife.ValueRO.IsEvolved ? math.radians(10f) : math.radians(20f);
                 int   amount     = math.max(1, knife.ValueRO.Amount);
+                float baseAngle  = math.atan2(dir2.y, dir2.x);
                 float halfSpread = (amount - 1) * 0.5f * spreadRad;
                 float dmg        = knife.ValueRO.Damage * stats.ValueRO.Might;
+                float spd        = knife.ValueRO.Speed * stats.ValueRO.ProjectileSpeedMult;
 
                 for (int s = 0; s < amount; s++)
                 {
@@ -57,7 +58,7 @@ namespace VampireSurvivors.Systems
                     ecb.AddComponent(bullet, new Projectile
                     {
                         Damage    = dmg,
-                        Speed     = knife.ValueRO.Speed,
+                        Speed     = spd,
                         Direction = dir,
                         MaxRange  = knife.ValueRO.MaxRange,
                         Traveled  = 0f

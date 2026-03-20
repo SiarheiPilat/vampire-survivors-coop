@@ -45,7 +45,10 @@ namespace VampireSurvivors.MonoBehaviours
         bool        _queryCreated;
         float       _elapsedTime;
         bool        _gameOver;
+        bool        _victory;
         bool        _hadPlayers;  // true once at least 1 player was alive
+
+        const float RunDuration = 1800f; // 30 minutes in seconds
 
         readonly int[]   _lastLevels     = new int[4];
         readonly float[] _levelUpTimers  = new float[4];
@@ -59,11 +62,12 @@ namespace VampireSurvivors.MonoBehaviours
         // Dynamic 3-choice upgrade system
         enum UpgradeType
         {
-            Spinach, Pummarola, Armor, EmptyTome, Crown, Clover,
+            Spinach, Pummarola, Armor, EmptyTome, Crown, Clover, Bracer,
             WandAmount, KnifeAmount, FireAmount,
-            HolyWandEvolution,    // Magic Wand + Empty Tome
-            SoulEaterEvolution,   // Garlic + Pummarola
-            HeavenSwordEvolution, // Cross + Clover
+            HolyWandEvolution,     // Magic Wand + Empty Tome
+            SoulEaterEvolution,    // Garlic + Pummarola
+            HeavenSwordEvolution,  // Cross + Clover
+            ThousandEdgeEvolution, // Knife + Bracer
         }
         readonly UpgradeType[] _currentChoices = new UpgradeType[3];
         readonly TMP_Text[]    _btnLabels       = new TMP_Text[3];
@@ -82,6 +86,7 @@ namespace VampireSurvivors.MonoBehaviours
             (UpgradeType.EmptyTome,"Empty Tome\n-8% weapon cooldown"),
             (UpgradeType.Crown,    "Crown\n+8% XP gain"),
             (UpgradeType.Clover,   "Clover\n+10% Luck (better drops)"),
+            (UpgradeType.Bracer,   "Bracer\n+10% projectile speed"),
         };
 
         // Gold display (created programmatically)
@@ -151,9 +156,17 @@ namespace VampireSurvivors.MonoBehaviours
 
         void Update()
         {
-            if (_gameOver) return;
+            if (_gameOver || _victory) return;
 
             _elapsedTime += Time.unscaledDeltaTime; // unscaled so timer advances while paused
+
+            // 30-minute win condition
+            if (_elapsedTime >= RunDuration)
+            {
+                TriggerVictory();
+                return;
+            }
+
             UpdateTimer();
             TickLevelUpTimers();
 
@@ -244,6 +257,14 @@ namespace VampireSurvivors.MonoBehaviours
             if (timerText == null) return;
             int total      = Mathf.FloorToInt(_elapsedTime);
             timerText.text = $"{total / 60:00}:{total % 60:00}";
+
+            // Warn when < 5 minutes remain (yellow flash)
+            float remaining = RunDuration - _elapsedTime;
+            if (remaining <= 300f)
+                timerText.color = (Mathf.FloorToInt(remaining) % 2 == 0)
+                    ? new Color(1f, 0.9f, 0.1f) : Color.white;
+            else
+                timerText.color = Color.white;
         }
 
         void TriggerGameOver()
@@ -272,6 +293,38 @@ namespace VampireSurvivors.MonoBehaviours
                     AddStatLine(gameOverPanel, $"Gold Earned  {gs.Total}", -90f);
                 }
             }
+        }
+
+        void TriggerVictory()
+        {
+            _victory = true;
+            Time.timeScale = 0f; // pause the game on victory
+
+            // Re-use the game-over panel as the victory panel (swap text)
+            if (gameOverPanel == null) return;
+            gameOverPanel.SetActive(true);
+
+            if (gameOverTimeText != null)
+                gameOverTimeText.text = "YOU SURVIVED 30 MINUTES!";
+
+            // Append stats
+            var goWorld = World.DefaultGameObjectInjectionWorld;
+            if (goWorld != null)
+            {
+                using var gq = goWorld.EntityManager.CreateEntityQuery(
+                    ComponentType.ReadOnly<SharedGold>());
+                if (gq.CalculateEntityCount() > 0)
+                {
+                    using var arr = gq.ToComponentDataArray<SharedGold>(Unity.Collections.Allocator.Temp);
+                    var gs = arr[0];
+                    AddStatLine(gameOverPanel, $"Enemies Killed  {gs.EnemiesKilled}", -50f);
+                    AddStatLine(gameOverPanel, $"Gold Earned  {gs.Total}", -90f);
+                }
+            }
+
+            // Tint the panel green for victory
+            var bg = gameOverPanel.GetComponent<UnityEngine.UI.Image>();
+            if (bg != null) bg.color = new Color(0.05f, 0.25f, 0.05f, 0.92f);
         }
 
         static void AddStatLine(GameObject panel, string text, float yOffset)
@@ -594,6 +647,15 @@ namespace VampireSurvivors.MonoBehaviours
                         "★ Heaven Sword\nCross + Clover — 2 swords, 200 dmg, piercing, 2.5s CD"));
             }
 
+            // Thousand Edge = Knife + Bracer (ProjectileSpeedMult > 1 means bracer was taken)
+            if (em.HasComponent<KnifeState>(_pendingUpgradeEntity))
+            {
+                var ks = em.GetComponentData<KnifeState>(_pendingUpgradeEntity);
+                if (!ks.IsEvolved && playerStats.ProjectileSpeedMult > 1.0f)
+                    pool.Add((UpgradeType.ThousandEdgeEvolution,
+                        "★ Thousand Edge\nKnife + Bracer — 5 blades, 15 dmg, 0.15s CD, speed 20"));
+            }
+
             // Fisher-Yates shuffle using UnityEngine.Random (unscaled, so fine while paused)
             for (int i = pool.Count - 1; i > 0; i--)
             {
@@ -647,6 +709,10 @@ namespace VampireSurvivors.MonoBehaviours
                     stats.Luck += 0.1f;
                     Debug.Log($"[HUDManager] P{pidx} chose Clover — Luck = {stats.Luck:F1}");
                     break;
+                case UpgradeType.Bracer:
+                    stats.ProjectileSpeedMult *= 1.1f;
+                    Debug.Log($"[HUDManager] P{pidx} chose Bracer — ProjectileSpeedMult = {stats.ProjectileSpeedMult:F3}×");
+                    break;
                 case UpgradeType.WandAmount:
                     if (em.HasComponent<MagicWandState>(_pendingUpgradeEntity))
                     {
@@ -699,6 +765,21 @@ namespace VampireSurvivors.MonoBehaviours
                         garlic.HealPerPulse = 2f;
                         em.SetComponentData(_pendingUpgradeEntity, garlic);
                         Debug.Log($"[HUDManager] P{pidx} evolved Garlic → Soul Eater");
+                    }
+                    break;
+
+                case UpgradeType.ThousandEdgeEvolution:
+                    if (em.HasComponent<KnifeState>(_pendingUpgradeEntity))
+                    {
+                        var knife       = em.GetComponentData<KnifeState>(_pendingUpgradeEntity);
+                        knife.IsEvolved = true;
+                        knife.Amount    = 5;
+                        knife.Damage    = 15f;
+                        knife.Speed     = 20f;
+                        knife.Cooldown  = 0.15f;
+                        knife.MaxRange  = 15f;
+                        em.SetComponentData(_pendingUpgradeEntity, knife);
+                        Debug.Log($"[HUDManager] P{pidx} evolved Knife → Thousand Edge");
                     }
                     break;
 
