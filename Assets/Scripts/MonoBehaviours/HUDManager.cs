@@ -108,6 +108,9 @@ namespace VampireSurvivors.MonoBehaviours
         EntityQuery _sharedGoldQuery;
         TMP_Text    _goldText;
 
+        // Revive stocks display (one label per player panel, created programmatically)
+        readonly TMP_Text[] _stocksTexts = new TMP_Text[4];
+
         // Revive progress display
         EntityQuery  _reviveProgressQuery;
         GameObject   _reviveBar;
@@ -154,6 +157,7 @@ namespace VampireSurvivors.MonoBehaviours
             CreateUpgradePanel();
             CreateGoldDisplay();
             CreateReviveBar();
+            CreateReviveStocksTexts();
         }
 
         void OnDisable()
@@ -195,6 +199,7 @@ namespace VampireSurvivors.MonoBehaviours
 
             bool[] seen = new bool[4];
 
+            var entities    = _playerQuery.ToEntityArray(Allocator.Temp);
             var indices     = _playerQuery.ToComponentDataArray<PlayerIndex>(Allocator.Temp);
             var stats       = _playerQuery.ToComponentDataArray<PlayerStats>(Allocator.Temp);
             var healths     = _playerQuery.ToComponentDataArray<Health>(Allocator.Temp);
@@ -205,9 +210,15 @@ namespace VampireSurvivors.MonoBehaviours
                 int slot = indices[i].Value;
                 if (slot < 0 || slot >= 4) continue;
                 seen[slot] = true;
-                UpdatePanel(slot, healths[i], stats[i]);
+
+                int stocks = 0;
+                if (world.EntityManager.HasComponent<ReviveStocks>(entities[i]))
+                    stocks = world.EntityManager.GetComponentData<ReviveStocks>(entities[i]).Count;
+
+                UpdatePanel(slot, healths[i], stats[i], stocks);
             }
 
+            entities.Dispose();
             indices.Dispose();
             stats.Dispose();
             healths.Dispose();
@@ -222,7 +233,7 @@ namespace VampireSurvivors.MonoBehaviours
                 TriggerGameOver();
         }
 
-        void UpdatePanel(int slot, Health health, PlayerStats stats)
+        void UpdatePanel(int slot, Health health, PlayerStats stats, int reviveStocks = 0)
         {
             if (panelRoots[slot] == null) return;
             panelRoots[slot].SetActive(true);
@@ -257,6 +268,20 @@ namespace VampireSurvivors.MonoBehaviours
                 levelTexts[slot].color = _levelUpTimers[slot] > 0f
                     ? LevelUpColor
                     : LevelTextNorm;
+            }
+
+            // Revive stocks — show "☠×N" when N > 0 (only Krochi starts with stocks)
+            if (_stocksTexts[slot] != null)
+            {
+                if (reviveStocks > 0)
+                {
+                    _stocksTexts[slot].text = $"\u2620\u00d7{reviveStocks}";
+                    _stocksTexts[slot].gameObject.SetActive(true);
+                }
+                else
+                {
+                    _stocksTexts[slot].gameObject.SetActive(false);
+                }
             }
         }
 
@@ -446,6 +471,32 @@ namespace VampireSurvivors.MonoBehaviours
 
             if (_reviveText != null)
                 _reviveText.text = $"Reviving P{slot + 1}... {Mathf.FloorToInt(ratio * 100)}%";
+        }
+
+        // ─── Revive Stocks (per panel) ──────────────────────────────────────
+
+        void CreateReviveStocksTexts()
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                if (panelRoots[i] == null) continue;
+
+                var go = new GameObject("ReviveStocksText");
+                go.transform.SetParent(panelRoots[i].transform, false);
+                var rt = go.AddComponent<RectTransform>();
+                // Anchor to bottom-right corner of the panel
+                rt.anchorMin        = new Vector2(1f, 0f);
+                rt.anchorMax        = new Vector2(1f, 0f);
+                rt.pivot            = new Vector2(1f, 0f);
+                rt.anchoredPosition = new Vector2(-4f, 4f);
+                rt.sizeDelta        = new Vector2(70f, 22f);
+
+                _stocksTexts[i] = go.AddComponent<TextMeshProUGUI>();
+                _stocksTexts[i].fontSize  = 16;
+                _stocksTexts[i].alignment = TextAlignmentOptions.Right;
+                _stocksTexts[i].color     = new Color(0.9f, 0.3f, 0.3f);
+                go.SetActive(false);
+            }
         }
 
         // ─── Gold Display ───────────────────────────────────────────────────

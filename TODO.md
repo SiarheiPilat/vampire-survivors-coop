@@ -1,10 +1,9 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~01:00
+> Last updated: 2026-03-21 ~01:20
 
 ## Next Up (priority order)
 
-- [ ] HUD: show ReviveStocks count on player panel (skull icon × N)
 - [ ] CharacterRegistry ScriptableObject (replace hard-coded array in LobbyManager)
 - [ ] New characters: Pugnala (needs Phiera Der Tuphello + Eight The Sparrow weapons), Giovanna (needs Gatti Amari weapon)
 - [ ] Map variety: second stage tileset + different enemy spawns
@@ -12,6 +11,10 @@
 - [ ] Crimson Shroud evolution (Garlic + Pummarola → Soul Eater + Armor?) — check wiki
 
 ## Completed
+
+### 2026-03-21 (Session 11 — ~01:20)
+
+- [x] **HUD ReviveStocks display** — per-player panel shows "☠×N" label (red, bottom-right) when player has ReviveStocks > 0; hidden otherwise; programmatically created as child of each panel root in `Start()`; `UpdatePanel` polls `ReviveStocks` component via entity array each frame
 
 ### 2026-03-21 (Session 10 — ~01:00)
 
