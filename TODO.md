@@ -1,18 +1,20 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-20 ~12:00
+> Last updated: 2026-03-20 ~12:30
 
 ## Next Up (priority order)
 
-- [ ] Duplicator passive (+1 Amount to all weapons)
-- [ ] Duplicator passive (+1 Amount to all weapons) + Thunder Loop (Lightning Ring + Duplicator)
 - [ ] More characters: Mortaccio (Bone), Yatta Cavallo (Santa Water)
-- [ ] Thunder Loop evolution (Lightning Ring + Duplicator passive)
-- [ ] Duplicator passive (+1 Amount to all weapons)
 - [ ] CharacterRegistry ScriptableObject (replace hard-coded array in LobbyManager)
 - [ ] Back-navigation from Lobby (B/Circle with no joined players → PressToStart)
+- [ ] Weapon evolutions: Unholy Vespers (King Bible + Spellbinder passive), O'Sole Meeo (Fire Wand + Candelabrador), Bone evolution
 
 ## Completed
+
+### 2026-03-20 (Session 6 — ~12:30)
+
+- [x] **Duplicator passive** — +1 Amount to ALL currently-owned weapons on pickup; `PlayerStats.DuplicatorStacks` tracks count for Thunder Loop gate; appears in level-up pool (no level cap — each pickup is meaningful)
+- [x] **Thunder Loop evolution** (Lightning Ring + Duplicator) — 65 dmg, 6 targets/strike, 0.5s CD; `LightningRingState.IsEvolved` flag; appears in pool when LightningRingState present + !IsEvolved + DuplicatorStacks > 0
 
 ### 2026-03-20 (Session 5 — ~12:00)
 

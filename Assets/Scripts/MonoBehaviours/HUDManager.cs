@@ -62,13 +62,14 @@ namespace VampireSurvivors.MonoBehaviours
         // Dynamic 3-choice upgrade system
         enum UpgradeType
         {
-            Spinach, Pummarola, Armor, EmptyTome, Crown, Clover, Bracer, HollowHeart,
+            Spinach, Pummarola, Armor, EmptyTome, Crown, Clover, Bracer, HollowHeart, Duplicator,
             WandAmount, KnifeAmount, FireAmount, LightningAmount, WhipAmount, AxeAmount, HolyWaterAmount,
             HolyWandEvolution,     // Magic Wand + Empty Tome
             SoulEaterEvolution,    // Garlic + Pummarola
             HeavenSwordEvolution,  // Cross + Clover
             ThousandEdgeEvolution, // Knife + Bracer
             BloodyTearEvolution,   // Whip + Hollow Heart
+            ThunderLoopEvolution,  // Lightning Ring + Duplicator
         }
         readonly UpgradeType[] _currentChoices = new UpgradeType[3];
         readonly TMP_Text[]    _btnLabels       = new TMP_Text[3];
@@ -93,6 +94,7 @@ namespace VampireSurvivors.MonoBehaviours
             (UpgradeType.Clover,      "Clover\n+10% Luck (better drops)"),
             (UpgradeType.Bracer,      "Bracer\n+10% projectile speed"),
             (UpgradeType.HollowHeart, "Hollow Heart\n+10% Max HP"),
+            (UpgradeType.Duplicator,  "Duplicator\n+1 Amount to all weapons"),
         };
 
         // Gold display (created programmatically)
@@ -700,6 +702,15 @@ namespace VampireSurvivors.MonoBehaviours
                         "★ Thousand Edge\nKnife + Bracer — 5 blades, 15 dmg, 0.15s CD, speed 20"));
             }
 
+            // Thunder Loop = Lightning Ring + Duplicator (DuplicatorStacks > 0 means duplicator was taken)
+            if (em.HasComponent<LightningRingState>(_pendingUpgradeEntity))
+            {
+                var lr = em.GetComponentData<LightningRingState>(_pendingUpgradeEntity);
+                if (!lr.IsEvolved && playerStats.DuplicatorStacks > 0)
+                    pool.Add((UpgradeType.ThunderLoopEvolution,
+                        "★ Thunder Loop\nLightning Ring + Duplicator — 65 dmg, 6 targets, 0.5s CD"));
+            }
+
             // Fisher-Yates shuffle using UnityEngine.Random (unscaled, so fine while paused)
             for (int i = pool.Count - 1; i > 0; i--)
             {
@@ -769,6 +780,55 @@ namespace VampireSurvivors.MonoBehaviours
                         stats.MaxHpBonus += bonus;
                         Debug.Log($"[HUDManager] P{pidx} chose Hollow Heart — MaxHp = {hp.Max} (+{bonus})");
                     }
+                    break;
+                }
+                case UpgradeType.Duplicator:
+                {
+                    // +1 Amount to every weapon the player currently owns
+                    stats.DuplicatorStacks++;
+                    if (em.HasComponent<WeaponState>(_pendingUpgradeEntity))
+                    {
+                        var w = em.GetComponentData<WeaponState>(_pendingUpgradeEntity);
+                        w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1;
+                        em.SetComponentData(_pendingUpgradeEntity, w);
+                    }
+                    if (em.HasComponent<MagicWandState>(_pendingUpgradeEntity))
+                    {
+                        var w = em.GetComponentData<MagicWandState>(_pendingUpgradeEntity);
+                        w.Amount++;
+                        em.SetComponentData(_pendingUpgradeEntity, w);
+                    }
+                    if (em.HasComponent<KnifeState>(_pendingUpgradeEntity))
+                    {
+                        var w = em.GetComponentData<KnifeState>(_pendingUpgradeEntity);
+                        w.Amount++;
+                        em.SetComponentData(_pendingUpgradeEntity, w);
+                    }
+                    if (em.HasComponent<FireWandState>(_pendingUpgradeEntity))
+                    {
+                        var w = em.GetComponentData<FireWandState>(_pendingUpgradeEntity);
+                        w.Amount++;
+                        em.SetComponentData(_pendingUpgradeEntity, w);
+                    }
+                    if (em.HasComponent<LightningRingState>(_pendingUpgradeEntity))
+                    {
+                        var w = em.GetComponentData<LightningRingState>(_pendingUpgradeEntity);
+                        w.Amount++;
+                        em.SetComponentData(_pendingUpgradeEntity, w);
+                    }
+                    if (em.HasComponent<AxeState>(_pendingUpgradeEntity))
+                    {
+                        var w = em.GetComponentData<AxeState>(_pendingUpgradeEntity);
+                        w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1;
+                        em.SetComponentData(_pendingUpgradeEntity, w);
+                    }
+                    if (em.HasComponent<HolyWaterState>(_pendingUpgradeEntity))
+                    {
+                        var w = em.GetComponentData<HolyWaterState>(_pendingUpgradeEntity);
+                        w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1;
+                        em.SetComponentData(_pendingUpgradeEntity, w);
+                    }
+                    Debug.Log($"[HUDManager] P{pidx} chose Duplicator — +1 Amount to all weapons (stacks={stats.DuplicatorStacks})");
                     break;
                 }
                 case UpgradeType.WandAmount:
@@ -902,6 +962,19 @@ namespace VampireSurvivors.MonoBehaviours
                         cross.TurnDistance = 0f;  // no boomerang return
                         em.SetComponentData(_pendingUpgradeEntity, cross);
                         Debug.Log($"[HUDManager] P{pidx} evolved Cross → Heaven Sword");
+                    }
+                    break;
+
+                case UpgradeType.ThunderLoopEvolution:
+                    if (em.HasComponent<LightningRingState>(_pendingUpgradeEntity))
+                    {
+                        var lr      = em.GetComponentData<LightningRingState>(_pendingUpgradeEntity);
+                        lr.IsEvolved = true;
+                        lr.Damage    = 65f;
+                        lr.Amount    = 6;
+                        lr.Cooldown  = 0.5f;
+                        em.SetComponentData(_pendingUpgradeEntity, lr);
+                        Debug.Log($"[HUDManager] P{pidx} evolved Lightning Ring → Thunder Loop");
                     }
                     break;
             }

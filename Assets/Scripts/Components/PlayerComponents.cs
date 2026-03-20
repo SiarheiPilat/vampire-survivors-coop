@@ -108,6 +108,13 @@ namespace VampireSurvivors.Components
         /// Also added to Health.Max and partially to Health.Current at pickup time.
         /// </summary>
         public int MaxHpBonus;
+
+        /// <summary>
+        /// Number of Duplicator passives taken. Gate for Thunder Loop evolution.
+        /// Each Duplicator pickup adds +1 Amount to every weapon the player owns.
+        /// Wiki: Duplicator — +1 Amount per level, max 2 levels.
+        /// </summary>
+        public int DuplicatorStacks;
     }
 
     /// <summary>
@@ -202,7 +209,8 @@ namespace VampireSurvivors.Components
         public float  Timer;
         public float  Cooldown;
         public float  Damage;
-        public int    Amount;  // enemies struck per activation
+        public int    Amount;     // enemies struck per activation
+        public bool   IsEvolved;  // true = Thunder Loop: 65 dmg, 0.5s CD, 6 targets
         public Random Rng;
     }
 
