@@ -4,9 +4,8 @@
 
 ## Next Up (priority order)
 
-- [ ] Bracer passive (+10% projectile speed) + Thousand Edge evolution (Knife + Bracer)
 - [ ] Hollow Heart passive (+10% max HP) + Bloody Tear evolution (Whip + Hollow Heart)
-- [ ] Win condition: 30-minute countdown → Victory screen (Death boss or hard cap)
+- [ ] Chest/treasure system: enemies drop chests on death, reward on contact (weapon/passive/gold)
 - [ ] Chest/treasure system: enemies drop chests on death, reward on contact (weapon/passive/gold)
 - [ ] Weapon amount upgrades for Whip, Axe, Cross, HolyWater, LightningRing in level-up pool
 - [ ] More characters: Mortaccio (Bone), Yatta Cavallo (Santa Water)
@@ -16,6 +15,12 @@
 - [ ] Back-navigation from Lobby (B/Circle with no joined players → PressToStart)
 
 ## Completed
+
+### 2026-03-20 (Session 2 — ~10:XX)
+
+- [x] **Bracer** passive: `PlayerStats.ProjectileSpeedMult` ×1.1 per pickup; applied in all 6 projectile weapon systems
+- [x] **Thousand Edge** evolution (Knife + Bracer): 5 blades, speed 20, 0.15s CD, 15 dmg, 10° tight fan
+- [x] **Win condition**: `TriggerVictory()` at 30:00 — green overlay, "YOU SURVIVED!", pauses game; timer flashes yellow < 5min warning
 
 ### 2026-03-20 (Session 1 — ~09:XX)
 
