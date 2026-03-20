@@ -22,9 +22,9 @@ namespace VampireSurvivors.Systems
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             var ecb          = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            foreach (var (weaponState, moveInput, transform, stats) in
+            foreach (var (weaponState, moveInput, transform, stats, entity) in
                 SystemAPI.Query<RefRW<WeaponState>, RefRO<MoveInput>, RefRO<LocalTransform>, RefRO<PlayerStats>>()
-                    .WithAll<PlayerTag>().WithNone<Downed>())
+                    .WithAll<PlayerTag>().WithNone<Downed>().WithEntityAccess())
             {
                 ref var ws = ref weaponState.ValueRW;
                 ws.SwingTimer -= dt;
@@ -38,11 +38,13 @@ namespace VampireSurvivors.Systems
                 var arcEntity = ecb.CreateEntity();
                 ecb.AddComponent(arcEntity, new HitArc
                 {
-                    Damage     = ws.Damage * stats.ValueRO.Might,
-                    Direction  = math.normalizesafe(dir),
-                    Range      = ws.Range,
-                    ArcDegrees = ws.ArcDegrees,
-                    Origin     = transform.ValueRO.Position
+                    Damage      = ws.Damage * stats.ValueRO.Might,
+                    Direction   = math.normalizesafe(dir),
+                    Range       = ws.Range,
+                    ArcDegrees  = ws.ArcDegrees,
+                    Origin      = transform.ValueRO.Position,
+                    OwnerEntity = ws.IsEvolved ? entity : Entity.Null,
+                    HealPerHit  = ws.HealPerHit
                 });
 
                 ws.SwingTimer = ws.SwingCooldown * stats.ValueRO.CooldownMult;

@@ -101,6 +101,13 @@ namespace VampireSurvivors.Components
         /// Wiki: Bracer grants +10% Projectile Speed per level.
         /// </summary>
         public float ProjectileSpeedMult;
+
+        /// <summary>
+        /// Flat max-HP bonus accumulated from Hollow Heart pickups.
+        /// Stored separately so the evolution condition (MaxHpBonus > 0) can be checked.
+        /// Also added to Health.Max and partially to Health.Current at pickup time.
+        /// </summary>
+        public int MaxHpBonus;
     }
 
     /// <summary>

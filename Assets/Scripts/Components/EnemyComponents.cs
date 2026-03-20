@@ -51,6 +51,8 @@ namespace VampireSurvivors.Components
         public float Damage;
         public float Range;
         public float ArcDegrees;
+        public bool  IsEvolved;   // true = Bloody Tear: double dmg, heals on hit
+        public float HealPerHit;  // HP restored to owner per enemy struck (Bloody Tear)
     }
 
     /// <summary>
@@ -60,11 +62,13 @@ namespace VampireSurvivors.Components
     /// </summary>
     public struct HitArc : IComponentData
     {
-        public float Damage;
-        public float2 Direction;   // normalised facing direction
-        public float Range;
-        public float ArcDegrees;
-        public float3 Origin;      // world position of the swinging player
+        public float  Damage;
+        public float2 Direction;    // normalised facing direction
+        public float  Range;
+        public float  ArcDegrees;
+        public float3 Origin;       // world position of the swinging player
+        public Entity OwnerEntity;  // player entity; Entity.Null = no heal
+        public float  HealPerHit;   // HP healed to OwnerEntity per enemy struck (Bloody Tear)
     }
 
     /// <summary>

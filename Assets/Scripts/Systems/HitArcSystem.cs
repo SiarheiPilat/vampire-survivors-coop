@@ -63,6 +63,7 @@ namespace VampireSurvivors.Systems
             {
                 float halfArcRad = math.radians(arc.ArcDegrees * 0.5f);
                 float2 dir       = math.normalizesafe(arc.Direction);
+                int    hitCount  = 0;
 
                 for (int i = 0; i < EnemyEntities.Length; i++)
                 {
@@ -81,6 +82,7 @@ namespace VampireSurvivors.Systems
                     var hp = HealthLookup[EnemyEntities[i]];
                     hp.Current -= (int)arc.Damage;
                     HealthLookup[EnemyEntities[i]] = hp;
+                    hitCount++;
 
                     var dmgEvt = Ecb.CreateEntity();
                     Ecb.AddComponent(dmgEvt, new DamageNumberEvent
@@ -93,6 +95,17 @@ namespace VampireSurvivors.Systems
                     float2 pushDir = math.normalizesafe(
                         EnemyTransforms[i].Position.xy - arc.Origin.xy);
                     Ecb.SetComponent(EnemyEntities[i], new Knockback { Velocity = pushDir * 6f });
+                }
+
+                // Bloody Tear: heal owner for each enemy struck
+                if (hitCount > 0 && arc.HealPerHit > 0f &&
+                    arc.OwnerEntity != Entity.Null &&
+                    HealthLookup.HasComponent(arc.OwnerEntity))
+                {
+                    var ownerHp = HealthLookup[arc.OwnerEntity];
+                    ownerHp.Current = math.min(ownerHp.Max,
+                        ownerHp.Current + (int)(arc.HealPerHit * hitCount));
+                    HealthLookup[arc.OwnerEntity] = ownerHp;
                 }
 
                 Ecb.DestroyEntity(entity);

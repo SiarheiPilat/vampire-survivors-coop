@@ -62,31 +62,34 @@ namespace VampireSurvivors.MonoBehaviours
         // Dynamic 3-choice upgrade system
         enum UpgradeType
         {
-            Spinach, Pummarola, Armor, EmptyTome, Crown, Clover, Bracer,
-            WandAmount, KnifeAmount, FireAmount,
+            Spinach, Pummarola, Armor, EmptyTome, Crown, Clover, Bracer, HollowHeart,
+            WandAmount, KnifeAmount, FireAmount, LightningAmount,
             HolyWandEvolution,     // Magic Wand + Empty Tome
             SoulEaterEvolution,    // Garlic + Pummarola
             HeavenSwordEvolution,  // Cross + Clover
             ThousandEdgeEvolution, // Knife + Bracer
+            BloodyTearEvolution,   // Whip + Hollow Heart
         }
         readonly UpgradeType[] _currentChoices = new UpgradeType[3];
         readonly TMP_Text[]    _btnLabels       = new TMP_Text[3];
 
         static readonly (UpgradeType type, string label)[] k_WeaponUpgrades =
         {
-            (UpgradeType.WandAmount,  "Magic Wand +1 shot\nFire an extra Wand projectile"),
-            (UpgradeType.KnifeAmount, "Knife +1 blade\nThrow an extra Knife per volley"),
-            (UpgradeType.FireAmount,  "Fire Wand +1 flame\nLaunch an extra fireball per burst"),
+            (UpgradeType.WandAmount,      "Magic Wand +1 shot\nFire an extra Wand projectile"),
+            (UpgradeType.KnifeAmount,     "Knife +1 blade\nThrow an extra Knife per volley"),
+            (UpgradeType.FireAmount,      "Fire Wand +1 flame\nLaunch an extra fireball per burst"),
+            (UpgradeType.LightningAmount, "Lightning Ring +1 strike\nHit an extra enemy per activation"),
         };
         static readonly (UpgradeType type, string label)[] k_PassiveUpgrades =
         {
-            (UpgradeType.Spinach,  "Spinach\n+10% Might (weapon damage)"),
-            (UpgradeType.Pummarola,"Pummarola\n+0.2 HP/s regen"),
-            (UpgradeType.Armor,    "Armor\n+1 flat damage reduction"),
-            (UpgradeType.EmptyTome,"Empty Tome\n-8% weapon cooldown"),
-            (UpgradeType.Crown,    "Crown\n+8% XP gain"),
-            (UpgradeType.Clover,   "Clover\n+10% Luck (better drops)"),
-            (UpgradeType.Bracer,   "Bracer\n+10% projectile speed"),
+            (UpgradeType.Spinach,     "Spinach\n+10% Might (weapon damage)"),
+            (UpgradeType.Pummarola,   "Pummarola\n+0.2 HP/s regen"),
+            (UpgradeType.Armor,       "Armor\n+1 flat damage reduction"),
+            (UpgradeType.EmptyTome,   "Empty Tome\n-8% weapon cooldown"),
+            (UpgradeType.Crown,       "Crown\n+8% XP gain"),
+            (UpgradeType.Clover,      "Clover\n+10% Luck (better drops)"),
+            (UpgradeType.Bracer,      "Bracer\n+10% projectile speed"),
+            (UpgradeType.HollowHeart, "Hollow Heart\n+10% Max HP"),
         };
 
         // Gold display (created programmatically)
@@ -613,6 +616,13 @@ namespace VampireSurvivors.MonoBehaviours
                             canAdd = curAmt < 5;
                         }
                         break;
+                    case UpgradeType.LightningAmount:
+                        if (em.HasComponent<LightningRingState>(_pendingUpgradeEntity))
+                        {
+                            curAmt = em.GetComponentData<LightningRingState>(_pendingUpgradeEntity).Amount;
+                            canAdd = curAmt < 5;
+                        }
+                        break;
                 }
                 if (canAdd) pool.Add((type, label + $"  ({curAmt}→{curAmt + 1})"));
             }
@@ -645,6 +655,15 @@ namespace VampireSurvivors.MonoBehaviours
                 if (!cs.IsEvolved && playerStats.Luck > 0f)
                     pool.Add((UpgradeType.HeavenSwordEvolution,
                         "★ Heaven Sword\nCross + Clover — 2 swords, 200 dmg, piercing, 2.5s CD"));
+            }
+
+            // Bloody Tear = Whip + Hollow Heart (MaxHpBonus > 0 means hollow heart was taken)
+            if (em.HasComponent<WeaponState>(_pendingUpgradeEntity))
+            {
+                var ws = em.GetComponentData<WeaponState>(_pendingUpgradeEntity);
+                if (!ws.IsEvolved && playerStats.MaxHpBonus > 0)
+                    pool.Add((UpgradeType.BloodyTearEvolution,
+                        "★ Bloody Tear\nWhip + Hollow Heart — 20 dmg, heals 1 HP/enemy hit"));
             }
 
             // Thousand Edge = Knife + Bracer (ProjectileSpeedMult > 1 means bracer was taken)
@@ -713,6 +732,20 @@ namespace VampireSurvivors.MonoBehaviours
                     stats.ProjectileSpeedMult *= 1.1f;
                     Debug.Log($"[HUDManager] P{pidx} chose Bracer — ProjectileSpeedMult = {stats.ProjectileSpeedMult:F3}×");
                     break;
+                case UpgradeType.HollowHeart:
+                {
+                    if (em.HasComponent<Health>(_pendingUpgradeEntity))
+                    {
+                        var hp     = em.GetComponentData<Health>(_pendingUpgradeEntity);
+                        int bonus  = Mathf.Max(1, hp.Max / 10); // +10% of current max
+                        hp.Max    += bonus;
+                        hp.Current = Mathf.Min(hp.Max, hp.Current + bonus); // also heal the bonus
+                        em.SetComponentData(_pendingUpgradeEntity, hp);
+                        stats.MaxHpBonus += bonus;
+                        Debug.Log($"[HUDManager] P{pidx} chose Hollow Heart — MaxHp = {hp.Max} (+{bonus})");
+                    }
+                    break;
+                }
                 case UpgradeType.WandAmount:
                     if (em.HasComponent<MagicWandState>(_pendingUpgradeEntity))
                     {
@@ -740,6 +773,15 @@ namespace VampireSurvivors.MonoBehaviours
                         Debug.Log($"[HUDManager] P{pidx} chose FireWand +1 — Amount = {fire.Amount}");
                     }
                     break;
+                case UpgradeType.LightningAmount:
+                    if (em.HasComponent<LightningRingState>(_pendingUpgradeEntity))
+                    {
+                        var ring = em.GetComponentData<LightningRingState>(_pendingUpgradeEntity);
+                        ring.Amount++;
+                        em.SetComponentData(_pendingUpgradeEntity, ring);
+                        Debug.Log($"[HUDManager] P{pidx} chose Lightning Ring +1 — Amount = {ring.Amount}");
+                    }
+                    break;
 
                 case UpgradeType.HolyWandEvolution:
                     if (em.HasComponent<MagicWandState>(_pendingUpgradeEntity))
@@ -765,6 +807,19 @@ namespace VampireSurvivors.MonoBehaviours
                         garlic.HealPerPulse = 2f;
                         em.SetComponentData(_pendingUpgradeEntity, garlic);
                         Debug.Log($"[HUDManager] P{pidx} evolved Garlic → Soul Eater");
+                    }
+                    break;
+
+                case UpgradeType.BloodyTearEvolution:
+                    if (em.HasComponent<WeaponState>(_pendingUpgradeEntity))
+                    {
+                        var ws        = em.GetComponentData<WeaponState>(_pendingUpgradeEntity);
+                        ws.IsEvolved  = true;
+                        ws.Damage     = 20f;       // double from base 10
+                        ws.HealPerHit = 1f;        // 1 HP healed per enemy struck
+                        ws.SwingCooldown = 0.45f;  // slightly faster
+                        em.SetComponentData(_pendingUpgradeEntity, ws);
+                        Debug.Log($"[HUDManager] P{pidx} evolved Whip → Bloody Tear");
                     }
                     break;
 
