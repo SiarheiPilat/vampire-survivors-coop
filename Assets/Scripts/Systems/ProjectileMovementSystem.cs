@@ -49,6 +49,14 @@ namespace VampireSurvivors.Systems
                 SystemAPI.Query<RefRW<Projectile>, RefRW<LocalTransform>>()
                     .WithEntityAccess())
             {
+                // Tick down pierce lock so the same enemy can be re-hit after it exits
+                if (proj.ValueRO.PierceLockTimer > 0f)
+                {
+                    proj.ValueRW.PierceLockTimer -= dt;
+                    if (proj.ValueRW.PierceLockTimer <= 0f)
+                        proj.ValueRW.LastPierceHit = Entity.Null;
+                }
+
                 float3 move;
 
                 if (proj.ValueRO.Returning)

@@ -13,7 +13,7 @@ namespace VampireSurvivors.Systems
         public void OnCreate(ref SystemState state)
         {
             var e = state.EntityManager.CreateEntity();
-            state.EntityManager.AddComponent(e, new SharedGold { Total = 0 });
+            state.EntityManager.AddComponentData(e, new SharedGold { Total = 0 });
             state.Enabled = false;
         }
     }

@@ -43,23 +43,58 @@ namespace VampireSurvivors.Systems
 
                 cross.ValueRW.Timer = cross.ValueRO.Cooldown * stats.ValueRO.CooldownMult;
 
-                float2 dir2 = math.lengthsq(facing.ValueRO.Value) > 0.001f
+                float2 baseDir = math.lengthsq(facing.ValueRO.Value) > 0.001f
                     ? math.normalize(facing.ValueRO.Value)
                     : new float2(1f, 0f);
 
-                var bullet = ecb.Instantiate(bulletPrefab);
-                ecb.AddComponent(bullet, new Projectile
+                if (cross.ValueRO.IsEvolved)
                 {
-                    Damage       = cross.ValueRO.Damage * stats.ValueRO.Might,
-                    Speed        = cross.ValueRO.Speed,
-                    Direction    = new float3(dir2.x, dir2.y, 0f),
-                    MaxRange     = 30f,  // safety despawn if owner is gone
-                    Traveled     = 0f,
-                    TurnDistance = cross.ValueRO.TurnDistance,
-                    OwnerEntity  = entity
-                });
-                ecb.SetComponent(bullet, LocalTransform.FromPositionRotationScale(
-                    transform.ValueRO.Position, quaternion.identity, 0.25f));
+                    // Heaven Sword: fire Count (2) piercing swords at ±15° from facing, no return
+                    int   count  = cross.ValueRO.Count > 0 ? cross.ValueRO.Count : 2;
+                    float spread = math.PI / 12f; // 15 degrees
+                    float startAngle = count > 1 ? -spread * (count - 1) * 0.5f : 0f;
+
+                    for (int s = 0; s < count; s++)
+                    {
+                        float  angle  = startAngle + spread * s;
+                        float  cos    = math.cos(angle);
+                        float  sin    = math.sin(angle);
+                        float2 dir2   = new float2(
+                            baseDir.x * cos - baseDir.y * sin,
+                            baseDir.x * sin + baseDir.y * cos);
+
+                        var sword = ecb.Instantiate(bulletPrefab);
+                        ecb.AddComponent(sword, new Projectile
+                        {
+                            Damage        = cross.ValueRO.Damage * stats.ValueRO.Might,
+                            Speed         = cross.ValueRO.Speed,
+                            Direction     = new float3(dir2.x, dir2.y, 0f),
+                            MaxRange      = 20f,
+                            Traveled      = 0f,
+                            TurnDistance  = 0f,   // no return
+                            Piercing      = true,
+                            LastPierceHit = Entity.Null,
+                        });
+                        ecb.SetComponent(sword, LocalTransform.FromPositionRotationScale(
+                            transform.ValueRO.Position, quaternion.identity, 0.3f));
+                    }
+                }
+                else
+                {
+                    var bullet = ecb.Instantiate(bulletPrefab);
+                    ecb.AddComponent(bullet, new Projectile
+                    {
+                        Damage       = cross.ValueRO.Damage * stats.ValueRO.Might,
+                        Speed        = cross.ValueRO.Speed,
+                        Direction    = new float3(baseDir.x, baseDir.y, 0f),
+                        MaxRange     = 30f,
+                        Traveled     = 0f,
+                        TurnDistance = cross.ValueRO.TurnDistance,
+                        OwnerEntity  = entity
+                    });
+                    ecb.SetComponent(bullet, LocalTransform.FromPositionRotationScale(
+                        transform.ValueRO.Position, quaternion.identity, 0.25f));
+                }
             }
         }
     }

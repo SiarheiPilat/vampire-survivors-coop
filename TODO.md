@@ -1,100 +1,55 @@
 # Vampire Survivors Co-op — TODO
 
-## Session Notes (2026-03-19)
+> Last updated: 2026-03-20
 
-- [ ] **Delete the one-shot editor script** (`Assets/Scripts/Editor/CreatePlayerSubScene.cs`)
-      once the SubScene setup is stable — it's not needed at runtime.
-- [ ] **MeshCollider on player Quads** — Quad primitive adds a MeshCollider automatically.
-      Remove it from Player_0–3 (players don't need physics colliders yet).
-- [ ] **HUD scene setup** — `HUDManager.cs` is created and committed. Needs Canvas + panel
-      hierarchy built in `4_SampleScene` via Unity Editor. Plan: `docs/superpowers/plans/2026-03-19-hud.md`
-      *(Unity MCP lost connection during long Burst compilation — do this when editor is responsive)*
+## Next Up (priority order)
 
-## Menu / Lobby Follow-ups
+- [ ] Bracer passive (+10% projectile speed) + Thousand Edge evolution (Knife + Bracer)
+- [ ] Hollow Heart passive (+10% max HP) + Bloody Tear evolution (Whip + Hollow Heart)
+- [ ] Win condition: 30-minute countdown → Victory screen (Death boss or hard cap)
+- [ ] Chest/treasure system: enemies drop chests on death, reward on contact (weapon/passive/gold)
+- [ ] Weapon amount upgrades for Whip, Axe, Cross, HolyWater, LightningRing in level-up pool
+- [ ] More characters: Mortaccio (Bone), Yatta Cavallo (Santa Water)
+- [ ] Thunder Loop evolution (Lightning Ring + Duplicator passive)
+- [ ] Duplicator passive (+1 Amount to all weapons)
+- [ ] CharacterRegistry ScriptableObject (replace hard-coded array in LobbyManager)
+- [ ] Back-navigation from Lobby (B/Circle with no joined players → PressToStart)
 
-- [ ] **CharacterRegistry ScriptableObject** — replace the hard-coded `Characters[]` array in
-      `LobbyManager` with a proper registry asset that holds name, sprite, starting weapon.
-- [ ] **Real customization/skin data** — `PlayerSlotUI` currently shows a slot index; wire up
-      actual skin sprites/names when art assets exist.
-- [ ] **Apple TV Remote support** — tvOS Siri Remote shows up as a non-Gamepad `InputDevice`.
-      `LobbyManager.Update()` skips non-Gamepad devices; add MFi / Apple TV remote handling.
-- [ ] **Back-navigation from Lobby** — pressing B/Circle with no joined players should return
-      to PressToStartScene instead of doing nothing.
+## Completed
 
----
+### 2026-03-20 (Session 1 — ~09:XX)
 
-## Core Systems
-
-- [x] Project initialized — DOTS/ECS, URP 2D, Input System
-- [x] ECSBootstrap proof-of-concept (disabled — replaced by PlayerAuthoring)
-- [x] Player entity — PlayerAuthoring, MoveInput, MoveSpeed, PlayerStats, PlayerTag, PlayerIndex
-- [x] Input routing — WASD/Gamepad dev fallback; lobby assigns devices by button-press (AssignedDeviceId)
-- [x] Camera system — centroid follow + dynamic zoom (CameraFollow)
-- [x] SubScene setup — Player_0–3 baked into ECS entities via Players.unity SubScene
-- [x] Enemy entity + movement AI — EnemyMovementSystem chases nearest player (Burst)
-- [x] Enemy spawner — EnemySpawnerSystem, 3s waves, Bat/Zombie/Skeleton weighted random at r=12
-- [x] Weapon system (Whip) — WhipSystem + HitArcSystem, 120° arc, 0.5s cooldown, 10 dmg
-- [x] Health + damage loop — Health/Invincible components, ContactDamageSystem, HealthSystem
-- [x] XP orb + leveling system — XpGem, XpGemSystem (magnet r=30, speed=8, collect r=0.5), LevelUpSystem (wiki formula, 2s iframes)
-- [ ] Level-up UI (weapon choice cards)
-- [ ] Pickup system (gold, health, magnets)
-- [ ] Player death + revive mechanic — Downed state done; revive interaction future work
-- [x] HUD (per-player HP bars, XP bars, level text, timer) — HUDManager + HUDCanvas in 4_SampleScene
-- [x] Main menu / character select — Splash → PressToStart → Lobby (4-player device assignment, char cycling, persistence)
-- [x] Game over screen — dark overlay + "GAME OVER" + "Survived MM:SS"; triggered when all players Downed
+- [x] Created TODO.md, assessed full project state against CLAUDE.md
+- [x] **Heaven Sword** evolution (Cross + Clover):
+  - Added `IsEvolved` + `Count` fields to `CrossState`
+  - Added `Piercing`, `LastPierceHit`, `PierceLockTimer` fields to `Projectile`
+  - `ProjectileMovementSystem`: ticks PierceLockTimer, clears LastPierceHit when expired
+  - `ProjectileHitSystem`: piercing projectiles pass through enemies (0.3s per-enemy re-hit lockout)
+  - `CrossSystem`: when evolved, fires `Count` (2) swords at ±15° from facing, no return, speed=20, MaxRange=20u
+  - `HUDManager`: `HeavenSwordEvolution` in upgrade pool when `CrossState` present + `!IsEvolved` + `Luck > 0`; apply sets 200 dmg / 2.5s CD / speed 20
 
 ---
 
-## Weapons (priority order)
+## Feature Notes
 
-- [x] Whip — WhipSystem/HitArcSystem, 120°arc, 10dmg, 0.5s CD, 1.5 range
-- [x] Magic Wand — MagicWandSystem + ProjectileMovementSystem + ProjectileHitSystem; fires at nearest enemy, 10 dmg, 0.5s CD, speed=10, range=15
-- [x] Garlic — GarlicSystem, radial pulse r=1.5, 10 dmg, 1.5s CD, hits all enemies in range simultaneously
-- [ ] King Bible
-- [ ] Fire Wand
-- [x] Knife — KnifeSystem fires in FacingDirection (last movement dir), 10 dmg, 0.35s CD, speed=15, range=12
-- [ ] Axe
-- [ ] Cross
-- [ ] Holy Water
-- [ ] Lightning Ring
+### Heaven Sword (Cross + Clover)
+- Wiki stats: 200 dmg, 2.5s CD, speed 20, pierces all enemies, fires 2 simultaneously at ±15° from facing
+- Condition: has CrossState + !IsEvolved + Luck > 0 (at least one Clover taken)
 
----
+### Bracer / Thousand Edge
+- Bracer: new `PlayerStats.ProjectileSpeedMult` field (+10% per level)
+- Thousand Edge: Knife + Bracer — fires 5 knives, doubled speed, high damage
 
-## Characters
+### Hollow Heart / Bloody Tear
+- Hollow Heart: new `PlayerStats.MaxHpMult` field (+10% max HP per level, updates MaxHp in HealthSystem)
+- Bloody Tear: Whip + Hollow Heart — whip heals 1 HP per enemy struck
 
-- [ ] Antonio (starter — Whip)
-- [ ] Imelda (starter — Magic Wand)
-- [ ] Pasqualina (starter — Runetracer)
-- [ ] Gennaro (starter — Knife)
+### Win Condition (30-min run)
+- HUDManager counts up to 30:00; at 30:00 trigger `TriggerVictory()` instead of game over
+- Show "YOU SURVIVED!" screen with same stats as game over
+- Optional: spawn unkillable Death boss at 30:00 (deferred)
 
----
-
-## Enemies
-
-- [x] Bat — hp=10, spd=2.5, dmg=10, xp=1 (red quad)
-- [x] Zombie — hp=40, spd=1.0, dmg=20, xp=5 (green quad)
-- [x] Skeleton — hp=75, spd=1.8, dmg=25, xp=10 (blue quad)
-- [ ] Slime (splits on death)
-- [ ] Bosses (after basics work)
-
----
-
-## Passive Items / Stats
-
-- [ ] Spinach (Might +10%)
-- [ ] Armor (reduce incoming dmg)
-- [ ] Pummarola (HP regen)
-- [ ] Empty Tome (Cooldown -8%)
-
----
-
-## Co-op Specific
-
-- [ ] Shared gold pool (any player pickup adds to team)
-- [ ] Independent XP / leveling per player
-- [ ] Per-player level-up weapon choice
-- [ ] Player death + revive (hold interact near downed player)
-- [x] Enemy aggro — EnemyMovementSystem targets nearest player (Burst, XY-plane constrained)
-- [ ] Boss HP scaling (×1.5 per additional player)
-- [x] "Press button to join" device-assignment lobby — implemented in LobbyScene
-- [ ] Online co-op via Netcode for Entities (after local co-op is solid)
+### Chest System
+- HealthSystem: 5% chance on enemy death to drop a `Chest` entity (yellow-green quad 0.4u)
+- `ChestPickupSystem`: walk-over collect (r=0.5u), award random item from weighted table
+  - 40% gold (25–100), 30% passive item, 20% weapon upgrade, 10% full HP restore

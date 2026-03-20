@@ -61,8 +61,9 @@ namespace VampireSurvivors.MonoBehaviours
         {
             Spinach, Pummarola, Armor, EmptyTome, Crown, Clover,
             WandAmount, KnifeAmount, FireAmount,
-            HolyWandEvolution,   // Magic Wand + Empty Tome
-            SoulEaterEvolution,  // Garlic + Pummarola
+            HolyWandEvolution,    // Magic Wand + Empty Tome
+            SoulEaterEvolution,   // Garlic + Pummarola
+            HeavenSwordEvolution, // Cross + Clover
         }
         readonly UpgradeType[] _currentChoices = new UpgradeType[3];
         readonly TMP_Text[]    _btnLabels       = new TMP_Text[3];
@@ -584,6 +585,15 @@ namespace VampireSurvivors.MonoBehaviours
                         "★ Soul Eater\nGarlic + Pummarola — r=3.5u, 25 dmg, heals 2 HP/pulse"));
             }
 
+            // Heaven Sword = Cross + Clover (Luck > 0 means clover was taken)
+            if (em.HasComponent<CrossState>(_pendingUpgradeEntity))
+            {
+                var cs = em.GetComponentData<CrossState>(_pendingUpgradeEntity);
+                if (!cs.IsEvolved && playerStats.Luck > 0f)
+                    pool.Add((UpgradeType.HeavenSwordEvolution,
+                        "★ Heaven Sword\nCross + Clover — 2 swords, 200 dmg, piercing, 2.5s CD"));
+            }
+
             // Fisher-Yates shuffle using UnityEngine.Random (unscaled, so fine while paused)
             for (int i = pool.Count - 1; i > 0; i--)
             {
@@ -689,6 +699,21 @@ namespace VampireSurvivors.MonoBehaviours
                         garlic.HealPerPulse = 2f;
                         em.SetComponentData(_pendingUpgradeEntity, garlic);
                         Debug.Log($"[HUDManager] P{pidx} evolved Garlic → Soul Eater");
+                    }
+                    break;
+
+                case UpgradeType.HeavenSwordEvolution:
+                    if (em.HasComponent<CrossState>(_pendingUpgradeEntity))
+                    {
+                        var cross       = em.GetComponentData<CrossState>(_pendingUpgradeEntity);
+                        cross.IsEvolved    = true;
+                        cross.Count        = 2;
+                        cross.Damage       = 200f;
+                        cross.Speed        = 20f;
+                        cross.Cooldown     = 2.5f;
+                        cross.TurnDistance = 0f;  // no boomerang return
+                        em.SetComponentData(_pendingUpgradeEntity, cross);
+                        Debug.Log($"[HUDManager] P{pidx} evolved Cross → Heaven Sword");
                     }
                     break;
             }

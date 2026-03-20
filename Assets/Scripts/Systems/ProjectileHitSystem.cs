@@ -62,12 +62,18 @@ namespace VampireSurvivors.Systems
 
             public EntityCommandBuffer Ecb;
 
-            void Execute(Entity entity, in Projectile proj, in LocalTransform transform)
+            void Execute(Entity entity, ref Projectile proj, in LocalTransform transform)
             {
                 for (int i = 0; i < EnemyEntities.Length; i++)
                 {
                     float dist = math.distance(transform.Position.xy, EnemyTransforms[i].Position.xy);
                     if (dist > HitRadius) continue;
+
+                    // Piercing: skip the most-recently-pierced enemy while lock is active
+                    if (proj.Piercing &&
+                        proj.LastPierceHit == EnemyEntities[i] &&
+                        proj.PierceLockTimer > 0f)
+                        continue;
 
                     var hp = HealthLookup[EnemyEntities[i]];
                     hp.Current -= (int)proj.Damage;
@@ -85,8 +91,17 @@ namespace VampireSurvivors.Systems
                         EnemyTransforms[i].Position.xy - transform.Position.xy);
                     Ecb.SetComponent(EnemyEntities[i], new Knockback { Velocity = pushDir * 8f });
 
-                    Ecb.DestroyEntity(entity); // bolt hits once then disappears
-                    return;
+                    if (proj.Piercing)
+                    {
+                        // Mark this enemy locked for 0.3 s, keep scanning for more hits
+                        proj.LastPierceHit   = EnemyEntities[i];
+                        proj.PierceLockTimer = 0.3f;
+                    }
+                    else
+                    {
+                        Ecb.DestroyEntity(entity); // normal bolt disappears on first hit
+                        return;
+                    }
                 }
             }
         }

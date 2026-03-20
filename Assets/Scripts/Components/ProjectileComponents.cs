@@ -57,5 +57,23 @@ namespace VampireSurvivors.Components
         /// axis-aligned "wall" (dominant direction component) and decrement.
         /// </summary>
         public byte BounceCount;
+
+        // ── Piercing fields (Heaven Sword, …) ────────────────────────────────
+
+        /// <summary>
+        /// If true, projectile does not despawn on enemy hit — passes through.
+        /// Uses LastPierceHit + PierceLockTimer to prevent re-hitting the same
+        /// enemy on consecutive frames as the projectile traverses it.
+        /// </summary>
+        public bool   Piercing;
+
+        /// <summary>The last enemy entity pierced. Ignored when PierceLockTimer &lt;= 0.</summary>
+        public Entity LastPierceHit;
+
+        /// <summary>
+        /// Seconds remaining before LastPierceHit can be hit again.
+        /// Ticked down by ProjectileMovementSystem. Resets to 0.3s on each pierce.
+        /// </summary>
+        public float  PierceLockTimer;
     }
 }

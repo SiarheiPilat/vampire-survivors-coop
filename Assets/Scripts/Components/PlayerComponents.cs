@@ -225,6 +225,8 @@ namespace VampireSurvivors.Components
         public float Damage;        // wiki: 50
         public float Speed;         // u/s
         public float TurnDistance;  // units before reversing
+        public bool  IsEvolved;     // true = Heaven Sword: 2 swords, 200 dmg, 2.5s CD, piercing, no return
+        public int   Count;         // swords per volley (1 base, 2 when evolved)
     }
 
     /// <summary>
