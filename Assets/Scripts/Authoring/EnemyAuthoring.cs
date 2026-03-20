@@ -23,6 +23,10 @@ namespace VampireSurvivors.Authoring
         [Header("Boss")]
         public bool isBoss;        // elite/boss — BossTag marker
 
+        [Header("Variant Tags")]
+        public bool isGhoul;       // faster undead variant — GhoulTag marker
+        public bool isGhost;       // knockback-immune specter — GhostTag marker
+
         class Baker : Baker<EnemyAuthoring>
         {
             public override void Bake(EnemyAuthoring authoring)
@@ -44,6 +48,8 @@ namespace VampireSurvivors.Authoring
                 if (authoring.isSlime)      AddComponent(entity, new SlimeTag());
                 if (authoring.isSmallSlime) AddComponent(entity, new SmallSlimeTag());
                 if (authoring.isBoss)       AddComponent(entity, new BossTag());
+                if (authoring.isGhoul)      AddComponent(entity, new GhoulTag());
+                if (authoring.isGhost)      AddComponent(entity, new GhostTag());
             }
         }
     }

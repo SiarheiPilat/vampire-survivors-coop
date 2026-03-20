@@ -1624,6 +1624,8 @@ MonoBehaviour:
   bigSlimePrefab: {fileID: 1509845159821908351, guid: 27eb97116a04a2741ba27632b1bedd7c, type: 3}
   smallSlimePrefab: {fileID: 1509845159821908351, guid: 40dbaf710f53e1342996ea104342c4d9, type: 3}
   bossPrefab: {fileID: 7200000000000001, guid: b055e0e0b055000000000000b055b055, type: 3}
+  ghoulPrefab: {fileID: 1233500337931011034, guid: 1b2c88b8b1255b644b0378faca17f113, type: 3}
+  specterPrefab: {fileID: 8050854994782148382, guid: 7a88c8b0a4162cf49af0a1f3b264b045, type: 3}
   xpGemPrefab: {fileID: 6100000000000001, guid: 5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b, type: 3}
   goldCoinPrefab: {fileID: 6200000000000001, guid: 6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c, type: 3}
   healthPickupPrefab: {fileID: 6300000000000001, guid: 7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d, type: 3}

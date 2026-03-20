@@ -140,6 +140,15 @@ namespace VampireSurvivors.Menu
 
         void Update()
         {
+            // Keyboard back-navigation: Escape with no joined players → PressToStart
+            if (UnityEngine.InputSystem.Keyboard.current != null &&
+                UnityEngine.InputSystem.Keyboard.current.escapeKey.wasPressedThisFrame &&
+                !AnySlotFilled())
+            {
+                SceneManager.LoadScene("2_PressToStartScene");
+                return;
+            }
+
             for (int i = 0; i < 4; i++)
             {
                 var device = _slotDevice[i];
@@ -147,9 +156,14 @@ namespace VampireSurvivors.Menu
 
                 if (device is not Gamepad gp) continue;
 
-                // Leave slot — UI.Cancel (B / Circle)
+                // Leave slot — B/Circle. If already empty (no players at all) go back to PressToStart.
                 if (gp.buttonEast.wasPressedThisFrame)
                 {
+                    if (!AnySlotFilled())
+                    {
+                        SceneManager.LoadScene("2_PressToStartScene");
+                        return;
+                    }
                     LeaveSlot(i);
                     continue;
                 }

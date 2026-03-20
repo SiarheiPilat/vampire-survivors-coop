@@ -1,17 +1,24 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~00:30
+> Last updated: 2026-03-21 ~01:00
 
 ## Next Up (priority order)
 
-- [ ] CharacterRegistry ScriptableObject (replace hard-coded array in LobbyManager)
-- [ ] Back-navigation from Lobby (B/Circle with no joined players → PressToStart)
-- [ ] New characters: Pugnala (needs Phiera+Eight The Sparrow weapons), Giovanna (needs Gatti Amari weapon)
-- [ ] New enemies: Ghost (intangible, passes through walls), Medusa (petrify debuff)
-- [ ] Map variety: second stage tileset + different enemy spawns
 - [ ] HUD: show ReviveStocks count on player panel (skull icon × N)
+- [ ] CharacterRegistry ScriptableObject (replace hard-coded array in LobbyManager)
+- [ ] New characters: Pugnala (needs Phiera Der Tuphello + Eight The Sparrow weapons), Giovanna (needs Gatti Amari weapon)
+- [ ] Map variety: second stage tileset + different enemy spawns
+- [ ] Wicked Season evolution (Runetracer + Spellbinder) — 10 dmg, bounces 5, MaxRange 16u, amount 3
+- [ ] Crimson Shroud evolution (Garlic + Pummarola → Soul Eater + Armor?) — check wiki
 
 ## Completed
+
+### 2026-03-21 (Session 10 — ~01:00)
+
+- [x] **Lobby back-navigation** — Escape (keyboard) or B/Circle (gamepad) with no joined players → `SceneManager.LoadScene("2_PressToStartScene")`
+- [x] **Ghoul enemy** — dark purple quad (0.6×0.6), HP=120, speed=2.2, dmg=30, XP=10; `GhoulTag` marker; spawns from wave 5 (weight grows to cap 0.12); `GhoulPrefab` field in `SpawnerData`
+- [x] **Specter enemy** — pale cyan quad (0.5×0.5), HP=40, speed=4.0, dmg=25, XP=12; `GhostTag` marker; knockback-immune (EnemyMovementSystem zeroes Velocity every frame for GhostTag entities); spawns from wave 7 (weight grows to cap 0.08); `SpecterPrefab` field in `SpawnerData`
+- [x] **EnemyMovementSystem split** — `MoveTowardPlayerJob [WithNone(GhostTag)]` applies+decays knockback; `GhostMoveJob [WithAll(GhostTag)]` zeroes knockback each frame (immunity via architecture, no weapon changes needed)
 
 ### 2026-03-21 (Session 9 — ~00:30)
 

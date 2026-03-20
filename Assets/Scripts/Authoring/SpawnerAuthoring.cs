@@ -18,6 +18,8 @@ namespace VampireSurvivors.Authoring
         public GameObject bigSlimePrefab;
         public GameObject smallSlimePrefab;
         public GameObject bossPrefab;
+        public GameObject ghoulPrefab;    // fast undead; spawns from wave 5
+        public GameObject specterPrefab;  // knockback-immune ghost; spawns from wave 7
 
         [Header("Pickup Prefabs")]
         public GameObject xpGemPrefab;
@@ -39,6 +41,8 @@ namespace VampireSurvivors.Authoring
                     BigSlimePrefab   = authoring.bigSlimePrefab      != null ? GetEntity(authoring.bigSlimePrefab,      TransformUsageFlags.Dynamic) : Entity.Null,
                     SmallSlimePrefab = authoring.smallSlimePrefab    != null ? GetEntity(authoring.smallSlimePrefab,    TransformUsageFlags.Dynamic) : Entity.Null,
                     BossPrefab       = authoring.bossPrefab          != null ? GetEntity(authoring.bossPrefab,          TransformUsageFlags.Dynamic) : Entity.Null,
+                    GhoulPrefab      = authoring.ghoulPrefab         != null ? GetEntity(authoring.ghoulPrefab,         TransformUsageFlags.Dynamic) : Entity.Null,
+                    SpecterPrefab    = authoring.specterPrefab       != null ? GetEntity(authoring.specterPrefab,       TransformUsageFlags.Dynamic) : Entity.Null,
                     XpGemPrefab      = authoring.xpGemPrefab         != null ? GetEntity(authoring.xpGemPrefab,         TransformUsageFlags.Dynamic) : Entity.Null,
                     GoldCoinPrefab   = authoring.goldCoinPrefab      != null ? GetEntity(authoring.goldCoinPrefab,      TransformUsageFlags.Dynamic) : Entity.Null,
                     HealthPickupPrefab = authoring.healthPickupPrefab != null ? GetEntity(authoring.healthPickupPrefab, TransformUsageFlags.Dynamic) : Entity.Null,

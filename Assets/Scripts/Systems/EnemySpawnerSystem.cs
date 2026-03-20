@@ -134,12 +134,15 @@ namespace VampireSurvivors.Systems
             int count   = spawner.Rng.NextInt(minSpawn, maxSpawn);
 
             // Weight distribution shifts over time:
-            // Early waves: Bat-heavy. Later waves: more Zombies, Skeletons, and Slimes.
-            float batWeight      = math.max(0.55f - (wave - 1) * 0.04f, 0.25f);
-            float zombieWeight   = math.min(0.22f + (wave - 1) * 0.02f, 0.35f);
-            float slimeWeight    = spawner.BigSlimePrefab != Entity.Null
-                                     ? math.min(0.08f + (wave - 1) * 0.01f, 0.15f)
-                                     : 0f;
+            // Early: Bat-heavy. Later: Zombies, Skeletons, Slimes, Ghouls (w5+), Specters (w7+).
+            float batWeight     = math.max(0.55f - (wave - 1) * 0.04f, 0.25f);
+            float zombieWeight  = math.min(0.22f + (wave - 1) * 0.02f, 0.35f);
+            float slimeWeight   = spawner.BigSlimePrefab != Entity.Null
+                                    ? math.min(0.08f + (wave - 1) * 0.01f, 0.15f) : 0f;
+            float ghoulWeight   = spawner.GhoulPrefab   != Entity.Null
+                                    ? math.min(math.max(wave - 4, 0) * 0.025f, 0.12f) : 0f;
+            float specterWeight = spawner.SpecterPrefab  != Entity.Null
+                                    ? math.min(math.max(wave - 6, 0) * 0.02f,  0.08f) : 0f;
             // skeleton fills remainder
 
             float mult = spawner.StatMultiplier;
@@ -154,11 +157,18 @@ namespace VampireSurvivors.Systems
                 );
 
                 float  roll   = spawner.Rng.NextFloat();
+                float  cumBat     = batWeight;
+                float  cumZombie  = cumBat     + zombieWeight;
+                float  cumSlime   = cumZombie  + slimeWeight;
+                float  cumGhoul   = cumSlime   + ghoulWeight;
+                float  cumSpecter = cumGhoul   + specterWeight;
                 Entity prefab;
-                if      (roll < batWeight)                              prefab = spawner.BatPrefab;
-                else if (roll < batWeight + zombieWeight)               prefab = spawner.ZombiePrefab;
-                else if (roll < batWeight + zombieWeight + slimeWeight) prefab = spawner.BigSlimePrefab;
-                else                                                    prefab = spawner.SkeletonPrefab;
+                if      (roll < cumBat)     prefab = spawner.BatPrefab;
+                else if (roll < cumZombie)  prefab = spawner.ZombiePrefab;
+                else if (roll < cumSlime)   prefab = spawner.BigSlimePrefab;
+                else if (roll < cumGhoul)   prefab = spawner.GhoulPrefab;
+                else if (roll < cumSpecter) prefab = spawner.SpecterPrefab;
+                else                        prefab = spawner.SkeletonPrefab;
 
                 var e = EntityManager.Instantiate(prefab);
                 EntityManager.SetComponentData(e, LocalTransform.FromPosition(spawnPos));

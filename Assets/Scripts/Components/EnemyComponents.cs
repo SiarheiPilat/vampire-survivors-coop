@@ -73,6 +73,18 @@ namespace VampireSurvivors.Components
     }
 
     /// <summary>
+    /// Marks a Ghoul enemy (fast undead variant of the Zombie).
+    /// Higher speed and HP than Zombie; no special death logic.
+    /// </summary>
+    public struct GhoulTag : IComponentData { }
+
+    /// <summary>
+    /// Marks a Specter enemy (ghost variant).
+    /// EnemyMovementSystem skips knockback application for Specters — they cannot be pushed.
+    /// </summary>
+    public struct GhostTag : IComponentData { }
+
+    /// <summary>
     /// Marks a big Slime enemy. On death, HealthSystem spawns 2 SmallSlime entities
     /// at the death position instead of (or in addition to) the normal XP gem.
     /// Wiki: Slime (large) splits into 2 smaller slimes on death.
@@ -102,6 +114,8 @@ namespace VampireSurvivors.Components
         public Entity BigSlimePrefab;
         public Entity SmallSlimePrefab;
         public Entity BossPrefab;
+        public Entity GhoulPrefab;    // stronger zombie variant; spawns from wave 5
+        public Entity SpecterPrefab;  // fast ghost, knockback-immune; spawns from wave 7
 
         // Pickup prefabs — instantiated by HealthSystem on enemy death
         public Entity XpGemPrefab;
