@@ -115,6 +115,18 @@ namespace VampireSurvivors.Systems
                         proj.ValueRW.Traveled    = 0f;
                         proj.ValueRW.BounceCount = (byte)(proj.ValueRO.BounceCount - 1);
                     }
+                    else if (proj.ValueRO.Explodes)
+                    {
+                        // Remove Projectile so hit-scan stops processing this entity,
+                        // then mark it for explosion processing by ExplosionSystem.
+                        ecb.RemoveComponent<Projectile>(entity);
+                        ecb.AddComponent(entity, new PendingExplosion
+                        {
+                            Position = transform.ValueRO.Position,
+                            Radius   = proj.ValueRO.ExplosionRadius,
+                            Damage   = proj.ValueRO.Damage,
+                        });
+                    }
                     else
                     {
                         ecb.DestroyEntity(entity);

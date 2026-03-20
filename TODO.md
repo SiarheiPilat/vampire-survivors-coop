@@ -1,16 +1,21 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~01:20
+> Last updated: 2026-03-21 ~01:45
 
 ## Next Up (priority order)
 
 - [ ] CharacterRegistry ScriptableObject (replace hard-coded array in LobbyManager)
 - [ ] New characters: Pugnala (needs Phiera Der Tuphello + Eight The Sparrow weapons), Giovanna (needs Gatti Amari weapon)
 - [ ] Map variety: second stage tileset + different enemy spawns
-- [ ] Wicked Season evolution (Runetracer + Spellbinder) — 10 dmg, bounces 5, MaxRange 16u, amount 3
-- [ ] Crimson Shroud evolution (Garlic + Pummarola → Soul Eater + Armor?) — check wiki
+- [ ] Crimson Shroud evolution (check wiki — requires Garlic + Armor? or different weapon?)
+- [ ] Victory Sword evolution (Cross + Clover → Heaven Sword already done; check remaining Cross evo)
+- [ ] New characters: Pugnala, Giovanna
 
 ## Completed
+
+### 2026-03-21 (Session 12 — ~01:45)
+
+- [x] **NO FUTURE evolution** (Runetracer + Armor) — `RunetracerState.IsEvolved=true`; 30 dmg, speed=11, amount=3, bounces=5, 0.35s CD; projectiles `Explodes=true, ExplosionRadius=1.5`; `PendingExplosion` IComponentData added by `ProjectileMovementSystem` on final expire; `ExplosionSystem` (Burst ISystem) deals AoE dmg + knockback in radius to all enemies in range then destroys entity; `RunetracerAmount` upgrade blocked when evolved; evolution gate: `Armor > 0`
 
 ### 2026-03-21 (Session 11 — ~01:20)
 

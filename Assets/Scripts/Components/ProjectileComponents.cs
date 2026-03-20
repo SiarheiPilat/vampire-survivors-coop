@@ -75,5 +75,28 @@ namespace VampireSurvivors.Components
         /// Ticked down by ProjectileMovementSystem. Resets to 0.3s on each pierce.
         /// </summary>
         public float  PierceLockTimer;
+
+        // ── Explosion-on-expire fields (NO FUTURE / Runetracer evolution) ────
+
+        /// <summary>
+        /// If true, triggers an AoE explosion when the projectile expires naturally
+        /// (BounceCount == 0 and Traveled >= MaxRange). Handled by ExplosionSystem.
+        /// </summary>
+        public bool  Explodes;
+
+        /// <summary>Radius in world units of the on-expire explosion. 0 if Explodes==false.</summary>
+        public float ExplosionRadius;
+    }
+
+    /// <summary>
+    /// Added by ProjectileMovementSystem (via ECB) to a projectile entity when
+    /// it expires with Explodes==true. ExplosionSystem reads this, deals AoE
+    /// damage to all enemies within Radius, then destroys the entity.
+    /// </summary>
+    public struct PendingExplosion : IComponentData
+    {
+        public float3 Position;
+        public float  Radius;
+        public float  Damage;
     }
 }

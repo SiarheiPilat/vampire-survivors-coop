@@ -73,6 +73,7 @@ namespace VampireSurvivors.MonoBehaviours
             ThunderLoopEvolution,  // Lightning Ring + Duplicator
             OsoleMeeoEvolution,    // Fire Wand + Candelabrador
             UnholyVespersEvolution,// King Bible + Spellbinder
+            NoFutureEvolution,     // Runetracer + Armor
         }
         readonly UpgradeType[] _currentChoices = new UpgradeType[3];
         readonly TMP_Text[]    _btnLabels       = new TMP_Text[3];
@@ -719,8 +720,9 @@ namespace VampireSurvivors.MonoBehaviours
                     case UpgradeType.RunetracerAmount:
                         if (em.HasComponent<RunetracerState>(_pendingUpgradeEntity))
                         {
-                            curAmt = Unity.Mathematics.math.max(1, em.GetComponentData<RunetracerState>(_pendingUpgradeEntity).Amount);
-                            canAdd = curAmt < 5;
+                            var rt2 = em.GetComponentData<RunetracerState>(_pendingUpgradeEntity);
+                            curAmt = Unity.Mathematics.math.max(1, rt2.Amount);
+                            canAdd = curAmt < 5 && !rt2.IsEvolved;
                         }
                         break;
                 }
@@ -791,6 +793,15 @@ namespace VampireSurvivors.MonoBehaviours
                 if (!fw.IsEvolved && playerStats.AreaMult > 1.0f)
                     pool.Add((UpgradeType.OsoleMeeoEvolution,
                         "★ O'Sole Meeo\nFire Wand + Candelabrador — 8 fireballs, 20 dmg, 0.4s CD"));
+            }
+
+            // NO FUTURE = Runetracer + Armor (Armor > 0 means armor was taken)
+            if (em.HasComponent<RunetracerState>(_pendingUpgradeEntity))
+            {
+                var rt2 = em.GetComponentData<RunetracerState>(_pendingUpgradeEntity);
+                if (!rt2.IsEvolved && playerStats.Armor > 0)
+                    pool.Add((UpgradeType.NoFutureEvolution,
+                        "★ NO FUTURE\nRunetracer + Armor — 3 tracers, 30 dmg, explode on expire"));
             }
 
             // Unholy Vespers = King Bible + Spellbinder (DurationMult > 1 means spellbinder was taken)
@@ -1131,6 +1142,21 @@ namespace VampireSurvivors.MonoBehaviours
                         kb.Spawned   = false; // triggers re-spawn with new stats
                         em.SetComponentData(_pendingUpgradeEntity, kb);
                         Debug.Log($"[HUDManager] P{pidx} evolved King Bible → Unholy Vespers");
+                    }
+                    break;
+
+                case UpgradeType.NoFutureEvolution:
+                    if (em.HasComponent<RunetracerState>(_pendingUpgradeEntity))
+                    {
+                        var rt3      = em.GetComponentData<RunetracerState>(_pendingUpgradeEntity);
+                        rt3.IsEvolved = true;
+                        rt3.Damage    = 30f;          // wiki: +20 over base 10
+                        rt3.Speed     = 11f;           // wiki: ~140% of base 8
+                        rt3.Amount    = Unity.Mathematics.math.max(rt3.Amount, 3); // wiki: +2 amount (min 3)
+                        rt3.Bounces   = 5;             // more bounces for extended lifetime
+                        rt3.Cooldown  = 0.35f;         // keep same CD
+                        em.SetComponentData(_pendingUpgradeEntity, rt3);
+                        Debug.Log($"[HUDManager] P{pidx} evolved Runetracer → NO FUTURE");
                     }
                     break;
             }

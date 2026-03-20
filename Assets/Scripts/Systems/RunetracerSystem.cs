@@ -45,6 +45,9 @@ namespace VampireSurvivors.Systems
                 float stepRad   = 20f * math.PI / 180f;
                 float centreOff = -(amount - 1) * 0.5f * stepRad;
 
+                bool  explodes        = weapon.ValueRO.IsEvolved;
+                float explosionRadius = explodes ? 1.5f : 0f;
+
                 for (int a = 0; a < amount; a++)
                 {
                     float  angle = baseAngle + centreOff + a * stepRad;
@@ -53,12 +56,14 @@ namespace VampireSurvivors.Systems
                     var proj = ecb.CreateEntity();
                     ecb.AddComponent(proj, new Projectile
                     {
-                        Damage      = damage,
-                        Speed       = spd,
-                        Direction   = dir,
-                        MaxRange    = weapon.ValueRO.MaxRange,
-                        Traveled    = 0f,
-                        BounceCount = weapon.ValueRO.Bounces
+                        Damage          = damage,
+                        Speed           = spd,
+                        Direction       = dir,
+                        MaxRange        = weapon.ValueRO.MaxRange,
+                        Traveled        = 0f,
+                        BounceCount     = weapon.ValueRO.Bounces,
+                        Explodes        = explodes,
+                        ExplosionRadius = explosionRadius,
                     });
                     ecb.AddComponent(proj, LocalTransform.FromPosition(transform.ValueRO.Position));
                 }

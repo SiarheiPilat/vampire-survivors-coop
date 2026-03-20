@@ -329,6 +329,8 @@ namespace VampireSurvivors.Components
         public float MaxRange; // distance per bounce segment (screen-width approximation)
         public byte  Bounces;  // wall bounces granted per projectile
         public int   Amount;   // projectiles fired per cooldown (1=default); fan spread 20° between
+        /// <summary>True after NO FUTURE evolution. Projectiles explode on final expire.</summary>
+        public bool  IsEvolved;
     }
 
     /// <summary>
