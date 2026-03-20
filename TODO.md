@@ -1,15 +1,21 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-20 ~12:30
+> Last updated: 2026-03-20 ~13:00
 
 ## Next Up (priority order)
 
-- [ ] More characters: Mortaccio (Bone), Yatta Cavallo (Santa Water)
 - [ ] CharacterRegistry ScriptableObject (replace hard-coded array in LobbyManager)
 - [ ] Back-navigation from Lobby (B/Circle with no joined players → PressToStart)
-- [ ] Weapon evolutions: Unholy Vespers (King Bible + Spellbinder passive), O'Sole Meeo (Fire Wand + Candelabrador), Bone evolution
+- [ ] Weapon evolutions: Unholy Vespers (King Bible + Spellbinder passive), O'Sole Meeo (Fire Wand + Candelabrador)
+- [ ] New weapons: Bone available for all (LevelUpSystem level 5), Runetracer Amount upgrade
 
 ## Completed
+
+### 2026-03-20 (Session 7 — ~13:00)
+
+- [x] **Mortaccio** character (Bone starter) — HP=100, Speed=7.0, no stat bonus; added to LobbyManager roster
+- [x] **Yatta Cavallo** character (Holy Water starter) — HP=100, Speed=7.0, no stat bonus; added to LobbyManager roster
+- [x] **Bone weapon** (`BoneState` + `BoneSystem`) — 30 dmg, 0.5s CD, speed=8, bounces=2, MaxRange=12u; fans Amount bones in 20° spread; `BoneAmount` in upgrade pool; Duplicator applies to Bone
 
 ### 2026-03-20 (Session 6 — ~12:30)
 

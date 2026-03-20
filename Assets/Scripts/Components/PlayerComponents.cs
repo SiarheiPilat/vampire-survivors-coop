@@ -306,6 +306,23 @@ namespace VampireSurvivors.Components
     }
 
     /// <summary>
+    /// Per-player Bone weapon state (Mortaccio's starter weapon).
+    /// Fires a bone in the facing direction. The bone bounces off virtual walls
+    /// up to Bounces times (like Runetracer, but higher damage, fewer bounces).
+    /// Wiki base stats: Damage 30, Cooldown 0.5 s, Speed 8 u/s, Bounces 2, MaxRange 12 u.
+    /// </summary>
+    public struct BoneState : IComponentData
+    {
+        public float Timer;
+        public float Cooldown;  // wiki: 0.5 s
+        public float Damage;    // wiki: 30
+        public float Speed;     // u/s, wiki: 8
+        public float MaxRange;  // units per bounce segment
+        public byte  Bounces;   // wall bounces per projectile (wiki: 2)
+        public int   Amount;    // bones fired per cooldown (1=default); fan spread 20° between bones
+    }
+
+    /// <summary>
     /// Per-player King Bible weapon state.
     /// Bibles orbit the player permanently, damaging enemies on contact.
     /// KingBibleSystem spawns KingBibleOrbit entities when Spawned == false,

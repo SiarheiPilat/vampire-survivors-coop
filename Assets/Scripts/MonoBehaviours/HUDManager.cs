@@ -63,7 +63,7 @@ namespace VampireSurvivors.MonoBehaviours
         enum UpgradeType
         {
             Spinach, Pummarola, Armor, EmptyTome, Crown, Clover, Bracer, HollowHeart, Duplicator,
-            WandAmount, KnifeAmount, FireAmount, LightningAmount, WhipAmount, AxeAmount, HolyWaterAmount,
+            WandAmount, KnifeAmount, FireAmount, LightningAmount, WhipAmount, AxeAmount, HolyWaterAmount, BoneAmount,
             HolyWandEvolution,     // Magic Wand + Empty Tome
             SoulEaterEvolution,    // Garlic + Pummarola
             HeavenSwordEvolution,  // Cross + Clover
@@ -83,6 +83,7 @@ namespace VampireSurvivors.MonoBehaviours
             (UpgradeType.WhipAmount,      "Whip +1 arc\nSwing an extra Whip in a new direction"),
             (UpgradeType.AxeAmount,       "Axe +1 blade\nThrow an extra Axe per volley"),
             (UpgradeType.HolyWaterAmount, "Holy Water +1 flask\nThrow an extra flask per volley"),
+            (UpgradeType.BoneAmount,      "Bone +1 bone\nFire an extra bouncing Bone per volley"),
         };
         static readonly (UpgradeType type, string label)[] k_PassiveUpgrades =
         {
@@ -650,6 +651,13 @@ namespace VampireSurvivors.MonoBehaviours
                             canAdd = curAmt < 5;
                         }
                         break;
+                    case UpgradeType.BoneAmount:
+                        if (em.HasComponent<BoneState>(_pendingUpgradeEntity))
+                        {
+                            curAmt = Unity.Mathematics.math.max(1, em.GetComponentData<BoneState>(_pendingUpgradeEntity).Amount);
+                            canAdd = curAmt < 5;
+                        }
+                        break;
                 }
                 if (canAdd) pool.Add((type, label + $"  ({curAmt}→{curAmt + 1})"));
             }
@@ -828,6 +836,12 @@ namespace VampireSurvivors.MonoBehaviours
                         w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1;
                         em.SetComponentData(_pendingUpgradeEntity, w);
                     }
+                    if (em.HasComponent<BoneState>(_pendingUpgradeEntity))
+                    {
+                        var w = em.GetComponentData<BoneState>(_pendingUpgradeEntity);
+                        w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1;
+                        em.SetComponentData(_pendingUpgradeEntity, w);
+                    }
                     Debug.Log($"[HUDManager] P{pidx} chose Duplicator — +1 Amount to all weapons (stacks={stats.DuplicatorStacks})");
                     break;
                 }
@@ -892,6 +906,15 @@ namespace VampireSurvivors.MonoBehaviours
                         hw2.Amount = Unity.Mathematics.math.max(1, hw2.Amount) + 1;
                         em.SetComponentData(_pendingUpgradeEntity, hw2);
                         Debug.Log($"[HUDManager] P{pidx} chose Holy Water +1 — Amount = {hw2.Amount}");
+                    }
+                    break;
+                case UpgradeType.BoneAmount:
+                    if (em.HasComponent<BoneState>(_pendingUpgradeEntity))
+                    {
+                        var bone2 = em.GetComponentData<BoneState>(_pendingUpgradeEntity);
+                        bone2.Amount = Unity.Mathematics.math.max(1, bone2.Amount) + 1;
+                        em.SetComponentData(_pendingUpgradeEntity, bone2);
+                        Debug.Log($"[HUDManager] P{pidx} chose Bone +1 — Amount = {bone2.Amount}");
                     }
                     break;
 

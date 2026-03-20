@@ -31,7 +31,9 @@ namespace VampireSurvivors.Menu
             "gennaro",   // Knife
             "arca",      // Garlic
             "porta",     // Lightning Ring
-            "lama",      // Axe
+            "lama",         // Axe
+            "mortaccio",    // Bone
+            "yattacavallo", // Holy Water
         };
 
         // Per-slot state

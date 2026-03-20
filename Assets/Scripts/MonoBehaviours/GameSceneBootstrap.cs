@@ -184,6 +184,45 @@ namespace VampireSurvivors.MonoBehaviours
                     Debug.Log($"[GameSceneBootstrap] P{slot} Lama: Axe, HP=130, Might=1.1");
                     break;
 
+                case "mortaccio":
+                    // Wiki: Bone starter, HP 100, Speed 7.0, no stat bonus
+                    SetBaseStats(em, entity, hp: 100, speed: 7.0f);
+                    if (em.HasComponent<WeaponState>(entity))
+                        em.RemoveComponent<WeaponState>(entity);
+                    em.AddComponentData(entity, new BoneState
+                    {
+                        Timer    = 0f,
+                        Cooldown = 0.5f,
+                        Damage   = 30f,
+                        Speed    = 8f,
+                        MaxRange = 12f,
+                        Bounces  = 2,
+                        Amount   = 1
+                    });
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Mortaccio: Bone, HP=100, Speed=7.0");
+                    break;
+
+                case "yattacavallo":
+                    // Wiki: Santa Water / Holy Water starter, HP 100, Speed 7.0, no stat bonus
+                    SetBaseStats(em, entity, hp: 100, speed: 7.0f);
+                    if (em.HasComponent<WeaponState>(entity))
+                        em.RemoveComponent<WeaponState>(entity);
+                    em.AddComponentData(entity, new HolyWaterState
+                    {
+                        Timer          = 0f,
+                        Cooldown       = 6.0f,
+                        Damage         = 20f,
+                        Speed          = 8f,
+                        MaxRange       = 4f,
+                        Radius         = 1.5f,
+                        PuddleLifetime = 5.0f,
+                        TickCooldown   = 0.5f,
+                        Amount         = 1,
+                        Rng            = Unity.Mathematics.Random.CreateFromIndex((uint)(slot * 53 + 7))
+                    });
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Yatta Cavallo: Holy Water, HP=100, Speed=7.0");
+                    break;
+
                 default:
                     Debug.LogWarning($"[GameSceneBootstrap] Unknown character '{charId}' for P{slot} — keeping Whip.");
                     break;
