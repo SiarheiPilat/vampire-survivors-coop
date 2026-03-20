@@ -79,7 +79,9 @@ namespace VampireSurvivors.Systems
                 for (int i = 0; i < PlayerEntities.Length; i++)
                 {
                     float dist = math.distance(transform.Position.xy, PlayerTransforms[i].Position.xy);
-                    if (dist < MagnetRadius && dist < nearestDist)
+                    // Per-player magnet radius scaled by Attractorb passive (MagnetRadiusMult)
+                    float playerMagnetRadius = MagnetRadius * StatsLookup[PlayerEntities[i]].MagnetRadiusMult;
+                    if (dist < playerMagnetRadius && dist < nearestDist)
                     {
                         nearestDist = dist;
                         nearestIdx  = i;

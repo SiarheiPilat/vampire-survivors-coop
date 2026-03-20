@@ -43,6 +43,8 @@ namespace VampireSurvivors.Authoring
                     ProjectileSpeedMult= 1.0f,  // Bracer multiplies by 1.1 per pickup
                     AreaMult           = 1.0f,  // Candelabrador multiplies by 1.1 per pickup
                     DurationMult       = 1.0f,  // Spellbinder multiplies by 1.1 per pickup
+                    SpeedMult          = 1.0f,  // Wings adds 0.1 per pickup (additive)
+                    MagnetRadiusMult   = 1.0f,  // Attractorb multiplies by 1.3 per pickup
                 });
                 AddComponent(entity, new AssignedDeviceId { Value = 0 });
                 AddComponent(entity, new Health { Current = authoring.maxHp, Max = authoring.maxHp });

@@ -129,6 +129,20 @@ namespace VampireSurvivors.Components
         /// Wiki: Spellbinder grants +10% Duration per level.
         /// </summary>
         public float DurationMult;
+
+        /// <summary>
+        /// Movement speed multiplier. Default 1.0. Each Wings pickup adds 0.1 (additive).
+        /// Applied to: PlayerMovementSystem (multiplies MoveSpeed.Value).
+        /// Wiki: Wings grants +10% Move Speed per level, max 5 levels.
+        /// </summary>
+        public float SpeedMult;
+
+        /// <summary>
+        /// XP magnet radius multiplier. Default 1.0. Each Attractorb pickup multiplies by 1.3.
+        /// Applied to: XpGemSystem magnet range (base 30u × MagnetRadiusMult).
+        /// Wiki: Attractorb increases item pickup range, roughly ×1.5/×2/×2.5/×3/×4 over 5 levels.
+        /// </summary>
+        public float MagnetRadiusMult;
     }
 
     /// <summary>

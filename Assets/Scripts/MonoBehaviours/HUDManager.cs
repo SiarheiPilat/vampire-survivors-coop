@@ -63,7 +63,7 @@ namespace VampireSurvivors.MonoBehaviours
         enum UpgradeType
         {
             Spinach, Pummarola, Armor, EmptyTome, Crown, Clover, Bracer, HollowHeart, Duplicator,
-            Candelabrador, Spellbinder,
+            Candelabrador, Spellbinder, Attractorb, Wings,
             WandAmount, KnifeAmount, FireAmount, LightningAmount, WhipAmount, AxeAmount, HolyWaterAmount, BoneAmount, RunetracerAmount,
             HolyWandEvolution,     // Magic Wand + Empty Tome
             SoulEaterEvolution,    // Garlic + Pummarola
@@ -104,6 +104,8 @@ namespace VampireSurvivors.MonoBehaviours
             (UpgradeType.Duplicator,    "Duplicator\n+1 Amount to all weapons"),
             (UpgradeType.Candelabrador, "Candelabrador\n+10% Area (weapon range/radius)"),
             (UpgradeType.Spellbinder,   "Spellbinder\n+10% Duration (effect lifetimes)"),
+            (UpgradeType.Attractorb,    "Attractorb\n+30% XP magnet radius"),
+            (UpgradeType.Wings,         "Wings\n+10% movement speed"),
         };
 
         // Gold display (created programmatically)
@@ -1043,6 +1045,14 @@ namespace VampireSurvivors.MonoBehaviours
                 case UpgradeType.Spellbinder:
                     stats.DurationMult *= 1.1f;
                     Debug.Log($"[HUDManager] P{pidx} chose Spellbinder — DurationMult = {stats.DurationMult:F3}×");
+                    break;
+                case UpgradeType.Attractorb:
+                    stats.MagnetRadiusMult *= 1.3f;
+                    Debug.Log($"[HUDManager] P{pidx} chose Attractorb — MagnetRadiusMult = {stats.MagnetRadiusMult:F2}×");
+                    break;
+                case UpgradeType.Wings:
+                    stats.SpeedMult += 0.1f;
+                    Debug.Log($"[HUDManager] P{pidx} chose Wings — SpeedMult = {stats.SpeedMult:F2}×");
                     break;
 
                 case UpgradeType.HolyWandEvolution:

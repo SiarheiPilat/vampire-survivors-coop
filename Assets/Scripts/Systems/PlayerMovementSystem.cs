@@ -24,11 +24,12 @@ namespace VampireSurvivors.Systems
         {
             public float DeltaTime;
 
-            void Execute(in MoveInput input, in MoveSpeed speed,
+            void Execute(in MoveInput input, in MoveSpeed speed, in PlayerStats stats,
                          ref LocalTransform transform, ref FacingDirection facing)
             {
-                // Move in XY plane only; Z stays 0
-                transform.Position += new float3(input.Value * speed.Value * DeltaTime, 0f);
+                // Move in XY plane only; Z stays 0; SpeedMult from Wings passive
+                float effectiveSpeed = speed.Value * stats.SpeedMult;
+                transform.Position += new float3(input.Value * effectiveSpeed * DeltaTime, 0f);
 
                 // Update facing when there is input; keep last known direction otherwise
                 if (math.lengthsq(input.Value) > 0.001f)

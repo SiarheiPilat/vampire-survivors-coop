@@ -1,6 +1,6 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~02:10
+> Last updated: 2026-03-21 ~02:30
 
 ## Next Up (priority order)
 
@@ -13,6 +13,11 @@
 - [ ] New characters: Pugnala (needs Phiera + Eight The Sparrow twin pistols), Giovanna (needs Gatti Amari)
 
 ## Completed
+
+### 2026-03-21 (Session 14 — ~02:30)
+
+- [x] **Attractorb passive** — `PlayerStats.MagnetRadiusMult` ×1.3 per pickup (wiki: ~×1.5/×2/×2.5/×3/×4 over 5 lvls); `XpGemSystem.CollectGemJob` uses `MagnetRadius * StatsLookup[player].MagnetRadiusMult` per player instead of global constant; in upgrade pool: "Attractorb — +30% XP magnet radius"
+- [x] **Wings passive** — `PlayerStats.SpeedMult` +0.1 per pickup (wiki: +10% move speed, additive); `PlayerMovementSystem.MoveJob` multiplies `speed.Value * stats.SpeedMult`; in upgrade pool; both fields default 1.0/1.0 via `PlayerAuthoring` bake
 
 ### 2026-03-21 (Session 13 — ~02:10)
 
