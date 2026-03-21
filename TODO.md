@@ -1,15 +1,20 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~09:00
+> Last updated: 2026-03-21 ~21:00
 
 ## Next Up (priority order)
 
-- [ ] **Achievement display** — in lobby, show progress toward next unlock ("Kill 347 more enemies")
+- [ ] **Achievement display** — in lobby, show progress toward next unlock ("Kill 347 more enemies to unlock Mortaccio")
 - [ ] **Floor item magnet** — when player walks over XpGem field, items magnetize toward them; scale magnet radius with Attractorb stacks
-- [ ] **Enemy elite variants** — rare red-tinted enemies (2% chance per spawn) with 3× HP, 2× XP, guaranteed Chest drop
-- [ ] **Bomb pickup** — floor item dropped rarely; collected → AoE 3u radius explosion, 80 dmg to all enemies
+- [ ] **Curse mechanic active effect** — enemies with `PlayerStats.Curse > 0` move faster (+10% per Curse point); currently Curse only boosts XP via wiki formula, but no speed scaling exists yet
+- [ ] **Victory Death boss** — at 30:00 spawn unkillable Death enemy (wiki: 666 contact dmg, 666 HP regen/s, cannot be killed); spawns at every player position simultaneously
 
 ## Completed
+
+### 2026-03-21 (Session 31 — ~20:45)
+
+- [x] **Enemy elite variants** — `EliteTag : IComponentData` added; `EnemySpawnerSystem` promotes 2% of spawns to elite post-stat-scaling: HP×3, XP×2, Speed×1.15, Scale×1.35; `EliteTag` added to entity; `HealthSystem` guarantees Chest drop for elites
+- [x] **Bomb pickup** — `BombPickup : IComponentData`; dropped by enemies at 1% base chance (Luck-scaled) via `HealthSystem`; `BombPickupSystem` (walk-over r=0.6u, deals 80 flat dmg to all `EnemyTag` in 3u radius, bypasses Armor, main-thread direct Health.Current write); `BombPickupPrefab` (orange-red quad 0.3u); `BombPickupMaterial.mat`; wired to `SpawnerAuthoring` in game scene; `PickupKind.BombPickup=6` baker case
 
 ### 2026-03-21 (Session 30 — ~09:00)
 

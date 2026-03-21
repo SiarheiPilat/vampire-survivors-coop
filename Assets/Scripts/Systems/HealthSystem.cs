@@ -149,8 +149,11 @@ namespace VampireSurvivors.Systems
                             }
                         }
 
-                        // Chest (~5% base chance, scaled by team Luck) — random reward on collect
-                        if (UnityEngine.Random.value < 0.05f * luckMult &&
+                        // Chest — always for elites; 5% base chance otherwise (scaled by Luck)
+                        bool isElite      = SystemAPI.HasComponent<EliteTag>(entity);
+                        bool spawnChest   = isElite ||
+                                            (UnityEngine.Random.value < 0.05f * luckMult);
+                        if (spawnChest &&
                             hasPrefabs && pickupSpawner.ChestPrefab != Entity.Null)
                         {
                             var chest = ecb.Instantiate(pickupSpawner.ChestPrefab);
@@ -162,6 +165,24 @@ namespace VampireSurvivors.Systems
                                     (uint)(transform.Position.x * 1000f + transform.Position.y * 37f +
                                            (uint)runStats.EnemiesKilled))
                             });
+                        }
+
+                        // Bomb pickup (~1% base chance, scaled by Luck) — AoE 80 dmg in 3u on collect
+                        if (UnityEngine.Random.value < 0.01f * luckMult)
+                        {
+                            if (hasPrefabs && pickupSpawner.BombPickupPrefab != Entity.Null)
+                            {
+                                var bomb = ecb.Instantiate(pickupSpawner.BombPickupPrefab);
+                                ecb.SetComponent(bomb, LocalTransform.FromPosition(
+                                    transform.Position + new float3(0.4f, 0.3f, 0f)));
+                            }
+                            else
+                            {
+                                var bomb = ecb.CreateEntity();
+                                ecb.AddComponent(bomb, new BombPickup());
+                                ecb.AddComponent(bomb, LocalTransform.FromPosition(
+                                    transform.Position + new float3(0.4f, 0.3f, 0f)));
+                            }
                         }
 
                         // Orologion (~1.5% base chance, scaled by Luck) — freezes all enemies 10s

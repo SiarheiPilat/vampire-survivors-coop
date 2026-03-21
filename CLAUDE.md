@@ -95,6 +95,8 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] Enemy knockback on hit — Knockback IComponentData (float2 Velocity) baked on all enemy prefabs; all weapon systems write knockback via ECB on each hit (projectiles 8 u/s, whip 6 u/s, garlic 4 u/s, king bible 5 u/s, holy water 3 u/s, lightning ring random 6 u/s); EnemyMovementSystem decays velocity with damping=12/s (~0.25 s to dissipate)
 - [x] Pause menu — PauseManager MonoBehaviour; ESC in game scene (buildIndex ≥ 3) toggles overlay; Time.timeScale=0 pauses DOTS + physics; Resume / Quit to Menu buttons; RuntimeInitializeOnLoadMethod auto-creates (no scene wiring)
 - [x] Weapon evolution — Holy Wand (Magic Wand + Empty Tome): 7 shots, 20 dmg, 0.25s CD, 10° tight fan; Soul Eater (Garlic + Pummarola): r=3.5u, 25 dmg, heals 2 HP/pulse; evolutions appear in level-up pool (★ label) when conditions met (has weapon + has passive), each only once (IsEvolved guard)
+- [x] Enemy elite variants — EliteTag : IComponentData; EnemySpawnerSystem promotes 2% of spawns post-wave-scaling: HP×3, XP×2, Speed×1.15, Scale×1.35; guaranteed Chest drop on death
+- [x] Bomb pickup — BombPickup floor item; 1% enemy death drop (Luck-scaled); BombPickupSystem walk-over r=0.6u triggers AoE 80 flat dmg in 3u radius to all enemies; bypasses Armor; orange-red quad 0.3u prefab
 
 ### Weapons (clone priority order)
 

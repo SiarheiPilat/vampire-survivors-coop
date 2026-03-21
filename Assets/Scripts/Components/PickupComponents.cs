@@ -37,6 +37,14 @@ namespace VampireSurvivors.Components
     public struct OrologionPickup : IComponentData { }
 
     /// <summary>
+    /// Bomb item dropped rarely by enemies (~1% base chance, scales with Luck).
+    /// When collected: instantly deals 80 flat damage to all enemies within a 3u radius
+    /// of the collecting player. Does NOT scale with Might — it is a flat environmental effect.
+    /// Visual: orange-red quad (0.3u). No projectile — instant AoE on pickup.
+    /// </summary>
+    public struct BombPickup : IComponentData { }
+
+    /// <summary>
     /// Treasure chest dropped by enemies. When collected by a player it awards one
     /// of four rewards determined by RNG at the moment of collection:
     ///   40% → Gold bonus (100–200 gold to team pool)

@@ -135,6 +135,7 @@ namespace VampireSurvivors.Components
         public Entity MagnetPickupPrefab;
         public Entity ChestPrefab;
         public Entity OrologionPickupPrefab;
+        public Entity BombPickupPrefab;
 
         public float  Timer;
         public float  BossTimer;   // counts down; spawn boss when ≤ 0
@@ -197,4 +198,13 @@ namespace VampireSurvivors.Components
     {
         public Unity.Mathematics.float2 Velocity; // world units per second
     }
+
+    /// <summary>
+    /// Marks an elite enemy — a rare (2% base chance) supercharged variant of any normal enemy.
+    /// Added by EnemySpawnerSystem at spawn time after normal stats are applied.
+    /// Effects:
+    ///   HP × 3, XP × 2, MoveSpeed × 1.15, visual scale × 1.35 (larger quad).
+    /// Death: always drops a Chest in addition to normal XP gem + gold.
+    /// </summary>
+    public struct EliteTag : IComponentData { }
 }

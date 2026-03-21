@@ -207,6 +207,29 @@ namespace VampireSurvivors.Systems
                         XpValue       = (int)(baseStats.XpValue * mult)
                     });
                 }
+
+                // 2% elite promotion — supercharged enemy: HP×3, XP×2, Speed×1.15, Scale×1.35
+                if (spawner.Rng.NextFloat() < 0.02f)
+                {
+                    var hp    = EntityManager.GetComponentData<Health>(e);
+                    var stats = EntityManager.GetComponentData<EnemyStats>(e);
+                    EntityManager.SetComponentData(e, new Health
+                    {
+                        Current = hp.Current * 3,
+                        Max     = hp.Max     * 3
+                    });
+                    EntityManager.SetComponentData(e, new EnemyStats
+                    {
+                        MoveSpeed     = stats.MoveSpeed * 1.15f,
+                        ContactDamage = stats.ContactDamage,
+                        XpValue       = stats.XpValue * 2
+                    });
+                    // Scale up for visual distinction
+                    var lt = EntityManager.GetComponentData<LocalTransform>(e);
+                    EntityManager.SetComponentData(e, LocalTransform.FromPositionRotationScale(
+                        lt.Position, lt.Rotation, lt.Scale * 1.35f));
+                    EntityManager.AddComponentData(e, new EliteTag());
+                }
             }
 
             EntityManager.SetComponentData(spawnerEntity, spawner);

@@ -12,7 +12,7 @@ namespace VampireSurvivors.Authoring
     /// </summary>
     public class PickupAuthoring : MonoBehaviour
     {
-        public enum PickupKind { XpGem, GoldCoin, HealthPickup, MagnetPickup, Chest, OrologionPickup }
+        public enum PickupKind { XpGem, GoldCoin, HealthPickup, MagnetPickup, Chest, OrologionPickup, BombPickup }
         public PickupKind kind;
 
         class Baker : Baker<PickupAuthoring>
@@ -43,6 +43,9 @@ namespace VampireSurvivors.Authoring
                         break;
                     case PickupKind.OrologionPickup:
                         AddComponent(entity, new OrologionPickup());
+                        break;
+                    case PickupKind.BombPickup:
+                        AddComponent(entity, new BombPickup());
                         break;
                 }
             }
