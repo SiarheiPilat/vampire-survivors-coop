@@ -157,6 +157,29 @@ namespace VampireSurvivors.Components
         /// Wiki: Stone Mask grants +10% Greed (coin earnings) per level, up to 5 levels.
         /// </summary>
         public float GoldMult;
+
+        /// <summary>
+        /// Silver Ring stacks. 0 = not taken. Each pickup adds +1.
+        /// Also applies: DurationMult *= 1.05 and AreaMult *= 1.05 per pickup.
+        /// Used as gate for Infinite Corridor evolution (needs > 0).
+        /// Wiki: Silver Ring — +5% Duration and +5% Area per level, 9 levels.
+        /// </summary>
+        public int SilverRingStacks;
+
+        /// <summary>
+        /// Gold Ring stacks. 0 = not taken. Each pickup adds +1.
+        /// Also applies: Curse += 0.05 per pickup (increases enemy difficulty/XP scaling).
+        /// Used as gate for Infinite Corridor evolution (needs > 0).
+        /// Wiki: Gold Ring — +5% Curse per level, 9 levels.
+        /// </summary>
+        public int GoldRingStacks;
+
+        /// <summary>
+        /// Curse stat. Default 0. Each Gold Ring pickup adds +0.05.
+        /// Increases enemy effective stats (harder enemies) and future XP scaling.
+        /// Wiki: Curse makes enemies stronger but implicitly increases reward value.
+        /// </summary>
+        public float Curse;
     }
 
     /// <summary>
@@ -417,9 +440,11 @@ namespace VampireSurvivors.Components
     public struct ClockLancetState : IComponentData
     {
         public float Timer;
-        public float Cooldown;       // seconds between freeze pulses — wiki base: 2.0s
+        public float Cooldown;       // seconds between freeze pulses — wiki base: 2.0s; evolved: 1.0s
         public float FreezeRadius;   // radius of freeze effect — 6.0u
-        public float FreezeDuration; // seconds each enemy stays frozen — wiki base: 2.0s
+        public float FreezeDuration; // seconds each enemy stays frozen — wiki base: 2.0s; evolved: n/a
+        /// <summary>True after Infinite Corridor evolution. Halves HP of all on-screen enemies instead of freezing.</summary>
+        public bool  IsEvolved;
     }
 
     public struct GattiAmariState : IComponentData
