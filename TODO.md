@@ -1,13 +1,17 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~21:00
+> Last updated: 2026-03-21 ~22:30
 
 ## Next Up (priority order)
 
-- [x] **Achievement display** — `AchievementHintPanel` (auto-created in Lobby scene); shows "Next unlock: Name — hint" at bottom; finds closest locked char by completion ratio
-- [x] **Floor item magnet** — `GoldCoinSystem` + `HealthPickupSystem` now move items toward nearest player within 4u base magnet radius (× `MagnetRadiusMult` per Attractorb); 6 u/s attraction speed; collect at 0.6u; no movement outside radius (idle until in range)
-- [x] **Curse mechanic active effect** — `EnemyMovementSystem` computes team average Curse each frame, passes `CurseSpeedMult = 1 + avgCurse × 0.1` to both `MoveTowardPlayerJob` and `GhostMoveJob`; `ContactDamageSystem` computes `CurseDamageMult` the same way and scales `ContactDamage` before Armor subtraction; wiki: +10% speed and +10% damage per Curse point
-- [x] **Victory Death boss** — `DeathBossTag : IComponentData`; `DeathRegenSystem` restores 666 HP/s; `HealthSystem` now `WithNone<DeathBossTag>()` so it can never be destroyed; `HUDManager.SpawnDeathBosses()` instantiates one Death per living player at 29:55 (5s early) using `SpawnerData.BossPrefab` for visuals (scale 2.0, HP=666000, ContactDamage=666, XpValue=0); StageBanner shows "DEATH APPROACHES" warning
+- [ ] **HUD stat tooltip on level-up cards** — show per-card stat line (e.g. "Might: 1.1 → 1.2") so players can see what they're gaining
+- [ ] **More characters** — Mortaccio, Yatta, Krochi, Dommario, Giovanna, Clerici, Poppea, Pugnala, Bi-An Zi are in `GameSceneBootstrap` but not in the Lobby character list yet; add to `LobbyManager.AllCharacterIds`
+
+## Completed
+
+### 2026-03-21 (Session 38 — ~22:30)
+
+- [x] **Character per-level stat scaling** — 4 new `PlayerStats` fields: `MightBonusPerLevel`, `XpMultBonusPerLevel`, `AreaBonusPerLevel`, `CooldownBonusPerLevel`; `LevelUpSystem` applies all 6 bonus-per-level fields (existing: ProjectileSpeed, Duration; new: Might, XpMult, Area, Cooldown) every level-up; `GameSceneBootstrap` sets per-character values: Antonio +1% Might/lv, Imelda +1% XP/lv, Pasqualina +1% ProjSpeed/lv, Arca -1% CD/lv (floor 0.5), Porta +1% Area/lv, Lama +1% Might/lv; Giovanna/Poppea already had their fields set; wiki-accurate scaling
 
 ## Completed
 

@@ -139,9 +139,10 @@ namespace VampireSurvivors.MonoBehaviours
                 case "antonio":
                     SetBaseStats(em, entity, hp: 120, speed: 7.0f);
                     var antonioStats = em.GetComponentData<PlayerStats>(entity);
-                    antonioStats.Might = 1.1f;
+                    antonioStats.Might              = 1.1f;
+                    antonioStats.MightBonusPerLevel = 0.01f; // wiki: +1% Might per level
                     em.SetComponentData(entity, antonioStats);
-                    Debug.Log($"[GameSceneBootstrap] P{slot} Antonio: Whip, HP=120, Might=1.1");
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Antonio: Whip, HP=120, Might=1.1, +1%Might/lv");
                     break;
 
                 case "imelda":
@@ -158,9 +159,10 @@ namespace VampireSurvivors.MonoBehaviours
                         Amount   = 1
                     });
                     var imeldaStats = em.GetComponentData<PlayerStats>(entity);
-                    imeldaStats.XpMult = 1.1f;
+                    imeldaStats.XpMult              = 1.1f;
+                    imeldaStats.XpMultBonusPerLevel = 0.01f; // wiki: +1% XP gain per level
                     em.SetComponentData(entity, imeldaStats);
-                    Debug.Log($"[GameSceneBootstrap] P{slot} Imelda: MagicWand, HP=100, XpMult=1.1");
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Imelda: MagicWand, HP=100, XpMult=1.1, +1%XP/lv");
                     break;
 
                 case "pasqualina":
@@ -177,7 +179,10 @@ namespace VampireSurvivors.MonoBehaviours
                         Bounces  = 3,
                         Amount   = 1
                     });
-                    Debug.Log($"[GameSceneBootstrap] P{slot} Pasqualina: Runetracer, HP=130");
+                    var pasqualStats = em.GetComponentData<PlayerStats>(entity);
+                    pasqualStats.ProjectileSpeedBonusPerLevel = 0.01f; // wiki: +1% Projectile Speed per level
+                    em.SetComponentData(entity, pasqualStats);
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Pasqualina: Runetracer, HP=130, +1%ProjSpeed/lv");
                     break;
 
                 case "gennaro":
@@ -209,13 +214,14 @@ namespace VampireSurvivors.MonoBehaviours
                         Range    = 1.5f
                     });
                     var arcaStats = em.GetComponentData<PlayerStats>(entity);
-                    arcaStats.CooldownMult = 0.95f; // -5% cooldown at start
+                    arcaStats.CooldownMult          = 0.95f;  // wiki: -5% cooldown at start
+                    arcaStats.CooldownBonusPerLevel = -0.01f; // wiki: -1% Cooldown per level (floored at 0.5)
                     em.SetComponentData(entity, arcaStats);
-                    Debug.Log($"[GameSceneBootstrap] P{slot} Arca: Garlic, HP=130, CooldownMult=0.95");
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Arca: Garlic, HP=130, CooldownMult=0.95, -1%CD/lv");
                     break;
 
                 case "porta":
-                    // Wiki: Lightning Ring starter, HP 100, Speed 7.5, no stat bonus
+                    // Wiki: Lightning Ring starter, HP 100, Speed 7.5, +1% Area per level
                     SetBaseStats(em, entity, hp: 100, speed: 7.5f);
                     if (em.HasComponent<WeaponState>(entity))
                         em.RemoveComponent<WeaponState>(entity);
@@ -227,7 +233,10 @@ namespace VampireSurvivors.MonoBehaviours
                         Amount   = 1,
                         Rng      = Unity.Mathematics.Random.CreateFromIndex((uint)(slot * 97 + 13))
                     });
-                    Debug.Log($"[GameSceneBootstrap] P{slot} Porta: Lightning Ring, HP=100, Speed=7.5");
+                    var portaStats = em.GetComponentData<PlayerStats>(entity);
+                    portaStats.AreaBonusPerLevel = 0.01f; // wiki: +1% Area per level
+                    em.SetComponentData(entity, portaStats);
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Porta: Lightning Ring, HP=100, Speed=7.5, +1%Area/lv");
                     break;
 
                 case "lama":
@@ -246,9 +255,10 @@ namespace VampireSurvivors.MonoBehaviours
                         Amount   = 1
                     });
                     var lamaStats = em.GetComponentData<PlayerStats>(entity);
-                    lamaStats.Might = 1.1f;
+                    lamaStats.Might              = 1.1f;
+                    lamaStats.MightBonusPerLevel = 0.01f; // wiki: +1% Might per level
                     em.SetComponentData(entity, lamaStats);
-                    Debug.Log($"[GameSceneBootstrap] P{slot} Lama: Axe, HP=130, Might=1.1");
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Lama: Axe, HP=130, Might=1.1, +1%Might/lv");
                     break;
 
                 case "mortaccio":

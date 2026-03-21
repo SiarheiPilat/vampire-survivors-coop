@@ -38,13 +38,20 @@ namespace VampireSurvivors.Systems
                     // Brief invincibility on level-up
                     invincible.ValueRW.Timer = math.max(invincible.ValueRO.Timer, 2f);
 
-                    // Giovanna passive: +1% ProjectileSpeed per level (no cap)
-                    if (stats.ValueRO.ProjectileSpeedBonusPerLevel > 0f)
+                    // Character per-level stat scaling (set in GameSceneBootstrap per charId)
+                    if (stats.ValueRO.ProjectileSpeedBonusPerLevel != 0f)
                         stats.ValueRW.ProjectileSpeedMult += stats.ValueRO.ProjectileSpeedBonusPerLevel;
-
-                    // Poppea passive: +1% Duration per level (no cap)
-                    if (stats.ValueRO.DurationBonusPerLevel > 0f)
+                    if (stats.ValueRO.DurationBonusPerLevel != 0f)
                         stats.ValueRW.DurationMult += stats.ValueRO.DurationBonusPerLevel;
+                    if (stats.ValueRO.MightBonusPerLevel != 0f)
+                        stats.ValueRW.Might += stats.ValueRO.MightBonusPerLevel;
+                    if (stats.ValueRO.XpMultBonusPerLevel != 0f)
+                        stats.ValueRW.XpMult += stats.ValueRO.XpMultBonusPerLevel;
+                    if (stats.ValueRO.AreaBonusPerLevel != 0f)
+                        stats.ValueRW.AreaMult += stats.ValueRO.AreaBonusPerLevel;
+                    if (stats.ValueRO.CooldownBonusPerLevel != 0f)
+                        stats.ValueRW.CooldownMult = math.max(0.5f,
+                            stats.ValueRO.CooldownMult + stats.ValueRO.CooldownBonusPerLevel);
 
                     // Unlock weapons at milestone levels (structural change via ECB)
                     int newLevel = stats.ValueRO.Level;

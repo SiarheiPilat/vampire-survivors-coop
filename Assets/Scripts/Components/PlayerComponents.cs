@@ -211,6 +211,34 @@ namespace VampireSurvivors.Components
         /// Wiki: Poppea — Duration increases by 1% each level.
         /// </summary>
         public float DurationBonusPerLevel;
+
+        /// <summary>
+        /// Flat Might bonus added each level-up.
+        /// Default 0.0. Antonio and Lama get 0.01 (+1% Might per level).
+        /// Wiki: Antonio/Lama — Might increases by 1% each level.
+        /// </summary>
+        public float MightBonusPerLevel;
+
+        /// <summary>
+        /// Flat XpMult bonus added each level-up.
+        /// Default 0.0. Imelda gets 0.01 (+1% XP gain per level).
+        /// Wiki: Imelda — XP gain increases by 1% each level.
+        /// </summary>
+        public float XpMultBonusPerLevel;
+
+        /// <summary>
+        /// Flat AreaMult bonus added each level-up.
+        /// Default 0.0. Porta gets 0.01 (+1% Area per level).
+        /// Wiki: Porta — Area increases by 1% each level.
+        /// </summary>
+        public float AreaBonusPerLevel;
+
+        /// <summary>
+        /// Flat CooldownMult delta applied each level-up (negative = shorter cooldown).
+        /// Default 0.0. Arca gets -0.01 (-1% Cooldown per level, floored at 0.5).
+        /// Wiki: Arca — Cooldown decreases by 1% each level.
+        /// </summary>
+        public float CooldownBonusPerLevel;
     }
 
     /// <summary>
