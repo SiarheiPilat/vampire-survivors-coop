@@ -134,6 +134,7 @@ namespace VampireSurvivors.Components
         public Entity HealthPickupPrefab;
         public Entity MagnetPickupPrefab;
         public Entity ChestPrefab;
+        public Entity OrologionPickupPrefab;
 
         public float  Timer;
         public float  BossTimer;   // counts down; spawn boss when ≤ 0

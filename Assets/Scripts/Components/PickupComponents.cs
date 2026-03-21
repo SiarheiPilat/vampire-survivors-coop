@@ -30,6 +30,13 @@ namespace VampireSurvivors.Components
     public struct MagnetPickup : IComponentData { }
 
     /// <summary>
+    /// Orologion clock item dropped rarely by enemies (wiki: ~1.5% base chance, scales with Luck).
+    /// When collected: freezes ALL on-screen enemies for 10 seconds (adds/refreshes Frozen component).
+    /// Unlocks Clock Lancet; collecting 20 unlocks Whiteout stage.
+    /// </summary>
+    public struct OrologionPickup : IComponentData { }
+
+    /// <summary>
     /// Treasure chest dropped by enemies. When collected by a player it awards one
     /// of four rewards determined by RNG at the moment of collection:
     ///   40% → Gold bonus (100–200 gold to team pool)

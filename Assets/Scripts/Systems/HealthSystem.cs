@@ -163,6 +163,24 @@ namespace VampireSurvivors.Systems
                                            (uint)runStats.EnemiesKilled))
                             });
                         }
+
+                        // Orologion (~1.5% base chance, scaled by Luck) — freezes all enemies 10s
+                        if (UnityEngine.Random.value < 0.015f * luckMult)
+                        {
+                            if (hasPrefabs && pickupSpawner.OrologionPickupPrefab != Entity.Null)
+                            {
+                                var orolo = ecb.Instantiate(pickupSpawner.OrologionPickupPrefab);
+                                ecb.SetComponent(orolo, LocalTransform.FromPosition(
+                                    transform.Position + new float3(-0.3f, -0.5f, 0f)));
+                            }
+                            else
+                            {
+                                var orolo = ecb.CreateEntity();
+                                ecb.AddComponent(orolo, new OrologionPickup());
+                                ecb.AddComponent(orolo, LocalTransform.FromPosition(
+                                    transform.Position + new float3(-0.3f, -0.5f, 0f)));
+                            }
+                        }
                     }
                     if (hasRunStats) runStats.EnemiesKilled++;
                     ecb.DestroyEntity(entity);

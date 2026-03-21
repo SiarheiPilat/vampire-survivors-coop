@@ -12,7 +12,7 @@ namespace VampireSurvivors.Authoring
     /// </summary>
     public class PickupAuthoring : MonoBehaviour
     {
-        public enum PickupKind { XpGem, GoldCoin, HealthPickup, MagnetPickup, Chest }
+        public enum PickupKind { XpGem, GoldCoin, HealthPickup, MagnetPickup, Chest, OrologionPickup }
         public PickupKind kind;
 
         class Baker : Baker<PickupAuthoring>
@@ -40,6 +40,9 @@ namespace VampireSurvivors.Authoring
                             // Rng seeded with entity index; overwritten by HealthSystem at spawn
                             Rng = Unity.Mathematics.Random.CreateFromIndex(0)
                         });
+                        break;
+                    case PickupKind.OrologionPickup:
+                        AddComponent(entity, new OrologionPickup());
                         break;
                 }
             }
