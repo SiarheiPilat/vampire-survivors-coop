@@ -4,12 +4,16 @@
 
 ## Next Up (priority order)
 
-- [ ] **Achievement display** — in lobby, show progress toward next unlock ("Kill 347 more enemies to unlock Mortaccio")
+- [x] **Achievement display** — `AchievementHintPanel` (auto-created in Lobby scene); shows "Next unlock: Name — hint" at bottom; finds closest locked char by completion ratio
 - [ ] **Floor item magnet** — when player walks over XpGem field, items magnetize toward them; scale magnet radius with Attractorb stacks
 - [ ] **Curse mechanic active effect** — enemies with `PlayerStats.Curse > 0` move faster (+10% per Curse point); currently Curse only boosts XP via wiki formula, but no speed scaling exists yet
 - [ ] **Victory Death boss** — at 30:00 spawn unkillable Death enemy (wiki: 666 contact dmg, 666 HP regen/s, cannot be killed); spawns at every player position simultaneously
 
 ## Completed
+
+### 2026-03-21 (Session 32 — ~21:00)
+
+- [x] **Achievement display** — `AchievementHintPanel` MonoBehaviour (Menu assembly, auto-created via RuntimeInitializeOnLoadMethod in Lobby scene); scans all locked characters, picks the one with highest completion ratio; shows gold-tinted "Next unlock: <Name> — hint" strip at bottom of screen (sorting order 15, semi-transparent background); destroys itself when leaving Lobby scene; "All characters unlocked!" when none remain
 
 ### 2026-03-21 (Session 31 — ~20:45)
 
