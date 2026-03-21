@@ -1,15 +1,24 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~05:10
+> Last updated: 2026-03-21 ~05:30
 
 ## Next Up (priority order)
 
 - [ ] CharacterRegistry ScriptableObject (replace hard-coded array in LobbyManager)
-- [ ] Metaglio Left + Right passives → Crimson Shroud evolution (Laurel evolved form)
 - [ ] Map variety: second stage tileset + different enemy spawns
 - [ ] Second map/stage — different background tile set + spawn weights (more skeletons/ghouls, fewer bats)
+- [ ] New weapon: Peachone (Bi An Zi's egg-bird weapon, fires eggs that bounce)
 
 ## Completed
+
+### 2026-03-21 (Session 23 — ~05:30)
+
+- [x] **Metaglio Left passive** — `PlayerStats.MetaglioLeftStacks` int (max 9); each pickup: `HpRegen += 0.1f`, `Health.Max += 5% of current MaxHp`, `MaxHpBonus += bonus`; in passive upgrade pool (excluded when stacks ≥ 9 via pre-filter loop); gate for Crimson Shroud
+- [x] **Metaglio Right passive** — `PlayerStats.MetaglioRightStacks` int (max 9); each pickup: `Curse += 0.05f`; in passive upgrade pool (excluded when stacks ≥ 9); gate for Crimson Shroud
+- [x] **Crimson Shroud evolution** (Laurel + Metaglio Left + Metaglio Right) — `LaurelState.IsEvolved=true`; `MaxDamageCap=10` (ContactDamageSystem clamps per-hit damage ≤ 10); `Cooldown=8.0s`; `RetaliationDamage=30`, `RetaliationRadius=2.0u` (LaurelSystem fires AoE retaliation each pulse when evolved)
+- [x] **ContactDamageSystem** — added `ComponentLookup<LaurelState>` (read-only, Burst-compatible); clamps damage at `MaxDamageCap` when player has evolved Laurel
+- [x] **LaurelSystem** rewritten — now Burst IJobEntity `.Run()` like GarlicSystem; adds `ComponentLookup<Health>` + enemy arrays for evolved AoE pulse; non-evolved path unchanged (just sets Invincible.Timer)
+- [x] **PlayerAuthoring** — `MetaglioLeftStacks=0`, `MetaglioRightStacks=0` defaults baked
 
 ### 2026-03-21 (Session 22 — ~05:10)
 

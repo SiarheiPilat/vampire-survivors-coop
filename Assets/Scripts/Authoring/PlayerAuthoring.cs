@@ -47,7 +47,9 @@ namespace VampireSurvivors.Authoring
                     MagnetRadiusMult   = 1.0f,  // Attractorb multiplies by 1.3 per pickup
                     ProjectileSpeedBonusPerLevel = 0.0f, // Giovanna: 0.01 set by GameSceneBootstrap
                     GoldMult = 1.0f,  // Stone Mask adds +0.1 per pickup (additive)
-                    SkullOManiacStacks   = 0,    // Skull O'Maniac passive; gate for Mannajja
+                    SkullOManiacStacks    = 0,    // Skull O'Maniac passive; gate for Mannajja
+                    MetaglioLeftStacks    = 0,    // gate for Crimson Shroud
+                    MetaglioRightStacks   = 0,    // gate for Crimson Shroud
                     DurationBonusPerLevel = 0.0f, // Poppea: 0.01 set by GameSceneBootstrap
                 });
                 AddComponent(entity, new AssignedDeviceId { Value = 0 });

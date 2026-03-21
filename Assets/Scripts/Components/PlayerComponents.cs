@@ -190,6 +190,22 @@ namespace VampireSurvivors.Components
         public int SkullOManiacStacks;
 
         /// <summary>
+        /// Metaglio Left stacks. 0 = not taken. Each pickup adds +1 (max 9).
+        /// Also applies: HpRegen += 0.1 and MaxHp *= 1.05 per pickup.
+        /// Used as gate (alongside MetaglioRightStacks) for Crimson Shroud evolution.
+        /// Wiki: Metaglio Left — +0.1 Recovery and ×1.05 Max Health per level, 9 levels.
+        /// </summary>
+        public int MetaglioLeftStacks;
+
+        /// <summary>
+        /// Metaglio Right stacks. 0 = not taken. Each pickup adds +1 (max 9).
+        /// Also applies: Curse += 0.05 per pickup.
+        /// Used as gate (alongside MetaglioLeftStacks) for Crimson Shroud evolution.
+        /// Wiki: Metaglio Right — +5% Curse per level, 9 levels.
+        /// </summary>
+        public int MetaglioRightStacks;
+
+        /// <summary>
         /// Flat Duration bonus added to DurationMult each level-up.
         /// Default 0.0. Poppea Pecorina gets 0.01 (+1% DurationMult per level, no cap).
         /// Wiki: Poppea — Duration increases by 1% each level.
@@ -509,10 +525,18 @@ namespace VampireSurvivors.Components
     /// </summary>
     public struct LaurelState : IComponentData
     {
-        public float Timer;          // counts down to next shield pulse
-        public float Cooldown;       // base: 10.0s; min 8s at max level (wiki)
-        public float InvulDuration;  // base: 0.5s invulnerability granted each pulse
-        /// <summary>True after Crimson Shroud evolution (deferred — requires Metaglio L+R).</summary>
+        public float Timer;              // counts down to next shield pulse
+        public float Cooldown;           // base: 10.0s; evolved: 8.0s
+        public float InvulDuration;      // base: 0.5s invulnerability per pulse (DurationMult scales this)
+        /// <summary>
+        /// True after Crimson Shroud evolution (Laurel + Metaglio Left + Metaglio Right).
+        /// When > 0, ContactDamageSystem clamps incoming damage to this value (wiki: cap 10).
+        /// </summary>
+        public int   MaxDamageCap;       // 0 = no cap; 10 = Crimson Shroud
+        /// <summary>AoE damage dealt in RetaliationRadius every Cooldown when evolved.</summary>
+        public float RetaliationDamage;  // 0 base; 30 when evolved
+        /// <summary>Radius of the retaliation explosion when evolved (wiki: Area 2).</summary>
+        public float RetaliationRadius;  // 0 base; 2.0u when evolved
         public bool  IsEvolved;
     }
 

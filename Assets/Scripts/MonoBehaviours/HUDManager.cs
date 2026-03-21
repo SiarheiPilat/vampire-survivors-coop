@@ -89,6 +89,9 @@ namespace VampireSurvivors.MonoBehaviours
             PhieraggiEvolution,       // Phiera + Eight + Tiragisú → 8-direction rapid fire
             SkullOManiac,             // passive: +10% Curse (harder enemies, more XP)
             MannajjaEvolution,        // Song of Mana + Skull O'Maniac → wide column, 40 dmg
+            MetaglioLeft,             // passive: +0.1 HpRegen, +5% MaxHp (9 levels)
+            MetaglioRight,            // passive: +5% Curse (9 levels)
+            CrimsonShroudEvolution,   // Laurel + Metaglio Left + Right → damage cap 10, AoE retaliation
         }
         readonly UpgradeType[] _currentChoices = new UpgradeType[3];
         readonly TMP_Text[]    _btnLabels       = new TMP_Text[3];
@@ -126,6 +129,8 @@ namespace VampireSurvivors.MonoBehaviours
             (UpgradeType.SilverRing,    "Silver Ring\n+5% Duration and Area"),
             (UpgradeType.GoldRing,      "Gold Ring\n+5% Curse (harder but more rewarding)"),
             (UpgradeType.SkullOManiac,  "Skull O'Maniac\n+10% Curse (enemies hit harder, drop more XP)"),
+            (UpgradeType.MetaglioLeft,  "Metaglio Left\n+0.1 HP/s Regen, +5% Max HP"),
+            (UpgradeType.MetaglioRight, "Metaglio Right\n+5% Curse (dark power, harder enemies)"),
         };
 
         static readonly (UpgradeType type, string label)[] k_WeaponUpgradesExtra =
@@ -679,8 +684,16 @@ namespace VampireSurvivors.MonoBehaviours
         {
             var em = world.EntityManager;
 
-            // Build pool: all 6 passives + weapon amount upgrades for weapons the player has
-            var pool = new System.Collections.Generic.List<(UpgradeType type, string label)>(k_PassiveUpgrades);
+            // Build pool: all passives (excluding capped ones) + weapon upgrades
+            var playerStatsPre = em.GetComponentData<PlayerStats>(_pendingUpgradeEntity);
+            var pool = new System.Collections.Generic.List<(UpgradeType type, string label)>();
+            foreach (var (t, l) in k_PassiveUpgrades)
+            {
+                // Filter out Metaglio at max stacks (9)
+                if (t == UpgradeType.MetaglioLeft  && playerStatsPre.MetaglioLeftStacks  >= 9) continue;
+                if (t == UpgradeType.MetaglioRight && playerStatsPre.MetaglioRightStacks >= 9) continue;
+                pool.Add((t, l));
+            }
 
             foreach (var (type, label) in k_WeaponUpgrades)
             {
@@ -914,6 +927,17 @@ namespace VampireSurvivors.MonoBehaviours
                 if (!som.IsEvolved && playerStats.SkullOManiacStacks > 0)
                     pool.Add((UpgradeType.MannajjaEvolution,
                         "★ Mannajja\nSong of Mana + Skull O'Maniac — 40 dmg, 6u×8u column, 4.5s CD"));
+            }
+
+            // Crimson Shroud = Laurel + Metaglio Left + Metaglio Right
+            if (em.HasComponent<LaurelState>(_pendingUpgradeEntity))
+            {
+                var ls = em.GetComponentData<LaurelState>(_pendingUpgradeEntity);
+                if (!ls.IsEvolved &&
+                    playerStats.MetaglioLeftStacks  > 0 &&
+                    playerStats.MetaglioRightStacks > 0)
+                    pool.Add((UpgradeType.CrimsonShroudEvolution,
+                        "★ Crimson Shroud\nLaurel + Metaglio L+R — cap dmg at 10, AoE retaliation 2u"));
             }
 
             // Vicious Hunger = Gatti Amari + Stone Mask (GoldMult > 1 means stone mask was taken)
@@ -1438,6 +1462,46 @@ namespace VampireSurvivors.MonoBehaviours
                         fw4.Cooldown   = 3.0f;  // wiki: 3.0s CD
                         em.SetComponentData(_pendingUpgradeEntity, fw4);
                         Debug.Log($"[HUDManager] P{pidx} evolved Fire Wand → Hellfire");
+                    }
+                    break;
+
+                case UpgradeType.MetaglioLeft:
+                {
+                    if (stats.MetaglioLeftStacks < 9)
+                    {
+                        stats.MetaglioLeftStacks++;
+                        stats.HpRegen += 0.1f;                               // +0.1 Recovery
+                        if (em.HasComponent<Health>(_pendingUpgradeEntity))  // +5% Max HP
+                        {
+                            var hp    = em.GetComponentData<Health>(_pendingUpgradeEntity);
+                            int bonus = Mathf.Max(1, hp.Max / 20); // 5% of current max
+                            hp.Max   += bonus;
+                            em.SetComponentData(_pendingUpgradeEntity, hp);
+                            stats.MaxHpBonus += bonus; // track for display
+                            Debug.Log($"[HUDManager] P{pidx} chose Metaglio Left (x{stats.MetaglioLeftStacks}) — HpRegen={stats.HpRegen:F1}/s MaxHp={hp.Max}");
+                        }
+                    }
+                    break;
+                }
+                case UpgradeType.MetaglioRight:
+                    if (stats.MetaglioRightStacks < 9)
+                    {
+                        stats.MetaglioRightStacks++;
+                        stats.Curse += 0.05f;
+                        Debug.Log($"[HUDManager] P{pidx} chose Metaglio Right (x{stats.MetaglioRightStacks}) — Curse={stats.Curse:F2}");
+                    }
+                    break;
+                case UpgradeType.CrimsonShroudEvolution:
+                    if (em.HasComponent<LaurelState>(_pendingUpgradeEntity))
+                    {
+                        var ls              = em.GetComponentData<LaurelState>(_pendingUpgradeEntity);
+                        ls.IsEvolved        = true;
+                        ls.Cooldown         = 8.0f;    // wiki: 8.0s CD (faster than base 10s)
+                        ls.MaxDamageCap     = 10;      // wiki: caps incoming damage at 10 per hit
+                        ls.RetaliationDamage = 30f;    // AoE explosion on each pulse
+                        ls.RetaliationRadius = 2.0f;   // wiki: Area 2
+                        em.SetComponentData(_pendingUpgradeEntity, ls);
+                        Debug.Log($"[HUDManager] P{pidx} evolved Laurel → Crimson Shroud (dmg cap 10, 2u AoE, 8s CD)");
                     }
                     break;
 

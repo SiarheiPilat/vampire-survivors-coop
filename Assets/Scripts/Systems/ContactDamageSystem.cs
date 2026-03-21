@@ -16,14 +16,16 @@ namespace VampireSurvivors.Systems
     [BurstCompile]
     public partial struct ContactDamageSystem : ISystem
     {
-        ComponentLookup<Health>     _healthLookup;
-        ComponentLookup<Invincible> _invincibleLookup;
+        ComponentLookup<Health>      _healthLookup;
+        ComponentLookup<Invincible>  _invincibleLookup;
+        ComponentLookup<LaurelState> _laurelLookup;
 
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             _healthLookup     = state.GetComponentLookup<Health>(isReadOnly: false);
             _invincibleLookup = state.GetComponentLookup<Invincible>(isReadOnly: false);
+            _laurelLookup     = state.GetComponentLookup<LaurelState>(isReadOnly: true);
         }
 
         [BurstCompile]
@@ -35,6 +37,7 @@ namespace VampireSurvivors.Systems
 
             _healthLookup.Update(ref state);
             _invincibleLookup.Update(ref state);
+            _laurelLookup.Update(ref state);
 
             var playerQuery = SystemAPI.QueryBuilder()
                 .WithAll<PlayerTag, LocalTransform, Health, Invincible, PlayerStats>()
@@ -53,7 +56,8 @@ namespace VampireSurvivors.Systems
                 PlayerTransforms = playerTransforms,
                 PlayerStats      = playerStats,
                 HealthLookup     = _healthLookup,
-                InvincibleLookup = _invincibleLookup
+                InvincibleLookup = _invincibleLookup,
+                LaurelLookup     = _laurelLookup,
             }.Run(); // Single-threaded — multiple enemies can target the same player
 
             playerEntities.Dispose();
@@ -74,6 +78,7 @@ namespace VampireSurvivors.Systems
 
             [NativeDisableParallelForRestriction] public ComponentLookup<Health>     HealthLookup;
             [NativeDisableParallelForRestriction] public ComponentLookup<Invincible> InvincibleLookup;
+            [ReadOnly]                            public ComponentLookup<LaurelState> LaurelLookup;
 
             void Execute(in EnemyStats stats, in LocalTransform transform)
             {
@@ -87,6 +92,14 @@ namespace VampireSurvivors.Systems
 
                     // Armor reduces incoming damage; always deal at least 1
                     int damage = math.max(1, stats.ContactDamage - PlayerStats[i].Armor);
+
+                    // Crimson Shroud (evolved Laurel): cap incoming damage per hit (wiki: max 10)
+                    if (LaurelLookup.HasComponent(PlayerEntities[i]))
+                    {
+                        var laurel = LaurelLookup[PlayerEntities[i]];
+                        if (laurel.IsEvolved && laurel.MaxDamageCap > 0)
+                            damage = math.min(damage, laurel.MaxDamageCap);
+                    }
 
                     var hp = HealthLookup[PlayerEntities[i]];
                     hp.Current -= damage;
