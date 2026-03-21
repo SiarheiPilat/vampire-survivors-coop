@@ -23,6 +23,10 @@ namespace VampireSurvivors.Menu
         }
 
         public SlotData[] Slots { get; } = new SlotData[4];
+
+        /// <summary>Stage selected in the lobby. Default "mad_forest".</summary>
+        public string StageId { get; set; } = "mad_forest";
+
         public int FilledCount
         {
             get

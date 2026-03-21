@@ -1,14 +1,28 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~07:10
+> Last updated: 2026-03-21 ~08:00
 
 ## Next Up (priority order)
 
-- [ ] **Second stage / map variety** — different background tileset, enemy spawn weights (more skeletons/ghouls at higher waves), stage-select at lobby
+- [ ] **Lobby stage name UI** — add TMP_Text label to LobbyScene canvas showing current stage name; wire `stageNameText` field on LobbyManager
 - [ ] **Achievements / Unlock tracking** — track Orologion collected count (20 = Whiteout unlock); persist with PlayerPrefs
 - [ ] **Bracer passive in level-up pool fix** — Bracer and other passives that only meaningfully apply to specific weapons should show only when relevant weapons are present
+- [ ] **HUD stage name banner** — brief on-screen stage name shown at game start (2s fade-in/out)
 
 ## Completed
+
+### 2026-03-21 (Session 28 — ~08:00)
+
+- [x] **Stage system** — `StageDefinition` + `StageRegistry` ScriptableObjects; `GameSession.StageId` (default "mad_forest"); 3 stages: Mad Forest (dark green), Inlaid Library (dark blue/purple, more skeletons+specters starting wave 4), Dairy Plant (grey-blue, more zombies+ghouls starting wave 3); `StageRegistry.asset` pre-populated
+- [x] **InfiniteBackground stage colors** — `Instance` singleton + `SetStageColors(a, b)` method; tile colors swapped dynamically when `GameSceneBootstrap.ApplyStage()` runs; no scene wiring needed
+- [x] **GameSceneBootstrap stage wiring** — `[SerializeField] StageRegistry`; `ApplyStage()` pushes colors to `InfiniteBackground.Instance` and writes `StageIndex` to `SpawnerData` singleton; hardcoded fallback colors when registry not assigned
+- [x] **EnemySpawnerSystem stage weights** — `SpawnerData.StageIndex`; Inlaid Library: lower bat base (40%), specter starts wave 4 (was 7), specter cap 14%; Dairy Plant: higher zombie base (30%), ghoul starts wave 3 (was 5)
+- [x] **Lobby stage cycling** — Q/E keyboard + LB/RB gamepad (first joined player); `StageId` written to `GameSession` before scene load; `StageRegistry` wired to `LobbyManager` in Inspector; optional `stageNameText` TMP_Text field (null-safe)
+
+### 2026-03-21 (Session 27 — ~07:40)
+
+- [x] **Ghoul enemy** — hp=130, speed=1.8, contactDmg=25, xp=15; GhoulTag baked; dark-purple quad (0.45u); spawns wave 5+, 10% weight; GhoulMaterial assigned to prefab
+- [x] **Specter enemy** — hp=80, speed=2.2, contactDmg=20, xp=12; GhostTag baked (knockback-immune via EnemyMovementSystem WithNone\<GhostTag\>); pale-blue quad (0.42u); spawns wave 7+, 8% weight; SpecterMaterial assigned; both wired to SpawnerAuthoring in game scene
 
 ### 2026-03-21 (Session 26 — ~07:10)
 

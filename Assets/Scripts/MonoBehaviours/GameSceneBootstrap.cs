@@ -23,6 +23,8 @@ namespace VampireSurvivors.MonoBehaviours
     /// </summary>
     public class GameSceneBootstrap : MonoBehaviour
     {
+        [SerializeField] StageRegistry stageRegistry; // assign StageRegistry.asset in Inspector
+
         void Start()
         {
             var session = GameSession.Instance;
@@ -64,6 +66,59 @@ namespace VampireSurvivors.MonoBehaviours
             }
 
             Debug.Log($"[GameSceneBootstrap] Stamped {session.FilledCount} device assignment(s).");
+
+            // ── Stage setup ───────────────────────────────────────────────────
+            ApplyStage(session.StageId, world.EntityManager);
+        }
+
+        void ApplyStage(string stageId, EntityManager em)
+        {
+            // Resolve stage from registry (fallback to Mad Forest colours)
+            int   stageIndex = 0;
+            Color colA       = new Color(0.07f, 0.11f, 0.07f, 1f);
+            Color colB       = new Color(0.10f, 0.15f, 0.10f, 1f);
+
+            if (stageRegistry != null)
+            {
+                var def = stageRegistry.Find(stageId);
+                if (def != null)
+                {
+                    stageIndex = stageRegistry.IndexOf(stageId);
+                    colA       = def.TileColorA;
+                    colB       = def.TileColorB;
+                }
+            }
+            else
+            {
+                // Hardcoded fallback colours when no registry is assigned
+                stageIndex = stageId switch
+                {
+                    "inlaid_library" => 1,
+                    "dairy_plant"    => 2,
+                    _                => 0,
+                };
+                (colA, colB) = stageIndex switch
+                {
+                    1 => (new Color(0.05f, 0.06f, 0.13f, 1f), new Color(0.08f, 0.10f, 0.19f, 1f)),
+                    2 => (new Color(0.08f, 0.10f, 0.13f, 1f), new Color(0.12f, 0.14f, 0.17f, 1f)),
+                    _ => (new Color(0.07f, 0.11f, 0.07f, 1f), new Color(0.10f, 0.15f, 0.10f, 1f)),
+                };
+            }
+
+            // Push colours to InfiniteBackground
+            InfiniteBackground.Instance?.SetStageColors(colA, colB);
+
+            // Write StageIndex into SpawnerData singleton so EnemySpawnerSystem can read it
+            using var spawnerQuery = em.CreateEntityQuery(ComponentType.ReadWrite<SpawnerData>());
+            if (!spawnerQuery.IsEmpty)
+            {
+                var spawnerEntity = spawnerQuery.GetSingletonEntity();
+                var spawner       = em.GetComponentData<SpawnerData>(spawnerEntity);
+                spawner.StageIndex = stageIndex;
+                em.SetComponentData(spawnerEntity, spawner);
+            }
+
+            Debug.Log($"[GameSceneBootstrap] Stage '{stageId}' (index {stageIndex}) applied.");
         }
 
         static void ApplyCharacter(EntityManager em, Entity entity, string charId, int slot)

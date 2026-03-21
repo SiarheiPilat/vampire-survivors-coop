@@ -21,6 +21,8 @@ namespace VampireSurvivors.Menu
         [SerializeField] Button            playButton;
         [SerializeField] GameObject        settingsPanel;
         [SerializeField] CharacterRegistry characterRegistry;  // assign CharacterRegistry.asset in Inspector
+        [SerializeField] StageRegistry     stageRegistry;      // assign StageRegistry.asset in Inspector
+        [SerializeField] TMPro.TMP_Text    stageNameText;      // optional label showing current stage
 
         // Fallback list used when no CharacterRegistry asset is assigned
         static readonly string[] s_FallbackIds =
@@ -32,6 +34,16 @@ namespace VampireSurvivors.Menu
 
         int   CharacterCount => characterRegistry != null ? characterRegistry.Count : s_FallbackIds.Length;
         string IdAt(int i)   => characterRegistry != null ? characterRegistry.IdAt(i) : s_FallbackIds[i];
+
+        // Stage selection (shared for all players)
+        int _stageIndex = 0;
+        int StageCount => stageRegistry != null ? stageRegistry.Count : 3;
+        string CurrentStageId => stageRegistry != null && stageRegistry.At(_stageIndex) != null
+            ? stageRegistry.At(_stageIndex).Id
+            : (_stageIndex == 1 ? "inlaid_library" : _stageIndex == 2 ? "dairy_plant" : "mad_forest");
+        string CurrentStageName => stageRegistry != null && stageRegistry.At(_stageIndex) != null
+            ? stageRegistry.At(_stageIndex).DisplayName
+            : (new[] { "Mad Forest", "Inlaid Library", "Dairy Plant" })[System.Math.Min(_stageIndex, 2)];
 
         // Per-slot state
         readonly InputDevice[] _slotDevice = new InputDevice[4];
@@ -76,6 +88,19 @@ namespace VampireSurvivors.Menu
             }
             RefreshPlayButton();
             settingsPanel.SetActive(false);
+            RefreshStageDisplay();
+        }
+
+        void CycleStage(int dir)
+        {
+            _stageIndex = (_stageIndex + dir + StageCount) % StageCount;
+            RefreshStageDisplay();
+        }
+
+        void RefreshStageDisplay()
+        {
+            if (stageNameText != null)
+                stageNameText.text = $"Stage: {CurrentStageName}";
         }
 
         // ── Join ────────────────────────────────────────────────────────────────
@@ -144,6 +169,14 @@ namespace VampireSurvivors.Menu
                 return;
             }
 
+            // Stage cycling — keyboard Q/E (available to any human at the keyboard)
+            var kb = UnityEngine.InputSystem.Keyboard.current;
+            if (kb != null)
+            {
+                if (kb.qKey.wasPressedThisFrame) CycleStage(-1);
+                if (kb.eKey.wasPressedThisFrame) CycleStage(+1);
+            }
+
             for (int i = 0; i < 4; i++)
             {
                 var device = _slotDevice[i];
@@ -192,6 +225,13 @@ namespace VampireSurvivors.Menu
                     else _repeatTimerH[i] -= Time.unscaledDeltaTime;
                 }
                 else _repeatTimerH[i] = 0f;
+
+                // Stage cycling — LB/RB on first filled slot only
+                if (i == FirstFilledSlot())
+                {
+                    if (gp.leftShoulder.wasPressedThisFrame)  CycleStage(-1);
+                    if (gp.rightShoulder.wasPressedThisFrame) CycleStage(+1);
+                }
 
                 // PLAY — any button on the south face button
                 if (gp.buttonSouth.wasPressedThisFrame && AnySlotFilled())
@@ -256,6 +296,8 @@ namespace VampireSurvivors.Menu
             var go      = new GameObject("GameSession");
             var session = go.AddComponent<GameSession>();
 
+            session.StageId = CurrentStageId;
+
             for (int i = 0; i < 4; i++)
             {
                 if (_slotDevice[i] == null) continue;
@@ -290,6 +332,13 @@ namespace VampireSurvivors.Menu
             foreach (var d in _slotDevice)
                 if (d != null) return true;
             return false;
+        }
+
+        int FirstFilledSlot()
+        {
+            for (int i = 0; i < 4; i++)
+                if (_slotDevice[i] != null) return i;
+            return -1;
         }
 
         void RefreshPlayButton() => playButton.interactable = AnySlotFilled();

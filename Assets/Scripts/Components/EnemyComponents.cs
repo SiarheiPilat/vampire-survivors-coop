@@ -148,6 +148,13 @@ namespace VampireSurvivors.Components
 
         /// <summary>Enemy stat multiplier for this wave (HP, damage, XP scale together).</summary>
         public float StatMultiplier;
+
+        /// <summary>
+        /// Stage index (0=Mad Forest, 1=Inlaid Library, 2=Dairy Plant).
+        /// Written by GameSceneBootstrap from GameSession.StageId.
+        /// Modifies base enemy spawn weights in EnemySpawnerSystem.
+        /// </summary>
+        public int StageIndex;
     }
 
     /// <summary>

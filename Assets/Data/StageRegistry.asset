@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 879afe342256a2a49ad9edc71e436a58, type: 3}
+  m_Name: StageRegistry
+  m_EditorClassIdentifier: VampireSurvivors.Menu::VampireSurvivors.Menu.StageRegistry
+  Stages:
+  - Id: mad_forest
+    DisplayName: Mad Forest
+    Description: The classic hunting ground. Dark greens, standard enemy mix.
+    TileColorA: {r: 0.07, g: 0.11, b: 0.07, a: 1}
+    TileColorB: {r: 0.1, g: 0.15, b: 0.1, a: 1}
+  - Id: inlaid_library
+    DisplayName: Inlaid Library
+    Description: Ancient halls of knowledge. Dark blues, more skeletons and specters.
+    TileColorA: {r: 0.05, g: 0.06, b: 0.13, a: 1}
+    TileColorB: {r: 0.08, g: 0.1, b: 0.19, a: 1}
+  - Id: dairy_plant
+    DisplayName: Dairy Plant
+    Description: Cold industrial halls. Muted grey-blue, more zombies and ghouls.
+    TileColorA: {r: 0.08, g: 0.1, b: 0.13, a: 1}
+    TileColorB: {r: 0.12, g: 0.14, b: 0.17, a: 1}

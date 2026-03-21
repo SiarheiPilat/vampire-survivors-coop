@@ -415,6 +415,7 @@ MonoBehaviour:
   timerText: {fileID: 1493933677}
   gameOverPanel: {fileID: 523383290}
   gameOverTimeText: {fileID: 1625746387}
+  characterRegistry: {fileID: 0}
 --- !u!114 &47171765
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1631,6 +1632,7 @@ MonoBehaviour:
   healthPickupPrefab: {fileID: 6300000000000001, guid: 7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d, type: 3}
   magnetPickupPrefab: {fileID: 6400000000000001, guid: 8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e, type: 3}
   chestPrefab: {fileID: 8678776594609913577, guid: c942ea81f786b9344804ebb3f01994d8, type: 3}
+  orologionPickupPrefab: {fileID: 6400000000000001, guid: 922e7b94068abba4bb8fdb2fa99304e3, type: 3}
 --- !u!4 &774028992
 Transform:
   m_ObjectHideFlags: 0
@@ -1812,6 +1814,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b8143a26342e6b46a484db7321b759f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VampireSurvivors.MonoBehaviours.GameSceneBootstrap
+  stageRegistry: {fileID: 11400000, guid: 6933e61696473064a860ca3b2b6834c1, type: 2}
 --- !u!4 &900000003
 Transform:
   m_ObjectHideFlags: 0

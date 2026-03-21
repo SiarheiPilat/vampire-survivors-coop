@@ -135,14 +135,30 @@ namespace VampireSurvivors.Systems
 
             // Weight distribution shifts over time:
             // Early: Bat-heavy. Later: Zombies, Skeletons, Slimes, Ghouls (w5+), Specters (w7+).
-            float batWeight     = math.max(0.55f - (wave - 1) * 0.04f, 0.25f);
-            float zombieWeight  = math.min(0.22f + (wave - 1) * 0.02f, 0.35f);
+            // Stage modifiers: library = more skeletons/specters; dairy = more zombies/ghouls.
+            int stage = spawner.StageIndex;
+
+            // Bats: reduced in later stages
+            float batBase   = stage == 0 ? 0.55f : (stage == 1 ? 0.40f : 0.45f);
+            float batWeight = math.max(batBase - (wave - 1) * 0.04f, 0.20f);
+
+            // Zombies: boosted in Dairy Plant
+            float zombieBase   = stage == 2 ? 0.30f : 0.22f;
+            float zombieWeight = math.min(zombieBase + (wave - 1) * 0.02f, 0.35f);
+
             float slimeWeight   = spawner.BigSlimePrefab != Entity.Null
                                     ? math.min(0.08f + (wave - 1) * 0.01f, 0.15f) : 0f;
-            float ghoulWeight   = spawner.GhoulPrefab   != Entity.Null
-                                    ? math.min(math.max(wave - 4, 0) * 0.025f, 0.12f) : 0f;
-            float specterWeight = spawner.SpecterPrefab  != Entity.Null
-                                    ? math.min(math.max(wave - 6, 0) * 0.02f,  0.08f) : 0f;
+
+            // Ghouls: starts earlier in Dairy Plant (wave 3 instead of 5)
+            int ghoulStartWave  = stage == 2 ? 3 : 5;
+            float ghoulWeight   = spawner.GhoulPrefab != Entity.Null
+                                    ? math.min(math.max(wave - ghoulStartWave, 0) * 0.025f, 0.14f) : 0f;
+
+            // Specters: starts earlier in Inlaid Library (wave 4 instead of 7); boosted cap
+            int specterStartWave = stage == 1 ? 4 : 7;
+            float specterCap     = stage == 1 ? 0.14f : 0.08f;
+            float specterWeight  = spawner.SpecterPrefab != Entity.Null
+                                    ? math.min(math.max(wave - specterStartWave, 0) * 0.02f, specterCap) : 0f;
             // skeleton fills remainder
 
             float mult = spawner.StatMultiplier;

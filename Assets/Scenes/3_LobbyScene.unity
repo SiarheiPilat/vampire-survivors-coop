@@ -310,6 +310,7 @@ MonoBehaviour:
   joinedPanel: {fileID: 1673435716}
   playerLabel: {fileID: 704899914}
   characterName: {fileID: 1630350597}
+  characterDescription: {fileID: 0}
   customizationName: {fileID: 677361805}
 --- !u!1 &249190361
 GameObject:
@@ -2924,6 +2925,7 @@ MonoBehaviour:
   joinedPanel: {fileID: 1799706536}
   playerLabel: {fileID: 1949234828}
   characterName: {fileID: 571407306}
+  characterDescription: {fileID: 0}
   customizationName: {fileID: 58603213}
 --- !u!1 &1418060938
 GameObject:
@@ -3070,6 +3072,9 @@ MonoBehaviour:
   - {fileID: 1340318108}
   playButton: {fileID: 1647291248}
   settingsPanel: {fileID: 1295385697}
+  characterRegistry: {fileID: 0}
+  stageRegistry: {fileID: 11400000, guid: 6933e61696473064a860ca3b2b6834c1, type: 2}
+  stageNameText: {fileID: 0}
 --- !u!4 &1490719545
 Transform:
   m_ObjectHideFlags: 0
@@ -4424,6 +4429,7 @@ MonoBehaviour:
   joinedPanel: {fileID: 2140571463}
   playerLabel: {fileID: 2134074237}
   characterName: {fileID: 763432434}
+  characterDescription: {fileID: 0}
   customizationName: {fileID: 472561938}
 --- !u!1 &2054578252
 GameObject:
@@ -4479,6 +4485,7 @@ MonoBehaviour:
   joinedPanel: {fileID: 584975525}
   playerLabel: {fileID: 1893958740}
   characterName: {fileID: 1746931365}
+  characterDescription: {fileID: 0}
   customizationName: {fileID: 249190363}
 --- !u!1 &2074069590
 GameObject:

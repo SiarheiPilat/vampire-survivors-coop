@@ -15,16 +15,37 @@ public class InfiniteBackground : MonoBehaviour
     const float TileSize  = 10f;       // world units per tile
     const float ZDepth    = 5f;        // behind all game entities
 
-    // Two alternating tile colours — dark muted greens
-    static readonly Color ColA = new Color(0.07f, 0.11f, 0.07f, 1f);
-    static readonly Color ColB = new Color(0.10f, 0.15f, 0.10f, 1f);
+    // Default tile colours (Mad Forest dark greens)
+    static readonly Color DefaultColA = new Color(0.07f, 0.11f, 0.07f, 1f);
+    static readonly Color DefaultColB = new Color(0.10f, 0.15f, 0.10f, 1f);
+
+    Color _colA = DefaultColA;
+    Color _colB = DefaultColB;
 
     SpriteRenderer[,] _tiles;
     Camera            _cam;
 
+    /// <summary>Singleton reference so GameSceneBootstrap can push stage colours.</summary>
+    public static InfiniteBackground Instance { get; private set; }
+
+    /// <summary>
+    /// Called by GameSceneBootstrap once the stage is known.
+    /// Re-tints all 25 tiles immediately.
+    /// </summary>
+    public void SetStageColors(Color a, Color b)
+    {
+        _colA = a;
+        _colB = b;
+        if (_tiles == null) return;
+        for (int r = 0; r < GridSize; r++)
+            for (int c = 0; c < GridSize; c++)
+                _tiles[r, c].color = ((r + c) % 2 == 0) ? _colA : _colB;
+    }
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void AutoCreate()
     {
+        if (Instance != null) return; // already alive — DontDestroyOnLoad persists it
         var go = new GameObject("[InfiniteBackground]");
         DontDestroyOnLoad(go);
         go.AddComponent<InfiniteBackground>();
@@ -32,6 +53,7 @@ public class InfiniteBackground : MonoBehaviour
 
     void Awake()
     {
+        Instance = this;
         // Build a 1×1 white sprite for tinting
         var tex = new Texture2D(1, 1, TextureFormat.RGBA32, false);
         tex.SetPixel(0, 0, Color.white);
@@ -56,7 +78,7 @@ public class InfiniteBackground : MonoBehaviour
 
                 var sr             = tileGo.AddComponent<SpriteRenderer>();
                 sr.sprite          = sprite;
-                sr.color           = ((r + c) % 2 == 0) ? ColA : ColB;
+                sr.color           = ((r + c) % 2 == 0) ? _colA : _colB;
                 sr.sortingOrder    = -100;
                 _tiles[r, c]       = sr;
             }
