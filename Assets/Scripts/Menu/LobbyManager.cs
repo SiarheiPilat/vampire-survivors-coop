@@ -39,6 +39,7 @@ namespace VampireSurvivors.Menu
             "giovanna",     // Gatti Amari (+20% speed, +1% ProjSpeed/level)
             "pugnala",      // Phiera Der Tuphello + Eight The Sparrow (twin pistols, speed 7.4)
             "poppea",       // Song of Mana (+20% speed, +1% Duration/level)
+            "clerici",      // Holy Water (HP=150, +0.5 HpRegen/s at start)
         };
 
         // Per-slot state

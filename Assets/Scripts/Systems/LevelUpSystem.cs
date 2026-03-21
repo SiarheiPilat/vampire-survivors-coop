@@ -203,6 +203,17 @@ namespace VampireSurvivors.Systems
                                 });
                             break;
 
+                        // Laurel: defensive shield, auto-granted at level 15 to all characters
+                        case 15:
+                            if (!SystemAPI.HasComponent<LaurelState>(entity))
+                                ecb.AddComponent(entity, new LaurelState
+                                {
+                                    Timer        = 0f,
+                                    Cooldown     = 10.0f, // wiki: 10.0s base CD
+                                    InvulDuration = 0.5f, // wiki: ~0.5s invulnerability per pulse
+                                });
+                            break;
+
                         // Clock Lancet: auto-granted at level 11 to all characters
                         case 11:
                             if (!SystemAPI.HasComponent<ClockLancetState>(entity))

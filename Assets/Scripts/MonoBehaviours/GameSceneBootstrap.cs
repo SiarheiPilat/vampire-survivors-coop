@@ -281,6 +281,30 @@ namespace VampireSurvivors.MonoBehaviours
                     Debug.Log($"[GameSceneBootstrap] P{slot} Giovanna: Gatti Amari, HP=100, Speed=8.4, +1%ProjSpeed/lv");
                     break;
 
+                case "clerici":
+                    // Wiki: Santa Water starter, HP=150 (+50), HpRegen=0.5/s (+0.5 Recovery), Speed=7.0
+                    SetBaseStats(em, entity, hp: 150, speed: 7.0f);
+                    if (em.HasComponent<WeaponState>(entity))
+                        em.RemoveComponent<WeaponState>(entity);
+                    em.AddComponentData(entity, new HolyWaterState
+                    {
+                        Timer          = 0f,
+                        Cooldown       = 6.0f,
+                        Damage         = 20f,
+                        Speed          = 8f,
+                        MaxRange       = 4f,
+                        Radius         = 1.5f,
+                        PuddleLifetime = 5.0f,
+                        TickCooldown   = 0.5f,
+                        Amount         = 1,
+                        Rng            = Unity.Mathematics.Random.CreateFromIndex((uint)(slot * 71 + 3))
+                    });
+                    var clericiStats = em.GetComponentData<PlayerStats>(entity);
+                    clericiStats.HpRegen = 0.5f; // wiki: +0.5 Recovery at start
+                    em.SetComponentData(entity, clericiStats);
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Clerici: HolyWater, HP=150, HpRegen=0.5/s");
+                    break;
+
                 case "poppea":
                     // Wiki: Song of Mana starter, HP 100, Speed +20% = 8.4, +1% DurationMult per level
                     SetBaseStats(em, entity, hp: 100, speed: 8.4f);

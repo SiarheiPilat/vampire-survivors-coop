@@ -1,16 +1,20 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~04:50
+> Last updated: 2026-03-21 ~05:10
 
 ## Next Up (priority order)
 
 - [ ] CharacterRegistry ScriptableObject (replace hard-coded array in LobbyManager)
-- [ ] Laurel weapon (Clerici's starter — shield/barrier that absorbs damage), then Crimson Shroud evolution
+- [ ] Metaglio Left + Right passives → Crimson Shroud evolution (Laurel evolved form)
 - [ ] Map variety: second stage tileset + different enemy spawns
 - [ ] Second map/stage — different background tile set + spawn weights (more skeletons/ghouls, fewer bats)
-- [ ] Crimson Shroud (complex — requires Laurel + Metaglio Left + Metaglio Right)
 
 ## Completed
+
+### 2026-03-21 (Session 22 — ~05:10)
+
+- [x] **Laurel weapon** (`LaurelState` + `LaurelSystem`) — 10.0s CD, 0.5s InvulDuration; every Cooldown×CooldownMult seconds sets player `Invincible.Timer = InvulDuration×DurationMult`; integrates with existing ContactDamageSystem (already skips invincible players); Burst-compiled; auto-granted at level 15; no Amount/damage upgrade (wiki: only benefits from Cooldown); Crimson Shroud evolution deferred (needs Metaglio L+R)
+- [x] **Santa Clerici** character — Holy Water starter (same stats as Yatta Cavallo), HP=150 (+50 wiki), HpRegen=0.5/s (+0.5 Recovery wiki), Speed=7.0; added to LobbyManager roster
 
 ### 2026-03-21 (Session 21 — ~04:50)
 

@@ -499,6 +499,24 @@ namespace VampireSurvivors.Components
     }
 
     /// <summary>
+    /// Per-player Laurel weapon state — defensive shield that grants periodic invincibility.
+    /// Every Cooldown seconds, grants the player InvulDuration seconds of invincibility
+    /// (sets Invincible.Timer). ContactDamageSystem already skips damage when Invincible.Timer > 0.
+    /// Wiki base stats: Cooldown 10.0 s, Duration 0.5 s (benefits from DurationMult and CooldownMult).
+    /// Auto-granted at level 15; Clerici starts with Holy Water (not Laurel).
+    ///
+    /// Evolved (Crimson Shroud = Laurel + Metaglio Left + Metaglio Right): deferred.
+    /// </summary>
+    public struct LaurelState : IComponentData
+    {
+        public float Timer;          // counts down to next shield pulse
+        public float Cooldown;       // base: 10.0s; min 8s at max level (wiki)
+        public float InvulDuration;  // base: 0.5s invulnerability granted each pulse
+        /// <summary>True after Crimson Shroud evolution (deferred — requires Metaglio L+R).</summary>
+        public bool  IsEvolved;
+    }
+
+    /// <summary>
     /// Per-player Song of Mana weapon state (Poppea Pecorina's starter).
     /// Every Cooldown seconds, pulses a tall vertical column of mana centered on the player,
     /// damaging all enemies within the column's rectangular bounds.
