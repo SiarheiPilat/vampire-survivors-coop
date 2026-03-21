@@ -31,6 +31,9 @@ namespace VampireSurvivors.MonoBehaviours
         [SerializeField] GameObject gameOverPanel;
         [SerializeField] TMP_Text   gameOverTimeText;
 
+        [Header("Score Screen")]
+        [SerializeField] VampireSurvivors.Menu.CharacterRegistry characterRegistry;
+
         static readonly Color HpColorHigh   = new Color(0.20f, 0.80f, 0.20f, 1f);
         static readonly Color HpColorMid    = new Color(0.90f, 0.80f, 0.10f, 1f);
         static readonly Color HpColorLow    = new Color(0.85f, 0.15f, 0.15f, 1f);
@@ -359,55 +362,99 @@ namespace VampireSurvivors.MonoBehaviours
                 gameOverTimeText.text = $"Survived  {total / 60:00}:{total % 60:00}";
             }
 
-            // Append run stats (kills, gold) as text lines inside the game-over panel
-            var goWorld = World.DefaultGameObjectInjectionWorld;
-            if (goWorld != null)
-            {
-                using var gq = goWorld.EntityManager.CreateEntityQuery(
-                    ComponentType.ReadOnly<SharedGold>());
-                if (gq.CalculateEntityCount() > 0)
-                {
-                    using var arr = gq.ToComponentDataArray<SharedGold>(Unity.Collections.Allocator.Temp);
-                    var gs = arr[0];
-                    AddStatLine(gameOverPanel, $"Enemies Killed  {gs.EnemiesKilled}", -50f);
-                    AddStatLine(gameOverPanel, $"Gold Earned  {gs.Total}", -90f);
-                }
-            }
+            BuildScoreScreen(gameOverPanel, victory: false);
         }
 
         void TriggerVictory()
         {
             _victory = true;
-            Time.timeScale = 0f; // pause the game on victory
+            Time.timeScale = 0f;
 
-            // Re-use the game-over panel as the victory panel (swap text)
             if (gameOverPanel == null) return;
             gameOverPanel.SetActive(true);
 
             if (gameOverTimeText != null)
                 gameOverTimeText.text = "YOU SURVIVED 30 MINUTES!";
 
-            // Append stats
-            var goWorld = World.DefaultGameObjectInjectionWorld;
-            if (goWorld != null)
-            {
-                using var gq = goWorld.EntityManager.CreateEntityQuery(
-                    ComponentType.ReadOnly<SharedGold>());
-                if (gq.CalculateEntityCount() > 0)
-                {
-                    using var arr = gq.ToComponentDataArray<SharedGold>(Unity.Collections.Allocator.Temp);
-                    var gs = arr[0];
-                    AddStatLine(gameOverPanel, $"Enemies Killed  {gs.EnemiesKilled}", -50f);
-                    AddStatLine(gameOverPanel, $"Gold Earned  {gs.Total}", -90f);
-                }
-            }
+            BuildScoreScreen(gameOverPanel, victory: true);
 
-            // Tint the panel green for victory
             var bg = gameOverPanel.GetComponent<UnityEngine.UI.Image>();
             if (bg != null) bg.color = new Color(0.05f, 0.25f, 0.05f, 0.92f);
         }
 
-        static void AddStatLine(GameObject panel, string text, float yOffset)
+        /// <summary>
+        /// Populates the game-over / victory panel with per-player rows + team stats.
+        /// Layout (top-to-bottom from panel center):
+        ///   y=-40  Per-player rows: "P1 — CharName  Lv X"
+        ///   …      (one row per filled slot, spaced 38 px)
+        ///   gap    Divider line
+        ///   …      Team stats: Enemies Killed / Gold Earned
+        /// </summary>
+        void BuildScoreScreen(GameObject panel, bool victory)
+        {
+            var world = World.DefaultGameObjectInjectionWorld;
+            if (world == null) return;
+
+            var em = world.EntityManager;
+
+            // --- Gather per-player level data (indexed by PlayerIndex.Value 0-3) ---
+            var playerLevels = new int[4];
+            using (var pq = em.CreateEntityQuery(
+                ComponentType.ReadOnly<PlayerTag>(),
+                ComponentType.ReadOnly<PlayerIndex>(),
+                ComponentType.ReadOnly<PlayerStats>()))
+            {
+                using var pEntities = pq.ToEntityArray(Unity.Collections.Allocator.Temp);
+                for (int i = 0; i < pEntities.Length; i++)
+                {
+                    var idx   = em.GetComponentData<PlayerIndex>(pEntities[i]);
+                    var stats = em.GetComponentData<PlayerStats>(pEntities[i]);
+                    if (idx.Value < 4) playerLevels[idx.Value] = stats.Level;
+                }
+            }
+
+            // --- Per-player rows ---
+            float yOffset = -40f;
+            const float rowStep = 38f;
+
+            var session = VampireSurvivors.Menu.GameSession.Instance;
+            for (int i = 0; i < 4; i++)
+            {
+                bool filled = session != null && session.Slots[i].Filled;
+                if (!filled && playerLevels[i] == 0) continue;
+
+                string charId      = session != null ? session.Slots[i].CharacterId : "";
+                string charDisplay = characterRegistry != null
+                    ? characterRegistry.GetDisplayName(charId)
+                    : (string.IsNullOrEmpty(charId) ? $"P{i + 1}"
+                       : char.ToUpper(charId[0]) + (charId.Length > 1 ? charId[1..] : ""));
+                int lv = playerLevels[i] > 0 ? playerLevels[i] : 1;
+
+                AddStatLine(panel,
+                    $"P{i + 1}  —  {charDisplay,-14}  Lv {lv,2}",
+                    yOffset,
+                    fontSize: 20f,
+                    color: victory ? new Color(0.6f, 1f, 0.6f) : new Color(0.85f, 0.85f, 1f));
+                yOffset -= rowStep;
+            }
+
+            // Gap between player rows and team stats
+            yOffset -= 12f;
+
+            // --- Team stats ---
+            using var gq = em.CreateEntityQuery(ComponentType.ReadOnly<SharedGold>());
+            if (gq.CalculateEntityCount() > 0)
+            {
+                using var arr = gq.ToComponentDataArray<SharedGold>(Unity.Collections.Allocator.Temp);
+                var gs = arr[0];
+                AddStatLine(panel, $"Enemies Killed    {gs.EnemiesKilled}", yOffset);
+                yOffset -= rowStep;
+                AddStatLine(panel, $"Gold Earned       {gs.Total}", yOffset);
+            }
+        }
+
+        static void AddStatLine(GameObject panel, string text, float yOffset,
+                                float fontSize = 22f, Color? color = null)
         {
             var go  = new GameObject("StatLine");
             go.transform.SetParent(panel.transform, false);
@@ -415,12 +462,12 @@ namespace VampireSurvivors.MonoBehaviours
             rt.anchorMin        = new Vector2(0.5f, 0.5f);
             rt.anchorMax        = new Vector2(0.5f, 0.5f);
             rt.pivot            = new Vector2(0.5f, 0.5f);
-            rt.sizeDelta        = new Vector2(400f, 36f);
+            rt.sizeDelta        = new Vector2(460f, 36f);
             rt.anchoredPosition = new Vector2(0f, yOffset);
             var tmp = go.AddComponent<TMPro.TextMeshProUGUI>();
             tmp.text      = text;
-            tmp.fontSize  = 22f;
-            tmp.color     = Color.white;
+            tmp.fontSize  = fontSize;
+            tmp.color     = color ?? Color.white;
             tmp.alignment = TMPro.TextAlignmentOptions.Center;
         }
 

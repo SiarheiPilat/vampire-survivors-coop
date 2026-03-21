@@ -1,14 +1,19 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~06:40
+> Last updated: 2026-03-21 ~07:10
 
 ## Next Up (priority order)
 
-- [ ] **Orologion passive + Infinite Corridor fix** — `OrologionStacks` passive (Clock Lancet evolution gate; wiki: Orologion + Silver Ring + Gold Ring); currently InfiniteCorridorEvolution gates on SilverRing+GoldRing stacks but wiki requires Orologion too — needs Orologion passive added and gate updated
 - [ ] **Second stage / map variety** — different background tileset, enemy spawn weights (more skeletons/ghouls at higher waves), stage-select at lobby
-- [ ] **Score screen** — end-of-run stats: time survived, enemies killed, gold, levels reached per player; polished overlay instead of the current GameOverPanel
+- [ ] **Achievements / Unlock tracking** — track Orologion collected count (20 = Whiteout unlock); persist with PlayerPrefs
+- [ ] **Bracer passive in level-up pool fix** — Bracer and other passives that only meaningfully apply to specific weapons should show only when relevant weapons are present
 
 ## Completed
+
+### 2026-03-21 (Session 26 — ~07:10)
+
+- [x] **Orologion floor item** — `OrologionPickup` IComponentData; `OrologionPickupSystem` (main thread, walk-over 0.6u radius) freezes ALL on-screen enemies for 10s via existing `Frozen` + `FrozenTickSystem`; 1.5% base drop chance on enemy death (scales with Luck); `OrologionPickupPrefab` white-blue quad (0.35u); `SpawnerData/SpawnerAuthoring` wired; `PickupKind.OrologionPickup` added; note: InfiniteCorridorEvolution gate (Clock Lancet + Silver Ring + Gold Ring) is already correct per wiki
+- [x] **Score screen overhaul** — `BuildScoreScreen(panel, victory)` helper shared by TriggerGameOver + TriggerVictory; shows per-player row: "P1 — CharName  Lv X" (colored blue/green for dead/victory); reads PlayerStats.Level + PlayerIndex from ECS, CharacterId from GameSession; falls back to capitalized id if CharacterRegistry not assigned; team stats (kills, gold) follow with dynamic y-offset; `[SerializeField] CharacterRegistry characterRegistry` added to HUDManager
 
 ### 2026-03-21 (Session 25 — ~06:40)
 
