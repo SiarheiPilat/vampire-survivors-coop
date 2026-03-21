@@ -1,6 +1,6 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~03:30
+> Last updated: 2026-03-21 ~03:50
 
 ## Next Up (priority order)
 
@@ -8,10 +8,14 @@
 - [ ] New characters: Pugnala (needs Phiera Der Tuphello + Eight The Sparrow twin pistols, complex paired weapon system)
 - [ ] Map variety: second stage tileset + different enemy spawns
 - [ ] Crimson Shroud (check wiki — separate weapon or misnamed evo?)
-- [ ] Vicious Hunger evolution (Gatti Amari + Stone Mask) — needs Stone Mask passive first
 - [ ] Second map/stage — different background tile set + spawn weights (more skeletons/ghouls, fewer bats)
 
 ## Completed
+
+### 2026-03-21 (Session 17 — ~03:50)
+
+- [x] **Stone Mask passive** — `PlayerStats.GoldMult` +0.1 per pickup (additive, wiki: +10% Greed/level); `GoldCoinSystem` tracks nearest player index, applies `coin.Value × GoldMult` (rounded); default 1.0
+- [x] **Vicious Hunger evolution** (Gatti Amari + Stone Mask) — `GattiAmariState.IsEvolved=true`; 30 dmg, 8.0s CD, 2 giant cats (scale=0.6u), 7.0s lifetime, 1.5u×AreaMult AoE radius; `GattiAmariSystem` branches on `IsEvolved`; `GattiAmariAmount` + Duplicator blocked when evolved; gate: `GoldMult > 1.0`
 
 ### 2026-03-21 (Session 16 — ~03:30)
 
