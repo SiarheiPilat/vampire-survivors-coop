@@ -5,9 +5,14 @@
 ## Next Up (priority order)
 
 - [ ] **HUD stat tooltip on level-up cards** — show per-card stat line (e.g. "Might: 1.1 → 1.2") so players can see what they're gaining
-- [ ] **More characters** — Mortaccio, Yatta, Krochi, Dommario, Giovanna, Clerici, Poppea, Pugnala, Bi-An Zi are in `GameSceneBootstrap` but not in the Lobby character list yet; add to `LobbyManager.AllCharacterIds`
+- [ ] **Buff/debuff indicator bar** — small icon strip above each player's HP bar showing active timed effects (invincibility, freeze immunity, etc.)
 
 ## Completed
+
+### 2026-03-21 (Session 39 — ~22:45)
+
+- [x] **Lobby character stat descriptions** — `LobbyManager` now generates built-in stat summaries for all 16 characters (e.g. "Whip | HP 120 | Spd 7.0 | +10% Might | +1% Might/lv"); used when no CharacterRegistry is assigned or registry lacks a description; `FallbackDisplayName()` switch handles proper display names for all characters; all 16 chars now have correct display names + stat lines in lobby
+- [x] **CLAUDE.md characters section updated** — all 16 implemented characters documented with current stats and per-level bonuses
 
 ### 2026-03-21 (Session 38 — ~22:30)
 

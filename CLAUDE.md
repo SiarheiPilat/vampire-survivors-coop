@@ -124,14 +124,22 @@ Characters are selected in the lobby (`LobbyManager`). `GameSceneBootstrap` read
 `GameSession.Slots[i].CharacterId` and swaps the baked Whip for the correct starting weapon.
 `LevelUpSystem` already guards with `!HasComponent<X>` so it won't re-grant starting weapons.
 
-- [x] Antonio — Whip (baked default), HP=120, speed=7.0, Might=1.1
-- [x] Imelda — Magic Wand (replaces Whip at start), HP=100, speed=7.0, XpMult=1.1
-- [x] Pasqualina — Runetracer (replaces Whip at start), HP=130, speed=7.0, no stat bonus
+- [x] Antonio — Whip (baked default), HP=120, speed=7.0, Might=1.1, +1% Might/lv
+- [x] Imelda — Magic Wand (replaces Whip at start), HP=100, speed=7.0, XpMult=1.1, +1% XP/lv
+- [x] Pasqualina — Runetracer (replaces Whip at start), HP=130, speed=7.0, +1% ProjSpeed/lv
 - [x] Gennaro — Knife (replaces Whip at start), HP=100, speed=7.7, no stat bonus
-- [x] Arca — Garlic (replaces Whip at start), HP=130, speed=7.0, CooldownMult=0.95 (-5% cooldown)
-- [x] Porta — Lightning Ring (replaces Whip at start), HP=100, speed=7.5, no stat bonus
-- [x] Lama — Axe (replaces Whip at start), HP=130, speed=6.5, Might=1.1 (+10% damage)
-- [ ] *(others later)*
+- [x] Arca — Garlic (replaces Whip at start), HP=130, speed=7.0, CooldownMult=0.95 (-5% cooldown), -1% CD/lv
+- [x] Porta — Lightning Ring (replaces Whip at start), HP=100, speed=7.5, +1% Area/lv
+- [x] Lama — Axe (replaces Whip at start), HP=130, speed=6.5, Might=1.1 (+10% damage), +1% Might/lv
+- [x] Mortaccio — Bone (replaces Whip at start), HP=100, speed=7.0, no stat bonus
+- [x] Yatta Cavallo — Holy Water (replaces Whip at start), HP=100, speed=7.0, no stat bonus
+- [x] Krochi — Cross (replaces Whip at start), HP=100, speed=9.1, starts with 1 ReviveStock (+1 more at lv33)
+- [x] Dommario — King Bible (replaces Whip at start), HP=100, speed=4.2, DurationMult=1.4 & ProjectileSpeedMult=1.4
+- [x] Giovanna — Gatti Amari (replaces Whip at start), HP=100, speed=8.4, +1% ProjSpeed/lv
+- [x] Pugnala — Phiera Der Tuphello + Eight The Sparrow (replaces Whip at start), HP=100, speed=7.4
+- [x] Poppea — Song of Mana (replaces Whip at start), HP=100, speed=8.4, +1% Duration/lv
+- [x] Clerici — Holy Water (replaces Whip at start), HP=150, speed=7.0, HpRegen=0.5/s
+- [x] Bi-An Zi — Peachone + Ebony Wings (replaces Whip at start), HP=100, speed=7.0
 
 ### Enemies
 

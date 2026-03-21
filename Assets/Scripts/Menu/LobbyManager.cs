@@ -270,10 +270,63 @@ namespace VampireSurvivors.Menu
             string id   = _slotChar[slot];
             string name = characterRegistry != null
                 ? characterRegistry.GetDisplayName(id)
-                : (string.IsNullOrEmpty(id) ? "Unknown" : char.ToUpper(id[0]) + (id.Length > 1 ? id[1..] : ""));
-            string desc = characterRegistry != null ? characterRegistry.GetDescription(id) : "";
+                : FallbackDisplayName(id);
+            string desc = characterRegistry != null
+                ? characterRegistry.GetDescription(id)
+                : null;
+            // Fall back to built-in stat summary when registry has no description
+            if (string.IsNullOrEmpty(desc))
+                desc = GetBuiltInDescription(id);
             slots[slot].ShowJoined(name, desc, _slotCustom[slot]);
         }
+
+        static string FallbackDisplayName(string id) => id switch
+        {
+            "antonio"     => "Antonio",
+            "imelda"      => "Imelda",
+            "pasqualina"  => "Pasqualina",
+            "gennaro"     => "Gennaro",
+            "arca"        => "Arca",
+            "porta"       => "Porta",
+            "lama"        => "Lama",
+            "mortaccio"   => "Mortaccio",
+            "yattacavallo"=> "Yatta Cavallo",
+            "krochi"      => "Krochi",
+            "dommario"    => "Dommario",
+            "giovanna"    => "Giovanna",
+            "pugnala"     => "Pugnala",
+            "poppea"      => "Poppea",
+            "clerici"     => "Clerici",
+            "bianzi"      => "Bi-An Zi",
+            _ => string.IsNullOrEmpty(id) ? "Unknown"
+                 : char.ToUpper(id[0]) + (id.Length > 1 ? id[1..] : ""),
+        };
+
+        /// <summary>
+        /// Built-in stat summary displayed in the lobby slot when no CharacterRegistry is assigned
+        /// or the assigned registry lacks a description for this character.
+        /// Format: weapon | HP xxx | speed xxx | stat bonus | per-level bonus
+        /// </summary>
+        static string GetBuiltInDescription(string id) => id switch
+        {
+            "antonio"      => "Whip | HP 120 | Spd 7.0 | +10% Might | +1% Might/lv",
+            "imelda"       => "Magic Wand | HP 100 | Spd 7.0 | +10% XP | +1% XP/lv",
+            "pasqualina"   => "Runetracer | HP 130 | Spd 7.0 | +1% ProjSpeed/lv",
+            "gennaro"      => "Knife | HP 100 | Spd 7.7 | (no bonus)",
+            "arca"         => "Garlic | HP 130 | Spd 7.0 | −5% CD | −1% CD/lv",
+            "porta"        => "Lightning Ring | HP 100 | Spd 7.5 | +1% Area/lv",
+            "lama"         => "Axe | HP 130 | Spd 6.5 | +10% Might | +1% Might/lv",
+            "mortaccio"    => "Bone | HP 100 | Spd 7.0",
+            "yattacavallo" => "Holy Water | HP 100 | Spd 7.0",
+            "krochi"       => "Cross | HP 100 | Spd 9.1 | 1 Auto-revive",
+            "dommario"     => "King Bible | HP 100 | Spd 4.2 | +40% Duration & ProjSpeed",
+            "giovanna"     => "Gatti Amari | HP 100 | Spd 8.4 | +1% ProjSpeed/lv",
+            "pugnala"      => "Phiera + Eight | HP 100 | Spd 7.4",
+            "poppea"       => "Song of Mana | HP 100 | Spd 8.4 | +1% Duration/lv",
+            "clerici"      => "Holy Water | HP 150 | Spd 7.0 | 0.5 HP/s Regen",
+            "bianzi"       => "Peachone + Ebony Wings | HP 100 | Spd 7.0",
+            _ => "",
+        };
 
         int IndexOfId(string id)
         {
