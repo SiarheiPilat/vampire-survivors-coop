@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
@@ -18,29 +17,21 @@ namespace VampireSurvivors.Menu
     /// </summary>
     public class LobbyManager : MonoBehaviour
     {
-        [SerializeField] PlayerSlotUI[] slots;          // 4 slots, assigned in Inspector
-        [SerializeField] Button         playButton;
-        [SerializeField] GameObject     settingsPanel;
+        [SerializeField] PlayerSlotUI[]    slots;              // 4 slots, assigned in Inspector
+        [SerializeField] Button            playButton;
+        [SerializeField] GameObject        settingsPanel;
+        [SerializeField] CharacterRegistry characterRegistry;  // assign CharacterRegistry.asset in Inspector
 
-        // Characters available — replace with CharacterRegistry ScriptableObject later
-        static readonly string[] Characters =
+        // Fallback list used when no CharacterRegistry asset is assigned
+        static readonly string[] s_FallbackIds =
         {
-            "antonio",   // Whip
-            "imelda",    // Magic Wand
-            "pasqualina",// Runetracer
-            "gennaro",   // Knife
-            "arca",      // Garlic
-            "porta",     // Lightning Ring
-            "lama",         // Axe
-            "mortaccio",    // Bone
-            "yattacavallo", // Holy Water
-            "krochi",       // Cross  (+30% speed, 1 auto-revive)
-            "dommario",     // King Bible (-40% speed, +40% Duration/Speed)
-            "giovanna",     // Gatti Amari (+20% speed, +1% ProjSpeed/level)
-            "pugnala",      // Phiera Der Tuphello + Eight The Sparrow (twin pistols, speed 7.4)
-            "poppea",       // Song of Mana (+20% speed, +1% Duration/level)
-            "clerici",      // Holy Water (HP=150, +0.5 HpRegen/s at start)
+            "antonio", "imelda", "pasqualina", "gennaro", "arca", "porta", "lama",
+            "mortaccio", "yattacavallo", "krochi", "dommario", "giovanna",
+            "pugnala", "poppea", "clerici",
         };
+
+        int   CharacterCount => characterRegistry != null ? characterRegistry.Count : s_FallbackIds.Length;
+        string IdAt(int i)   => characterRegistry != null ? characterRegistry.IdAt(i) : s_FallbackIds[i];
 
         // Per-slot state
         readonly InputDevice[] _slotDevice = new InputDevice[4];
@@ -118,7 +109,7 @@ namespace VampireSurvivors.Menu
             _slotChar[slot]   = charId;
             _slotCustom[slot] = customIdx;
 
-            slots[slot].ShowJoined(charId, customIdx);
+            RefreshSlotDisplay(slot);
             RefreshPlayButton();
         }
 
@@ -210,11 +201,11 @@ namespace VampireSurvivors.Menu
 
         void CycleCharacter(int slot, int dir)
         {
-            int idx = System.Array.IndexOf(Characters, _slotChar[slot]);
-            idx = (idx + dir + Characters.Length) % Characters.Length;
-            _slotChar[slot] = Characters[idx];
+            int idx = IndexOfId(_slotChar[slot]);
+            idx = (idx + dir + CharacterCount) % CharacterCount;
+            _slotChar[slot] = IdAt(idx);
             SaveSlot(slot);
-            slots[slot].ShowJoined(_slotChar[slot], _slotCustom[slot]);
+            RefreshSlotDisplay(slot);
         }
 
         void CycleCustomization(int slot, int dir)
@@ -222,7 +213,25 @@ namespace VampireSurvivors.Menu
             const int MaxCustomizations = 4; // placeholder count
             _slotCustom[slot] = (_slotCustom[slot] + dir + MaxCustomizations) % MaxCustomizations;
             SaveSlot(slot);
-            slots[slot].ShowJoined(_slotChar[slot], _slotCustom[slot]);
+            RefreshSlotDisplay(slot);
+        }
+
+        void RefreshSlotDisplay(int slot)
+        {
+            string id   = _slotChar[slot];
+            string name = characterRegistry != null
+                ? characterRegistry.GetDisplayName(id)
+                : (string.IsNullOrEmpty(id) ? "Unknown" : char.ToUpper(id[0]) + (id.Length > 1 ? id[1..] : ""));
+            string desc = characterRegistry != null ? characterRegistry.GetDescription(id) : "";
+            slots[slot].ShowJoined(name, desc, _slotCustom[slot]);
+        }
+
+        int IndexOfId(string id)
+        {
+            for (int i = 0; i < CharacterCount; i++)
+                if (string.Equals(IdAt(i), id, System.StringComparison.OrdinalIgnoreCase))
+                    return i;
+            return 0;
         }
 
         void SaveSlot(int slot)

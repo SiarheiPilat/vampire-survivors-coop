@@ -14,8 +14,9 @@ namespace VampireSurvivors.Menu
 
         [Header("Joined State")]
         [SerializeField] GameObject joinedPanel;
-        [SerializeField] TMP_Text   playerLabel;  // "P1", "P2", …
+        [SerializeField] TMP_Text   playerLabel;        // "P1", "P2", …
         [SerializeField] TMP_Text   characterName;
+        [SerializeField] TMP_Text   characterDescription; // optional — assign in Inspector
         [SerializeField] TMP_Text   customizationName;
 
         public int SlotIndex { get; set; }
@@ -26,15 +27,19 @@ namespace VampireSurvivors.Menu
             joinedPanel.SetActive(false);
         }
 
-        public void ShowJoined(string character, int customizationIndex)
+        /// <param name="displayName">Pre-resolved display name (e.g. "Antonio").</param>
+        /// <param name="description">Optional flavour / stat line. Ignored if field unassigned.</param>
+        /// <param name="customizationIndex">0-based skin index.</param>
+        public void ShowJoined(string displayName, string description, int customizationIndex)
         {
             emptyPanel.SetActive(false);
             joinedPanel.SetActive(true);
             playerLabel.text       = $"P{SlotIndex + 1}";
-            characterName.text     = string.IsNullOrEmpty(character)
-                ? "Unknown"
-                : char.ToUpper(character[0]) + (character.Length > 1 ? character[1..] : "");
+            characterName.text     = string.IsNullOrEmpty(displayName) ? "Unknown" : displayName;
             customizationName.text = $"Skin {customizationIndex + 1}";
+
+            if (characterDescription != null)
+                characterDescription.text = description ?? "";
         }
     }
 }

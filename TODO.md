@@ -1,13 +1,20 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~05:30
+> Last updated: 2026-03-21 ~06:10
 
 ## Next Up (priority order)
 
-- [ ] CharacterRegistry ScriptableObject (replace hard-coded array in LobbyManager)
+- [ ] **Peachone + Ebony Wings + Vandalier** — `PeachoneState`/`EbonyWingsState` rotating projectile weapons; Bi An Zi character (HP=100, Speed=7.0); Vandalier evolution (Peachone + Ebony Wings)
 - [ ] Map variety: second stage tileset + different enemy spawns
 - [ ] Second map/stage — different background tile set + spawn weights (more skeletons/ghouls, fewer bats)
-- [ ] New weapon: Peachone (Bi An Zi's egg-bird weapon, fires eggs that bounce)
+
+## Completed
+
+### 2026-03-21 (Session 24 — ~06:10)
+
+- [x] **CharacterRegistry ScriptableObject** — `CharacterDefinition` serializable class (Id, DisplayName, Description); `CharacterRegistry : ScriptableObject` with `Find(id)`, `GetDisplayName(id)`, `GetDescription(id)`, `IdAt(index)`, `Count`; `[CreateAssetMenu]` menu entry; `Assets/Data/CharacterRegistry.asset` pre-populated with all 15 characters (Antonio → Clerici) with display names + stat-summary descriptions
+- [x] **LobbyManager** — replaced `static readonly string[] Characters` with `[SerializeField] CharacterRegistry characterRegistry` + `s_FallbackIds` fallback; `CharacterCount`/`IdAt()` helpers; `RefreshSlotDisplay(slot)` resolves display name + description from registry; `IndexOfId()` replaces `Array.IndexOf`; `CycleCharacter`/`CycleCustomization`/`JoinSlot` all use new helpers
+- [x] **PlayerSlotUI** — `ShowJoined(string displayName, string description, int customizationIndex)` — now accepts pre-resolved display name (no manual capitalize); optional `[SerializeField] TMP_Text characterDescription` field for description line (null-safe)
 
 ## Completed
 
