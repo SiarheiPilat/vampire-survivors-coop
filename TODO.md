@@ -5,11 +5,15 @@
 ## Next Up (priority order)
 
 - [x] **Achievement display** — `AchievementHintPanel` (auto-created in Lobby scene); shows "Next unlock: Name — hint" at bottom; finds closest locked char by completion ratio
-- [ ] **Floor item magnet** — when player walks over XpGem field, items magnetize toward them; scale magnet radius with Attractorb stacks
+- [x] **Floor item magnet** — `GoldCoinSystem` + `HealthPickupSystem` now move items toward nearest player within 4u base magnet radius (× `MagnetRadiusMult` per Attractorb); 6 u/s attraction speed; collect at 0.6u; no movement outside radius (idle until in range)
 - [x] **Curse mechanic active effect** — `EnemyMovementSystem` computes team average Curse each frame, passes `CurseSpeedMult = 1 + avgCurse × 0.1` to both `MoveTowardPlayerJob` and `GhostMoveJob`; `ContactDamageSystem` computes `CurseDamageMult` the same way and scales `ContactDamage` before Armor subtraction; wiki: +10% speed and +10% damage per Curse point
 - [ ] **Victory Death boss** — at 30:00 spawn unkillable Death enemy (wiki: 666 contact dmg, 666 HP regen/s, cannot be killed); spawns at every player position simultaneously
 
 ## Completed
+
+### 2026-03-21 (Session 34 — ~21:30)
+
+- [x] **Floor item magnet** — `GoldCoinSystem` rewritten: gold coins now slide toward nearest player at 6 u/s within `4u × MagnetRadiusMult`; `HealthPickupSystem` rewritten identically; both still collect at 0.6u; both add `PlayerStats` to their player queries to read `MagnetRadiusMult`; scales naturally with Attractorb passive; items idle until player is in range
 
 ### 2026-03-21 (Session 33 — ~21:15)
 

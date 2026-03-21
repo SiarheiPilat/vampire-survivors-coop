@@ -8,9 +8,9 @@ using VampireSurvivors.Components;
 namespace VampireSurvivors.Systems
 {
     /// <summary>
-    /// Collects GoldCoin entities when any living player walks within CollectRadius.
-    /// No magnet — players must move to coins.
-    /// Accumulated value is added to the SharedGold singleton each frame.
+    /// Moves GoldCoin entities toward the nearest player when within MagnetRadius
+    /// (4u base × MagnetRadiusMult; scales with Attractorb passive).
+    /// Collects when within CollectRadius (0.6u): adds Value × GoldMult to SharedGold.
     /// </summary>
     [BurstCompile]
     [UpdateBefore(typeof(TransformSystemGroup))]
@@ -47,10 +47,12 @@ namespace VampireSurvivors.Systems
 
             new CollectCoinJob
             {
-                PlayerTransforms = playerTransforms,
-                PlayerGoldMults  = ExtractGoldMults(playerStats, Allocator.TempJob),
-                GoldAccum        = goldAccum,
-                Ecb              = ecb
+                PlayerTransforms    = playerTransforms,
+                PlayerGoldMults     = ExtractGoldMults(playerStats, Allocator.TempJob),
+                PlayerMagnetMults   = ExtractMagnetMults(playerStats, Allocator.TempJob),
+                GoldAccum           = goldAccum,
+                Ecb                 = ecb,
+                DeltaTime           = SystemAPI.Time.DeltaTime,
             }.Run();
 
             playerTransforms.Dispose();
@@ -76,31 +78,58 @@ namespace VampireSurvivors.Systems
             return result;
         }
 
+        static NativeArray<float> ExtractMagnetMults(NativeArray<PlayerStats> stats, Allocator alloc)
+        {
+            var result = new NativeArray<float>(stats.Length, alloc);
+            for (int i = 0; i < stats.Length; i++)
+                result[i] = math.max(1f, stats[i].MagnetRadiusMult);
+            return result;
+        }
+
         [BurstCompile]
         partial struct CollectCoinJob : IJobEntity
         {
-            const float CollectRadius = 0.6f;
+            const float BaseMagnetRadius = 4f;   // scales with Attractorb
+            const float CollectRadius    = 0.6f;
+            const float CoinSpeed        = 6f;
 
             [ReadOnly] public NativeArray<LocalTransform> PlayerTransforms;
             [ReadOnly] public NativeArray<float>          PlayerGoldMults;
+            [ReadOnly] public NativeArray<float>          PlayerMagnetMults;
             public NativeReference<int>                   GoldAccum;
             public EntityCommandBuffer                    Ecb;
+            public float                                  DeltaTime;
 
-            void Execute(Entity entity, in LocalTransform transform, in GoldCoin coin)
+            void Execute(Entity entity, ref LocalTransform transform, in GoldCoin coin)
             {
+                // Find nearest player within magnet radius
+                int   nearestIdx  = -1;
                 float nearestDist = float.MaxValue;
-                int   nearestIdx  = 0;
+
                 for (int i = 0; i < PlayerTransforms.Length; i++)
                 {
-                    float dist = math.distance(transform.Position.xy, PlayerTransforms[i].Position.xy);
-                    if (dist < nearestDist) { nearestDist = dist; nearestIdx = i; }
+                    float dist         = math.distance(transform.Position.xy, PlayerTransforms[i].Position.xy);
+                    float magnetRadius = BaseMagnetRadius * PlayerMagnetMults[i];
+                    if (dist < magnetRadius && dist < nearestDist)
+                    {
+                        nearestDist = dist;
+                        nearestIdx  = i;
+                    }
                 }
+
+                if (nearestIdx < 0) return;
 
                 if (nearestDist <= CollectRadius)
                 {
                     float mult = nearestIdx < PlayerGoldMults.Length ? PlayerGoldMults[nearestIdx] : 1f;
                     GoldAccum.Value += (int)math.round(coin.Value * mult);
                     Ecb.DestroyEntity(entity);
+                }
+                else
+                {
+                    // Move toward player
+                    float3 dir = math.normalizesafe(PlayerTransforms[nearestIdx].Position - transform.Position);
+                    transform.Position += new float3(dir.x, dir.y, 0f) * CoinSpeed * DeltaTime;
                 }
             }
         }
