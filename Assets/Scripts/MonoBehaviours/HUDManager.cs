@@ -50,9 +50,11 @@ namespace VampireSurvivors.MonoBehaviours
         float       _elapsedTime;
         bool        _gameOver;
         bool        _victory;
-        bool        _hadPlayers;  // true once at least 1 player was alive
+        bool        _hadPlayers;    // true once at least 1 player was alive
+        bool        _deathSpawned;  // true after Death boss entities have been spawned
 
-        const float RunDuration = 1800f; // 30 minutes in seconds
+        const float RunDuration         = 1800f; // 30 minutes in seconds
+        const float DeathSpawnLeadTime  = 5f;    // seconds before run end to spawn Death
 
         readonly int[]   _lastLevels     = new int[4];
         readonly float[] _levelUpTimers  = new float[4];
@@ -223,6 +225,14 @@ namespace VampireSurvivors.MonoBehaviours
 
             _elapsedTime += Time.unscaledDeltaTime; // unscaled so timer advances while paused
 
+            // Spawn Death boss 5 s before the run ends as a final threat
+            if (!_deathSpawned && _elapsedTime >= RunDuration - DeathSpawnLeadTime)
+            {
+                SpawnDeathBosses();
+                _deathSpawned = true;
+                StageBanner.Show("DEATH APPROACHES");
+            }
+
             // 30-minute win condition
             if (_elapsedTime >= RunDuration)
             {
@@ -365,6 +375,76 @@ namespace VampireSurvivors.MonoBehaviours
             }
 
             BuildScoreScreen(gameOverPanel, victory: false);
+        }
+
+        /// <summary>
+        /// Spawns one Death entity per living player at their current position.
+        /// Death: HP=666000, ContactDamage=666, MoveSpeed=2.0, Scale=2.0.
+        /// DeathBossTag prevents HealthSystem from destroying it;
+        /// DeathRegenSystem keeps it alive at 666 HP/s.
+        /// Uses SpawnerData.BossPrefab as the visual base if available.
+        /// </summary>
+        void SpawnDeathBosses()
+        {
+            var world = World.DefaultGameObjectInjectionWorld;
+            if (world == null) return;
+
+            var em = world.EntityManager;
+
+            // Gather living player positions
+            using var pq = em.CreateEntityQuery(
+                ComponentType.ReadOnly<PlayerTag>(),
+                ComponentType.ReadOnly<Unity.Transforms.LocalTransform>(),
+                ComponentType.Exclude<Downed>());
+            if (pq.IsEmpty) return;
+
+            using var positions = pq.ToComponentDataArray<Unity.Transforms.LocalTransform>(Allocator.Temp);
+
+            // Attempt to use BossPrefab for visuals; fall back to blank entity
+            Entity bossPrefab = Entity.Null;
+            using var sq = em.CreateEntityQuery(ComponentType.ReadOnly<SpawnerData>());
+            if (sq.CalculateEntityCount() > 0)
+            {
+                using var sd = sq.ToComponentDataArray<SpawnerData>(Allocator.Temp);
+                bossPrefab = sd[0].BossPrefab;
+            }
+
+            foreach (var lt in positions)
+            {
+                Entity death;
+                if (bossPrefab != Entity.Null)
+                {
+                    death = em.Instantiate(bossPrefab);
+                }
+                else
+                {
+                    death = em.CreateEntity();
+                    em.AddComponent<EnemyTag>(death);
+                    em.AddComponent<EnemyStats>(death);
+                    em.AddComponent<Health>(death);
+                    em.AddComponent<Knockback>(death);
+                    em.AddComponent<Unity.Transforms.LocalTransform>(death);
+                }
+
+                em.SetComponentData(death, Unity.Transforms.LocalTransform.FromPositionRotationScale(
+                    lt.Position, Unity.Mathematics.quaternion.identity, 2.0f));
+
+                em.SetComponentData(death, new Health { Current = 666_000, Max = 666_000 });
+                em.SetComponentData(death, new EnemyStats
+                {
+                    MoveSpeed     = 2.0f,
+                    ContactDamage = 666,
+                    XpValue       = 0,   // no XP — Death is a punishment, not a reward
+                });
+
+                em.AddComponent<DeathBossTag>(death);
+
+                // Remove EliteTag if BossPrefab happened to have one baked
+                if (em.HasComponent<EliteTag>(death))
+                    em.RemoveComponent<EliteTag>(death);
+            }
+
+            Debug.Log($"[HUDManager] DEATH spawned at {positions.Length} player position(s)!");
         }
 
         void TriggerVictory()

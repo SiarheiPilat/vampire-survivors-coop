@@ -100,6 +100,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] Achievement display — AchievementHintPanel (Menu assembly, RuntimeInitializeOnLoadMethod auto-created in Lobby scene); shows "Next unlock: Name — hint" gold text strip at bottom; finds closest-to-unlock locked character by completion ratio; self-destroys on scene change
 - [x] Curse active effects — EnemyMovementSystem + ContactDamageSystem compute team avgCurse each frame; CurseSpeedMult = 1 + avgCurse × 0.1 scales enemy movement; CurseDamageMult = same formula scales ContactDamage before Armor; wiki accurate (+10%/Curse point)
 - [x] Floor item magnet — GoldCoinSystem + HealthPickupSystem both magnetize floor items at 4u × MagnetRadiusMult base radius, 6 u/s; collect at 0.6u; extends Attractorb scaling to non-XP pickups
+- [x] Victory Death boss — DeathBossTag IComponentData; DeathRegenSystem +666 HP/s; HealthSystem WithNone<DeathBossTag>; HUDManager spawns one Death per player at 29:55 (5s early), scale=2.0, HP=666000, ContactDamage=666, XpValue=0; shows "DEATH APPROACHES" banner
 
 ### Weapons (clone priority order)
 

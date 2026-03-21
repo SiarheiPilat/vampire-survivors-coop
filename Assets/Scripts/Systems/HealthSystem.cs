@@ -51,9 +51,10 @@ namespace VampireSurvivors.Systems
             if (playerCount > 0) avgLuck /= playerCount;
             float luckMult = 1f + avgLuck; // Luck=0 → 1×, Luck=0.1 → 1.1×, Luck=1.0 → 2×
 
-            // WithNone<Downed> — skip already-downed players so this doesn't re-trigger
+            // WithNone<Downed>      — skip already-downed players
+            // WithNone<DeathBossTag> — Death is unkillable; DeathRegenSystem keeps its HP full
             foreach (var (health, entity) in
-                SystemAPI.Query<RefRO<Health>>().WithNone<Downed>().WithEntityAccess())
+                SystemAPI.Query<RefRO<Health>>().WithNone<Downed, DeathBossTag>().WithEntityAccess())
             {
                 if (health.ValueRO.Current > 0) continue;
 

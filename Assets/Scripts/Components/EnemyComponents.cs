@@ -207,4 +207,12 @@ namespace VampireSurvivors.Components
     /// Death: always drops a Chest in addition to normal XP gem + gold.
     /// </summary>
     public struct EliteTag : IComponentData { }
+
+    /// <summary>
+    /// Marks the Death boss entity that spawns at 29:55 (5 s before the 30:00 run end).
+    /// - HealthSystem skips this entity so it can never be destroyed.
+    /// - DeathRegenSystem restores 666 HP/s to keep it effectively unkillable.
+    /// - Stats at spawn: HP=666000, ContactDamage=666, MoveSpeed=2.0, Scale=2.0.
+    /// </summary>
+    public struct DeathBossTag : IComponentData { }
 }

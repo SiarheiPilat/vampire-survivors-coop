@@ -7,9 +7,13 @@
 - [x] **Achievement display** — `AchievementHintPanel` (auto-created in Lobby scene); shows "Next unlock: Name — hint" at bottom; finds closest locked char by completion ratio
 - [x] **Floor item magnet** — `GoldCoinSystem` + `HealthPickupSystem` now move items toward nearest player within 4u base magnet radius (× `MagnetRadiusMult` per Attractorb); 6 u/s attraction speed; collect at 0.6u; no movement outside radius (idle until in range)
 - [x] **Curse mechanic active effect** — `EnemyMovementSystem` computes team average Curse each frame, passes `CurseSpeedMult = 1 + avgCurse × 0.1` to both `MoveTowardPlayerJob` and `GhostMoveJob`; `ContactDamageSystem` computes `CurseDamageMult` the same way and scales `ContactDamage` before Armor subtraction; wiki: +10% speed and +10% damage per Curse point
-- [ ] **Victory Death boss** — at 30:00 spawn unkillable Death enemy (wiki: 666 contact dmg, 666 HP regen/s, cannot be killed); spawns at every player position simultaneously
+- [x] **Victory Death boss** — `DeathBossTag : IComponentData`; `DeathRegenSystem` restores 666 HP/s; `HealthSystem` now `WithNone<DeathBossTag>()` so it can never be destroyed; `HUDManager.SpawnDeathBosses()` instantiates one Death per living player at 29:55 (5s early) using `SpawnerData.BossPrefab` for visuals (scale 2.0, HP=666000, ContactDamage=666, XpValue=0); StageBanner shows "DEATH APPROACHES" warning
 
 ## Completed
+
+### 2026-03-21 (Session 35 — ~21:45)
+
+- [x] **Victory Death boss** — `DeathBossTag : IComponentData`; `DeathRegenSystem` +666 HP/s (`[UpdateBefore(HealthSystem)]`); `HealthSystem` uses `WithNone<DeathBossTag>()` to skip destruction; `HUDManager._deathSpawned` flag; `SpawnDeathBosses()` at 29:55 spawns one Death per living player at their position (scale 2.0, HP=666000, ContactDmg=666, no XP); reuses `SpawnerData.BossPrefab` for visuals; shows "DEATH APPROACHES" banner via `StageBanner.Show()`
 
 ### 2026-03-21 (Session 34 — ~21:30)
 
