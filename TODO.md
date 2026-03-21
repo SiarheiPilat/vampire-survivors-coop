@@ -1,16 +1,26 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~03:50
+> Last updated: 2026-03-21 ~04:10
 
 ## Next Up (priority order)
 
 - [ ] CharacterRegistry ScriptableObject (replace hard-coded array in LobbyManager)
 - [ ] New characters: Pugnala (needs Phiera Der Tuphello + Eight The Sparrow twin pistols, complex paired weapon system)
+- [ ] Infinite Corridor evolution (Clock Lancet + Silver Ring + Gold Ring)
+- [ ] Silver Ring passive (+Duration) and Gold Ring passive (+Area) needed for Infinite Corridor
 - [ ] Map variety: second stage tileset + different enemy spawns
-- [ ] Crimson Shroud (check wiki — separate weapon or misnamed evo?)
+- [ ] Crimson Shroud (complex — requires Laurel + Metaglio Left + Metaglio Right)
 - [ ] Second map/stage — different background tile set + spawn weights (more skeletons/ghouls, fewer bats)
 
 ## Completed
+
+### 2026-03-21 (Session 18 — ~04:10)
+
+- [x] **Frozen IComponentData** — `Frozen { float Timer }` in EnemyComponents.cs; while present, enemy is immobilised (no movement); weapons still deal damage; `EnemyMovementSystem` both jobs now `[WithNone(Frozen)]`
+- [x] **ClockLancetState** — Cooldown=2.0s, FreezeRadius=6.0u, FreezeDuration=2.0s; auto-granted at level 11 via `LevelUpSystem` (guard: `!HasComponent<ClockLancetState>`)
+- [x] **ClockLancetSystem** — non-Burst; every Cooldown freezes all enemies within 6u; `ComponentLookup<Frozen>` refreshes already-frozen timers in place; ECB adds `Frozen` to new targets; respects CooldownMult + DurationMult
+- [x] **FrozenTickSystem** — Burst ISystem; decrements `Frozen.Timer` each frame; removes via ECB on expire; runs `[UpdateBefore(EnemyMovementSystem)]`
+- [x] **Tiragisú passive** — `+1 ReviveStocks` per upgrade choice pickup; adds `ReviveStocks` component if player doesn't have one (universal, all characters); appears in upgrade pool
 
 ### 2026-03-21 (Session 17 — ~03:50)
 
