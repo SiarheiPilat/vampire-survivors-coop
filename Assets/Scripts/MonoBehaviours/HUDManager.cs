@@ -80,6 +80,7 @@ namespace VampireSurvivors.MonoBehaviours
             GattiAmariAmount,      // Gatti Amari +1 cat
             StoneMask,             // passive: +10% gold earnings
             ViciousHungerEvolution,// Gatti Amari + Stone Mask
+            Tiragisu,              // passive: +1 ReviveStocks
         }
         readonly UpgradeType[] _currentChoices = new UpgradeType[3];
         readonly TMP_Text[]    _btnLabels       = new TMP_Text[3];
@@ -113,6 +114,7 @@ namespace VampireSurvivors.MonoBehaviours
             (UpgradeType.Attractorb,    "Attractorb\n+30% XP magnet radius"),
             (UpgradeType.Wings,         "Wings\n+10% movement speed"),
             (UpgradeType.StoneMask,     "Stone Mask\n+10% gold earnings"),
+            (UpgradeType.Tiragisu,      "Tiragisú\n+1 Revival (auto-revive stock)"),
         };
 
         // Gold display (created programmatically)
@@ -1113,6 +1115,23 @@ namespace VampireSurvivors.MonoBehaviours
                     stats.GoldMult += 0.1f;
                     Debug.Log($"[HUDManager] P{pidx} chose Stone Mask — GoldMult = {stats.GoldMult:F2}×");
                     break;
+                case UpgradeType.Tiragisu:
+                {
+                    // Grant +1 ReviveStock — add the component if the player doesn't have it yet
+                    if (em.HasComponent<ReviveStocks>(_pendingUpgradeEntity))
+                    {
+                        var stocks = em.GetComponentData<ReviveStocks>(_pendingUpgradeEntity);
+                        stocks.Count++;
+                        em.SetComponentData(_pendingUpgradeEntity, stocks);
+                        Debug.Log($"[HUDManager] P{pidx} chose Tiragisú — ReviveStocks = {stocks.Count}");
+                    }
+                    else
+                    {
+                        em.AddComponentData(_pendingUpgradeEntity, new ReviveStocks { Count = 1 });
+                        Debug.Log($"[HUDManager] P{pidx} chose Tiragisú — ReviveStocks = 1 (first revival)");
+                    }
+                    break;
+                }
 
                 case UpgradeType.ViciousHungerEvolution:
                     if (em.HasComponent<GattiAmariState>(_pendingUpgradeEntity))

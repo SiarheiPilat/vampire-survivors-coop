@@ -408,6 +408,20 @@ namespace VampireSurvivors.Components
     /// Summons wandering cats that randomly attack nearby enemies in a small AoE.
     /// Wiki base stats: Damage 10, Cooldown 5.0 s, CatLifetime 5.0 s, Amount 1.
     /// </summary>
+    /// <summary>
+    /// Per-player Clock Lancet weapon state (auto-granted at level 11).
+    /// Every Cooldown seconds, freezes all enemies within FreezeRadius for FreezeDuration seconds.
+    /// Frozen enemies stop moving but still take damage.
+    /// Wiki base stats: Cooldown 2.0 s, Duration 2.0 s.
+    /// </summary>
+    public struct ClockLancetState : IComponentData
+    {
+        public float Timer;
+        public float Cooldown;       // seconds between freeze pulses — wiki base: 2.0s
+        public float FreezeRadius;   // radius of freeze effect — 6.0u
+        public float FreezeDuration; // seconds each enemy stays frozen — wiki base: 2.0s
+    }
+
     public struct GattiAmariState : IComponentData
     {
         public float Timer;

@@ -7,6 +7,17 @@ namespace VampireSurvivors.Components
     public struct EnemyTag : IComponentData { }
 
     /// <summary>
+    /// Added to an enemy entity when frozen by Clock Lancet.
+    /// Timer counts down to zero; when it expires, the component is removed by FrozenTickSystem.
+    /// While present, EnemyMovementSystem skips this entity (enemy is completely immobilised).
+    /// Weapons still deal damage to frozen enemies (freeze does not grant invincibility).
+    /// </summary>
+    public struct Frozen : IComponentData
+    {
+        public float Timer; // seconds remaining
+    }
+
+    /// <summary>
     /// Marks an elite/boss enemy. Spawned on a countdown by EnemySpawnerSystem
     /// at boss-timer intervals (starting 45 s, decreasing with wave number).
     /// No split or special death logic — just much higher HP, damage, and XP.

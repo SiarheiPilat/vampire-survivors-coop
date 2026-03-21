@@ -158,6 +158,18 @@ namespace VampireSurvivors.Systems
                                     Rng      = new Unity.Mathematics.Random((uint)(entity.Index * 987654321u + 3u))
                                 });
                             break;
+                        // Clock Lancet: auto-granted at level 11 to all characters
+                        case 11:
+                            if (!SystemAPI.HasComponent<ClockLancetState>(entity))
+                                ecb.AddComponent(entity, new ClockLancetState
+                                {
+                                    Timer          = 0f,
+                                    Cooldown       = 2.0f,  // wiki: 2.0s CD
+                                    FreezeRadius   = 6.0f,  // all enemies within 6u
+                                    FreezeDuration = 2.0f,  // wiki: 2.0s freeze
+                                });
+                            break;
+
                         // Krochi level 33 bonus: +1 ReviveStock (only if character has ReviveStocks)
                         case 33:
                             if (SystemAPI.HasComponent<ReviveStocks>(entity))

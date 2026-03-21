@@ -53,7 +53,7 @@ namespace VampireSurvivors.Systems
 
         [BurstCompile]
         [WithAll(typeof(EnemyTag))]
-        [WithNone(typeof(GhostTag))]
+        [WithNone(typeof(GhostTag), typeof(Frozen))]
         partial struct MoveTowardPlayerJob : IJobEntity
         {
             [ReadOnly] public NativeArray<LocalTransform> PlayerPositions;
@@ -92,6 +92,7 @@ namespace VampireSurvivors.Systems
         /// </summary>
         [BurstCompile]
         [WithAll(typeof(EnemyTag), typeof(GhostTag))]
+        [WithNone(typeof(Frozen))]
         partial struct GhostMoveJob : IJobEntity
         {
             [ReadOnly] public NativeArray<LocalTransform> PlayerPositions;
