@@ -35,37 +35,70 @@ namespace VampireSurvivors.Systems
 
                 gatti.ValueRW.Timer = gatti.ValueRO.Cooldown * stats.ValueRO.CooldownMult;
 
-                float damage  = gatti.ValueRO.Damage * stats.ValueRO.Might;
-                float radius  = 0.5f * stats.ValueRO.AreaMult;
                 float lifetime = gatti.ValueRO.CatLifetime * stats.ValueRO.DurationMult;
-                int   amount  = math.max(1, gatti.ValueRO.Amount);
 
-                for (int a = 0; a < amount; a++)
+                if (gatti.ValueRO.IsEvolved)
                 {
-                    // Spread cats in a ring around the player with slight offset
-                    float spawnAngle = (float)a / amount * math.PI * 2f;
-                    float3 spawnPos  = transform.ValueRO.Position +
-                        new float3(math.cos(spawnAngle) * 0.4f, math.sin(spawnAngle) * 0.4f, 0f);
-
-                    // Seed each cat's RNG from entity index + spawn offset + slot
-                    uint seed = (uint)(stats.GetHashCode() * 2654435761u + (uint)a * 987654321u + 1u);
-                    if (seed == 0) seed = 1;
-
-                    var cat = ecb.Instantiate(bulletPrefab);
-                    ecb.AddComponent(cat, new GattiAmariCat
+                    // ── Vicious Hunger: 2 giant cats, 30 dmg, 1.5u radius, 7s lifetime ──
+                    // Wiki: Vicious Hunger — 30 dmg, 8s CD, Amount 2, Duration 7s
+                    float vhDamage = gatti.ValueRO.Damage * stats.ValueRO.Might;
+                    float vhRadius = 1.5f * stats.ValueRO.AreaMult;
+                    for (int a = 0; a < 2; a++)
                     {
-                        Damage         = damage,
-                        Radius         = radius,
-                        Lifetime       = lifetime,
-                        AttackTimer    = 0f,
-                        AttackCooldown = 1.0f,
-                        WanderTimer    = 0f,
-                        WanderDir      = new float2(math.cos(spawnAngle), math.sin(spawnAngle)),
-                        Rng            = new Unity.Mathematics.Random(seed),
-                    });
-                    // Orange-yellow cats: scale 0.3u
-                    ecb.SetComponent(cat, LocalTransform.FromPositionRotationScale(
-                        spawnPos, quaternion.identity, 0.3f));
+                        float  spawnAngle = (float)a / 2f * math.PI * 2f;
+                        float3 spawnPos   = transform.ValueRO.Position +
+                            new float3(math.cos(spawnAngle) * 0.5f, math.sin(spawnAngle) * 0.5f, 0f);
+                        uint   seed = (uint)(stats.GetHashCode() * 1234567891u + (uint)a * 2654435761u + 7u);
+                        if (seed == 0) seed = 7u;
+
+                        var cat = ecb.Instantiate(bulletPrefab);
+                        ecb.AddComponent(cat, new GattiAmariCat
+                        {
+                            Damage         = vhDamage,
+                            Radius         = vhRadius,
+                            Lifetime       = lifetime,
+                            AttackTimer    = 0f,
+                            AttackCooldown = 1.0f,
+                            WanderTimer    = 0f,
+                            WanderDir      = new float2(math.cos(spawnAngle), math.sin(spawnAngle)),
+                            Rng            = new Unity.Mathematics.Random(seed),
+                        });
+                        // Giant cats: scale 0.6u
+                        ecb.SetComponent(cat, LocalTransform.FromPositionRotationScale(
+                            spawnPos, quaternion.identity, 0.6f));
+                    }
+                }
+                else
+                {
+                    // ── Normal Gatti Amari: wandering small cats ──
+                    float damage = gatti.ValueRO.Damage * stats.ValueRO.Might;
+                    float radius = 0.5f * stats.ValueRO.AreaMult;
+                    int   amount = math.max(1, gatti.ValueRO.Amount);
+
+                    for (int a = 0; a < amount; a++)
+                    {
+                        float  spawnAngle = (float)a / amount * math.PI * 2f;
+                        float3 spawnPos   = transform.ValueRO.Position +
+                            new float3(math.cos(spawnAngle) * 0.4f, math.sin(spawnAngle) * 0.4f, 0f);
+                        uint seed = (uint)(stats.GetHashCode() * 2654435761u + (uint)a * 987654321u + 1u);
+                        if (seed == 0) seed = 1;
+
+                        var cat = ecb.Instantiate(bulletPrefab);
+                        ecb.AddComponent(cat, new GattiAmariCat
+                        {
+                            Damage         = damage,
+                            Radius         = radius,
+                            Lifetime       = lifetime,
+                            AttackTimer    = 0f,
+                            AttackCooldown = 1.0f,
+                            WanderTimer    = 0f,
+                            WanderDir      = new float2(math.cos(spawnAngle), math.sin(spawnAngle)),
+                            Rng            = new Unity.Mathematics.Random(seed),
+                        });
+                        // Small cats: scale 0.3u
+                        ecb.SetComponent(cat, LocalTransform.FromPositionRotationScale(
+                            spawnPos, quaternion.identity, 0.3f));
+                    }
                 }
             }
         }

@@ -78,6 +78,8 @@ namespace VampireSurvivors.MonoBehaviours
             HellfireEvolution,     // Fire Wand + Spinach
             LaBorraEvolution,      // Holy Water + Attractorb
             GattiAmariAmount,      // Gatti Amari +1 cat
+            StoneMask,             // passive: +10% gold earnings
+            ViciousHungerEvolution,// Gatti Amari + Stone Mask
         }
         readonly UpgradeType[] _currentChoices = new UpgradeType[3];
         readonly TMP_Text[]    _btnLabels       = new TMP_Text[3];
@@ -110,6 +112,7 @@ namespace VampireSurvivors.MonoBehaviours
             (UpgradeType.Spellbinder,   "Spellbinder\n+10% Duration (effect lifetimes)"),
             (UpgradeType.Attractorb,    "Attractorb\n+30% XP magnet radius"),
             (UpgradeType.Wings,         "Wings\n+10% movement speed"),
+            (UpgradeType.StoneMask,     "Stone Mask\n+10% gold earnings"),
         };
 
         // Gold display (created programmatically)
@@ -737,8 +740,9 @@ namespace VampireSurvivors.MonoBehaviours
                     case UpgradeType.GattiAmariAmount:
                         if (em.HasComponent<GattiAmariState>(_pendingUpgradeEntity))
                         {
-                            curAmt = Unity.Mathematics.math.max(1, em.GetComponentData<GattiAmariState>(_pendingUpgradeEntity).Amount);
-                            canAdd = curAmt < 3;
+                            var ga2 = em.GetComponentData<GattiAmariState>(_pendingUpgradeEntity);
+                            curAmt = Unity.Mathematics.math.max(1, ga2.Amount);
+                            canAdd = curAmt < 3 && !ga2.IsEvolved;
                         }
                         break;
                 }
@@ -836,6 +840,15 @@ namespace VampireSurvivors.MonoBehaviours
                 if (!hw3.IsEvolved && playerStats.MagnetRadiusMult > 1.0f)
                     pool.Add((UpgradeType.LaBorraEvolution,
                         "★ La Borra\nHoly Water + Attractorb — puddles follow player, 40 dmg, 4 flasks"));
+            }
+
+            // Vicious Hunger = Gatti Amari + Stone Mask (GoldMult > 1 means stone mask was taken)
+            if (em.HasComponent<GattiAmariState>(_pendingUpgradeEntity))
+            {
+                var ga = em.GetComponentData<GattiAmariState>(_pendingUpgradeEntity);
+                if (!ga.IsEvolved && playerStats.GoldMult > 1.0f)
+                    pool.Add((UpgradeType.ViciousHungerEvolution,
+                        "★ Vicious Hunger\nGatti Amari + Stone Mask — 2 giant cats, 30 dmg, 1.5u AoE, 7s"));
             }
 
             // NO FUTURE = Runetracer + Armor (Armor > 0 means armor was taken)
@@ -985,8 +998,7 @@ namespace VampireSurvivors.MonoBehaviours
                     if (em.HasComponent<GattiAmariState>(_pendingUpgradeEntity))
                     {
                         var w = em.GetComponentData<GattiAmariState>(_pendingUpgradeEntity);
-                        w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1;
-                        em.SetComponentData(_pendingUpgradeEntity, w);
+                        if (!w.IsEvolved) { w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1; em.SetComponentData(_pendingUpgradeEntity, w); }
                     }
                     Debug.Log($"[HUDManager] P{pidx} chose Duplicator — +1 Amount to all weapons (stacks={stats.DuplicatorStacks})");
                     break;
@@ -1096,6 +1108,23 @@ namespace VampireSurvivors.MonoBehaviours
                 case UpgradeType.Wings:
                     stats.SpeedMult += 0.1f;
                     Debug.Log($"[HUDManager] P{pidx} chose Wings — SpeedMult = {stats.SpeedMult:F2}×");
+                    break;
+                case UpgradeType.StoneMask:
+                    stats.GoldMult += 0.1f;
+                    Debug.Log($"[HUDManager] P{pidx} chose Stone Mask — GoldMult = {stats.GoldMult:F2}×");
+                    break;
+
+                case UpgradeType.ViciousHungerEvolution:
+                    if (em.HasComponent<GattiAmariState>(_pendingUpgradeEntity))
+                    {
+                        var ga       = em.GetComponentData<GattiAmariState>(_pendingUpgradeEntity);
+                        ga.IsEvolved  = true;
+                        ga.Damage     = 30f;   // wiki: 30 dmg base
+                        ga.Cooldown   = 8.0f;  // wiki: 8s CD (much slower, fires 2 giants)
+                        ga.CatLifetime = 7.0f; // wiki: 7s duration
+                        em.SetComponentData(_pendingUpgradeEntity, ga);
+                        Debug.Log($"[HUDManager] P{pidx} evolved Gatti Amari → Vicious Hunger");
+                    }
                     break;
 
                 case UpgradeType.HolyWandEvolution:

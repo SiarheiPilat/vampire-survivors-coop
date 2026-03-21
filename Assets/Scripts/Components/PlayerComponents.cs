@@ -150,6 +150,13 @@ namespace VampireSurvivors.Components
         /// Wiki: Giovanna — projectile speed increases by 1% each level.
         /// </summary>
         public float ProjectileSpeedBonusPerLevel;
+
+        /// <summary>
+        /// Gold earnings multiplier. Default 1.0. Each Stone Mask pickup adds +0.1 (additive, max +0.5 at lv5).
+        /// Applied in GoldCoinSystem: goldEarned = coin.Value * GoldMult (rounded).
+        /// Wiki: Stone Mask grants +10% Greed (coin earnings) per level, up to 5 levels.
+        /// </summary>
+        public float GoldMult;
     }
 
     /// <summary>
@@ -408,5 +415,7 @@ namespace VampireSurvivors.Components
         public float Damage;        // wiki base: 10
         public float CatLifetime;   // seconds each cat lives — wiki base: 5.0s
         public int   Amount;        // cats spawned per cooldown (1=default); upgradeable up to 3
+        /// <summary>True after Vicious Hunger evolution (Gatti Amari + Stone Mask): 30 dmg, 8s CD, 2 giant cats, 7s lifetime.</summary>
+        public bool  IsEvolved;
     }
 }
