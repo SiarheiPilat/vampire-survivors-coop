@@ -281,6 +281,32 @@ namespace VampireSurvivors.MonoBehaviours
                     Debug.Log($"[GameSceneBootstrap] P{slot} Giovanna: Gatti Amari, HP=100, Speed=8.4, +1%ProjSpeed/lv");
                     break;
 
+                case "pugnala":
+                    // Wiki: Phiera Der Tuphello + Eight The Sparrow twin pistols, HP 100, Speed 7.4, no bonus
+                    SetBaseStats(em, entity, hp: 100, speed: 7.4f);
+                    if (em.HasComponent<WeaponState>(entity))
+                        em.RemoveComponent<WeaponState>(entity);
+                    em.AddComponentData(entity, new PhieraState
+                    {
+                        Timer    = 0f,
+                        Cooldown = 1.4f,
+                        Damage   = 5f,
+                        Speed    = 12f,
+                        MaxRange = 12f,
+                        Amount   = 1
+                    });
+                    em.AddComponentData(entity, new EightSparrowState
+                    {
+                        Timer    = 0f,
+                        Cooldown = 1.4f,
+                        Damage   = 5f,
+                        Speed    = 12f,
+                        MaxRange = 12f,
+                        Amount   = 1
+                    });
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Pugnala: Phiera+Eight, HP=100, Speed=7.4");
+                    break;
+
                 default:
                     Debug.LogWarning($"[GameSceneBootstrap] Unknown character '{charId}' for P{slot} — keeping Whip.");
                     break;

@@ -172,6 +172,20 @@ namespace VampireSurvivors.Systems
                                 });
                             break;
 
+                        // Eight The Sparrow: auto-granted at level 13 (Pugnala gets it from start)
+                        case 13:
+                            if (!SystemAPI.HasComponent<EightSparrowState>(entity))
+                                ecb.AddComponent(entity, new EightSparrowState
+                                {
+                                    Timer    = 0f,
+                                    Cooldown = 1.4f,
+                                    Damage   = 5f,
+                                    Speed    = 12f,
+                                    MaxRange = 12f,
+                                    Amount   = 1
+                                });
+                            break;
+
                         // Clock Lancet: auto-granted at level 11 to all characters
                         case 11:
                             if (!SystemAPI.HasComponent<ClockLancetState>(entity))

@@ -85,6 +85,8 @@ namespace VampireSurvivors.MonoBehaviours
             GoldRing,                 // passive: +5% Curse
             InfiniteCorridorEvolution,// Clock Lancet + Silver Ring + Gold Ring
             PhieraAmount,             // Phiera Der Tuphello +1 bullet/dir
+            EightAmount,              // Eight The Sparrow +1 bullet/dir
+            PhieraggiEvolution,       // Phiera + Eight + Tiragisú → 8-direction rapid fire
         }
         readonly UpgradeType[] _currentChoices = new UpgradeType[3];
         readonly TMP_Text[]    _btnLabels       = new TMP_Text[3];
@@ -126,6 +128,7 @@ namespace VampireSurvivors.MonoBehaviours
         static readonly (UpgradeType type, string label)[] k_WeaponUpgradesExtra =
         {
             (UpgradeType.PhieraAmount, "Phiera +1 bullet\nFire an extra bullet in each of the 4 directions"),
+            (UpgradeType.EightAmount,  "Eight +1 bullet\nFire an extra bullet in each of the 4 diagonal directions"),
         };
 
         // Gold display (created programmatically)
@@ -772,8 +775,17 @@ namespace VampireSurvivors.MonoBehaviours
                     case UpgradeType.PhieraAmount:
                         if (em.HasComponent<PhieraState>(_pendingUpgradeEntity))
                         {
-                            curAmt = Unity.Mathematics.math.max(1, em.GetComponentData<PhieraState>(_pendingUpgradeEntity).Amount);
-                            canAdd = curAmt < 3;
+                            var ph2 = em.GetComponentData<PhieraState>(_pendingUpgradeEntity);
+                            curAmt = Unity.Mathematics.math.max(1, ph2.Amount);
+                            canAdd = curAmt < 3 && !ph2.IsEvolved;
+                        }
+                        break;
+                    case UpgradeType.EightAmount:
+                        if (em.HasComponent<EightSparrowState>(_pendingUpgradeEntity))
+                        {
+                            var es2 = em.GetComponentData<EightSparrowState>(_pendingUpgradeEntity);
+                            curAmt = Unity.Mathematics.math.max(1, es2.Amount);
+                            canAdd = curAmt < 3 && !es2.IsEvolved;
                         }
                         break;
                 }
@@ -880,6 +892,16 @@ namespace VampireSurvivors.MonoBehaviours
                 if (!cl.IsEvolved && playerStats.SilverRingStacks > 0 && playerStats.GoldRingStacks > 0)
                     pool.Add((UpgradeType.InfiniteCorridorEvolution,
                         "★ Infinite Corridor\nClock Lancet + Silver Ring + Gold Ring — halves all enemy HP/s"));
+            }
+
+            // Phieraggi = Phiera + Eight The Sparrow + Tiragisú (ReviveStocks present = Tiragisú taken)
+            if (em.HasComponent<PhieraState>(_pendingUpgradeEntity) &&
+                em.HasComponent<EightSparrowState>(_pendingUpgradeEntity))
+            {
+                var phEvo = em.GetComponentData<PhieraState>(_pendingUpgradeEntity);
+                if (!phEvo.IsEvolved && em.HasComponent<ReviveStocks>(_pendingUpgradeEntity))
+                    pool.Add((UpgradeType.PhieraggiEvolution,
+                        "★ Phieraggi\nPhiera + Eight + Tiragisú — 8-way rapid fire, 0.35s CD"));
             }
 
             // Vicious Hunger = Gatti Amari + Stone Mask (GoldMult > 1 means stone mask was taken)
@@ -1038,6 +1060,16 @@ namespace VampireSurvivors.MonoBehaviours
                     if (em.HasComponent<GattiAmariState>(_pendingUpgradeEntity))
                     {
                         var w = em.GetComponentData<GattiAmariState>(_pendingUpgradeEntity);
+                        if (!w.IsEvolved) { w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1; em.SetComponentData(_pendingUpgradeEntity, w); }
+                    }
+                    if (em.HasComponent<PhieraState>(_pendingUpgradeEntity))
+                    {
+                        var w = em.GetComponentData<PhieraState>(_pendingUpgradeEntity);
+                        if (!w.IsEvolved) { w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1; em.SetComponentData(_pendingUpgradeEntity, w); }
+                    }
+                    if (em.HasComponent<EightSparrowState>(_pendingUpgradeEntity))
+                    {
+                        var w = em.GetComponentData<EightSparrowState>(_pendingUpgradeEntity);
                         if (!w.IsEvolved) { w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1; em.SetComponentData(_pendingUpgradeEntity, w); }
                     }
                     Debug.Log($"[HUDManager] P{pidx} chose Duplicator — +1 Amount to all weapons (stacks={stats.DuplicatorStacks})");
@@ -1199,6 +1231,30 @@ namespace VampireSurvivors.MonoBehaviours
                         ph.Amount = Unity.Mathematics.math.max(1, ph.Amount) + 1;
                         em.SetComponentData(_pendingUpgradeEntity, ph);
                         Debug.Log($"[HUDManager] P{pidx} chose Phiera +1 — Amount = {ph.Amount}");
+                    }
+                    break;
+                case UpgradeType.EightAmount:
+                    if (em.HasComponent<EightSparrowState>(_pendingUpgradeEntity))
+                    {
+                        var es = em.GetComponentData<EightSparrowState>(_pendingUpgradeEntity);
+                        es.Amount = Unity.Mathematics.math.max(1, es.Amount) + 1;
+                        em.SetComponentData(_pendingUpgradeEntity, es);
+                        Debug.Log($"[HUDManager] P{pidx} chose Eight +1 — Amount = {es.Amount}");
+                    }
+                    break;
+                case UpgradeType.PhieraggiEvolution:
+                    if (em.HasComponent<PhieraState>(_pendingUpgradeEntity) &&
+                        em.HasComponent<EightSparrowState>(_pendingUpgradeEntity))
+                    {
+                        // Phiera fires all 8 directions at 0.35s CD; Eight goes silent
+                        var phEvo        = em.GetComponentData<PhieraState>(_pendingUpgradeEntity);
+                        phEvo.IsEvolved  = true;
+                        phEvo.Cooldown   = 0.35f;  // wiki: Phieraggi 0.35s CD
+                        em.SetComponentData(_pendingUpgradeEntity, phEvo);
+                        var esEvo        = em.GetComponentData<EightSparrowState>(_pendingUpgradeEntity);
+                        esEvo.IsEvolved  = true;
+                        em.SetComponentData(_pendingUpgradeEntity, esEvo);
+                        Debug.Log($"[HUDManager] P{pidx} evolved Phiera+Eight → Phieraggi (8-way, 0.35s CD)");
                     }
                     break;
 

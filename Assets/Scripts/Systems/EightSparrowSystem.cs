@@ -7,19 +7,16 @@ using VampireSurvivors.Components;
 namespace VampireSurvivors.Systems
 {
     /// <summary>
-    /// Phiera Der Tuphello — fires Amount bullets simultaneously in each of the
-    /// four cardinal directions (right/up/left/down) every Cooldown seconds.
-    /// Each firing cycle spawns Amount×4 projectiles.
+    /// Eight The Sparrow — Pugnala's blue pistol, paired with Phiera Der Tuphello.
+    /// Fires Amount bullets simultaneously in each of the four diagonal directions
+    /// (NE / NW / SW / SE — 45°, 135°, 225°, 315°) every Cooldown seconds.
+    /// When IsEvolved (Phieraggi), goes silent — PhieraSystem fires all 8 directions instead.
     /// Wiki base stats: Damage 5, Cooldown 1.4 s, Speed ~12 u/s, Amount 1 (per direction).
-    ///
-    /// Evolved (Phieraggi = Phiera + Eight The Sparrow + Tiragisú):
-    ///   Fires in all 8 directions (cardinal + diagonal) at 0.35 s CD.
-    ///   EightSparrowSystem goes silent when IsEvolved.
     /// </summary>
     [BurstCompile]
-    [UpdateAfter(typeof(PlayerMovementSystem))]
+    [UpdateAfter(typeof(PhieraSystem))]
     [UpdateBefore(typeof(TransformSystemGroup))]
-    public partial struct PhieraSystem : ISystem
+    public partial struct EightSparrowSystem : ISystem
     {
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
@@ -32,29 +29,29 @@ namespace VampireSurvivors.Systems
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             var ecb          = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            foreach (var (ph, transform, stats) in
-                SystemAPI.Query<RefRW<PhieraState>, RefRO<LocalTransform>, RefRO<PlayerStats>>()
+            foreach (var (eight, transform, stats) in
+                SystemAPI.Query<RefRW<EightSparrowState>, RefRO<LocalTransform>, RefRO<PlayerStats>>()
                     .WithAll<PlayerTag>()
                     .WithNone<Downed>())
             {
-                ph.ValueRW.Timer -= dt;
-                if (ph.ValueRO.Timer > 0f) continue;
+                // Phieraggi evolution: Eight goes silent, Phiera handles all 8 directions
+                if (eight.ValueRO.IsEvolved) continue;
 
-                ph.ValueRW.Timer = ph.ValueRO.Cooldown * stats.ValueRO.CooldownMult;
+                eight.ValueRW.Timer -= dt;
+                if (eight.ValueRO.Timer > 0f) continue;
 
-                float  dmg    = ph.ValueRO.Damage * stats.ValueRO.Might;
-                float  spd    = ph.ValueRO.Speed  * stats.ValueRO.ProjectileSpeedMult;
-                int    amount = math.max(1, ph.ValueRO.Amount);
-                float  range  = ph.ValueRO.MaxRange;
+                eight.ValueRW.Timer = eight.ValueRO.Cooldown * stats.ValueRO.CooldownMult;
+
+                float  dmg    = eight.ValueRO.Damage * stats.ValueRO.Might;
+                float  spd    = eight.ValueRO.Speed  * stats.ValueRO.ProjectileSpeedMult;
+                int    amount = math.max(1, eight.ValueRO.Amount);
+                float  range  = eight.ValueRO.MaxRange;
                 float3 origin = transform.ValueRO.Position;
 
-                // When evolved (Phieraggi): 8 directions at 45° apart; otherwise 4 cardinal directions.
-                int   dirCount  = ph.ValueRO.IsEvolved ? 8 : 4;
-                float dirStep   = ph.ValueRO.IsEvolved ? math.PI * 0.25f : math.PI * 0.5f;
-
-                for (int d = 0; d < dirCount; d++)
+                // Four diagonal base directions (NE, NW, SW, SE = 45°, 135°, 225°, 315°)
+                for (int d = 0; d < 4; d++)
                 {
-                    float baseAngle = d * dirStep; // 0°…315° (evolved) or 0°/90°/180°/270° (base)
+                    float baseAngle = math.PI * 0.25f + d * math.PI * 0.5f; // 45°, 135°, 225°, 315°
 
                     for (int a = 0; a < amount; a++)
                     {

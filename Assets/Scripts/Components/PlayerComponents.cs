@@ -456,11 +456,31 @@ namespace VampireSurvivors.Components
     public struct PhieraState : IComponentData
     {
         public float Timer;
+        public float Cooldown;  // wiki: 1.4s; evolved: 0.35s
+        public float Damage;    // wiki: 5
+        public float Speed;     // u/s — wiki: ~12
+        public float MaxRange;  // distance before despawn
+        public int   Amount;    // bullets per direction (1=default); upgradeable up to 3
+        /// <summary>True after Phieraggi evolution. Fires in all 8 directions at 0.35s CD. EightSparrow goes silent.</summary>
+        public bool  IsEvolved;
+    }
+
+    /// <summary>
+    /// Per-player Eight The Sparrow weapon state (Pugnala's blue pistol, paired with Phiera).
+    /// Fires Amount bullets in each of the 4 diagonal directions (45°/135°/225°/315°) every Cooldown seconds.
+    /// Wiki base stats: Damage 5, Cooldown 1.4 s, Speed 12 u/s, Amount 1.
+    /// Auto-granted at level 13; Pugnala starts with it alongside Phiera Der Tuphello.
+    /// </summary>
+    public struct EightSparrowState : IComponentData
+    {
+        public float Timer;
         public float Cooldown;  // wiki: 1.4s
         public float Damage;    // wiki: 5
         public float Speed;     // u/s — wiki: ~12
         public float MaxRange;  // distance before despawn
         public int   Amount;    // bullets per direction (1=default); upgradeable up to 3
+        /// <summary>True after Phieraggi evolution. Eight goes silent; Phiera covers all 8 directions.</summary>
+        public bool  IsEvolved;
     }
 
     public struct GattiAmariState : IComponentData

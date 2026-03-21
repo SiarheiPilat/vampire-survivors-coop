@@ -37,6 +37,7 @@ namespace VampireSurvivors.Menu
             "krochi",       // Cross  (+30% speed, 1 auto-revive)
             "dommario",     // King Bible (-40% speed, +40% Duration/Speed)
             "giovanna",     // Gatti Amari (+20% speed, +1% ProjSpeed/level)
+            "pugnala",      // Phiera Der Tuphello + Eight The Sparrow (twin pistols, speed 7.4)
         };
 
         // Per-slot state

@@ -1,18 +1,22 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~04:10
+> Last updated: 2026-03-21 ~04:30
 
 ## Next Up (priority order)
 
 - [ ] CharacterRegistry ScriptableObject (replace hard-coded array in LobbyManager)
-- [ ] New characters: Pugnala (needs Phiera Der Tuphello + Eight The Sparrow twin pistols, complex paired weapon system)
-- [ ] Infinite Corridor evolution (Clock Lancet + Silver Ring + Gold Ring)
-- [ ] Silver Ring passive (+Duration) and Gold Ring passive (+Area) needed for Infinite Corridor
+- [ ] Song of Mana weapon (Poppea's starter — rains notes in random pattern, similar to HolyWater but musical AoE)
 - [ ] Map variety: second stage tileset + different enemy spawns
 - [ ] Crimson Shroud (complex — requires Laurel + Metaglio Left + Metaglio Right)
 - [ ] Second map/stage — different background tile set + spawn weights (more skeletons/ghouls, fewer bats)
 
 ## Completed
+
+### 2026-03-21 (Session 20 — ~04:30)
+
+- [x] **Eight The Sparrow weapon** (`EightSparrowState` + `EightSparrowSystem`) — 5 dmg, 1.4s CD, speed=12, MaxRange=12; fires Amount bullets in 4 diagonal directions (45°/135°/225°/315°) each Cooldown; spread ±8°/bullet when Amount>1; `EightAmount` in upgrade pool (cap 3); auto-granted at level 13; Pugnala starts with it
+- [x] **Phieraggi evolution** (Phiera + Eight + Tiragisú) — `PhieraState.IsEvolved=true` + `EightSparrowState.IsEvolved=true`; PhieraSystem fires 8 directions at 0.35s CD; EightSparrowSystem skips when IsEvolved; gate: has both states + HasComponent<ReviveStocks>; Duplicator applies to both weapons
+- [x] **Pugnala Provola** character — HP=100, Speed=7.4; twin pistols (Phiera + Eight) both as starters; added to LobbyManager roster
 
 ### 2026-03-21 (Session 18 — ~04:10)
 
