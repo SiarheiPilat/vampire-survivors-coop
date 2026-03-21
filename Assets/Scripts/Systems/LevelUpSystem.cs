@@ -38,6 +38,10 @@ namespace VampireSurvivors.Systems
                     // Brief invincibility on level-up
                     invincible.ValueRW.Timer = math.max(invincible.ValueRO.Timer, 2f);
 
+                    // Giovanna passive: +1% ProjectileSpeed per level (no cap)
+                    if (stats.ValueRO.ProjectileSpeedBonusPerLevel > 0f)
+                        stats.ValueRW.ProjectileSpeedMult += stats.ValueRO.ProjectileSpeedBonusPerLevel;
+
                     // Unlock weapons at milestone levels (structural change via ECB)
                     int newLevel = stats.ValueRO.Level;
                     switch (newLevel)

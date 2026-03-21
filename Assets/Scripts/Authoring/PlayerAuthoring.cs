@@ -45,6 +45,7 @@ namespace VampireSurvivors.Authoring
                     DurationMult       = 1.0f,  // Spellbinder multiplies by 1.1 per pickup
                     SpeedMult          = 1.0f,  // Wings adds 0.1 per pickup (additive)
                     MagnetRadiusMult   = 1.0f,  // Attractorb multiplies by 1.3 per pickup
+                    ProjectileSpeedBonusPerLevel = 0.0f, // Giovanna: 0.01 set by GameSceneBootstrap
                 });
                 AddComponent(entity, new AssignedDeviceId { Value = 0 });
                 AddComponent(entity, new Health { Current = authoring.maxHp, Max = authoring.maxHp });

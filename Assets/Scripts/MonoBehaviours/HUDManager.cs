@@ -77,6 +77,7 @@ namespace VampireSurvivors.MonoBehaviours
             DeathSpiralEvolution,  // Axe + Candelabrador
             HellfireEvolution,     // Fire Wand + Spinach
             LaBorraEvolution,      // Holy Water + Attractorb
+            GattiAmariAmount,      // Gatti Amari +1 cat
         }
         readonly UpgradeType[] _currentChoices = new UpgradeType[3];
         readonly TMP_Text[]    _btnLabels       = new TMP_Text[3];
@@ -91,7 +92,8 @@ namespace VampireSurvivors.MonoBehaviours
             (UpgradeType.AxeAmount,        "Axe +1 blade\nThrow an extra Axe per volley"),
             (UpgradeType.HolyWaterAmount,  "Holy Water +1 flask\nThrow an extra flask per volley"),
             (UpgradeType.BoneAmount,       "Bone +1 bone\nFire an extra bouncing Bone per volley"),
-            (UpgradeType.RunetracerAmount, "Runetracer +1 tracer\nFire an extra bouncing Runetracer"),
+            (UpgradeType.RunetracerAmount,  "Runetracer +1 tracer\nFire an extra bouncing Runetracer"),
+            (UpgradeType.GattiAmariAmount, "Gatti Amari +1 cat\nSummon an extra wandering cat"),
         };
         static readonly (UpgradeType type, string label)[] k_PassiveUpgrades =
         {
@@ -732,6 +734,13 @@ namespace VampireSurvivors.MonoBehaviours
                             canAdd = curAmt < 5 && !rt2.IsEvolved;
                         }
                         break;
+                    case UpgradeType.GattiAmariAmount:
+                        if (em.HasComponent<GattiAmariState>(_pendingUpgradeEntity))
+                        {
+                            curAmt = Unity.Mathematics.math.max(1, em.GetComponentData<GattiAmariState>(_pendingUpgradeEntity).Amount);
+                            canAdd = curAmt < 3;
+                        }
+                        break;
                 }
                 if (canAdd) pool.Add((type, label + $"  ({curAmt}→{curAmt + 1})"));
             }
@@ -973,6 +982,12 @@ namespace VampireSurvivors.MonoBehaviours
                         w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1;
                         em.SetComponentData(_pendingUpgradeEntity, w);
                     }
+                    if (em.HasComponent<GattiAmariState>(_pendingUpgradeEntity))
+                    {
+                        var w = em.GetComponentData<GattiAmariState>(_pendingUpgradeEntity);
+                        w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1;
+                        em.SetComponentData(_pendingUpgradeEntity, w);
+                    }
                     Debug.Log($"[HUDManager] P{pidx} chose Duplicator — +1 Amount to all weapons (stacks={stats.DuplicatorStacks})");
                     break;
                 }
@@ -1055,6 +1070,15 @@ namespace VampireSurvivors.MonoBehaviours
                         rt2.Amount = Unity.Mathematics.math.max(1, rt2.Amount) + 1;
                         em.SetComponentData(_pendingUpgradeEntity, rt2);
                         Debug.Log($"[HUDManager] P{pidx} chose Runetracer +1 — Amount = {rt2.Amount}");
+                    }
+                    break;
+                case UpgradeType.GattiAmariAmount:
+                    if (em.HasComponent<GattiAmariState>(_pendingUpgradeEntity))
+                    {
+                        var gatti = em.GetComponentData<GattiAmariState>(_pendingUpgradeEntity);
+                        gatti.Amount = Unity.Mathematics.math.max(1, gatti.Amount) + 1;
+                        em.SetComponentData(_pendingUpgradeEntity, gatti);
+                        Debug.Log($"[HUDManager] P{pidx} chose Gatti Amari +1 — Amount = {gatti.Amount}");
                     }
                     break;
                 case UpgradeType.Candelabrador:

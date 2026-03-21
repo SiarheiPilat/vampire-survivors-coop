@@ -262,6 +262,25 @@ namespace VampireSurvivors.MonoBehaviours
                     Debug.Log($"[GameSceneBootstrap] P{slot} Dommario: King Bible, HP=100, Speed=4.2, Duration+Speed×1.4");
                     break;
 
+                case "giovanna":
+                    // Wiki: Gatti Amari starter, HP 100, Speed +20% = 8.4, +1% ProjectileSpeed/level
+                    SetBaseStats(em, entity, hp: 100, speed: 8.4f);
+                    if (em.HasComponent<WeaponState>(entity))
+                        em.RemoveComponent<WeaponState>(entity);
+                    em.AddComponentData(entity, new GattiAmariState
+                    {
+                        Timer       = 0f,
+                        Cooldown    = 5.0f,
+                        Damage      = 10f,
+                        CatLifetime = 5.0f,
+                        Amount      = 1,
+                    });
+                    var giovannaStats = em.GetComponentData<PlayerStats>(entity);
+                    giovannaStats.ProjectileSpeedBonusPerLevel = 0.01f; // +1% per level, no cap
+                    em.SetComponentData(entity, giovannaStats);
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Giovanna: Gatti Amari, HP=100, Speed=8.4, +1%ProjSpeed/lv");
+                    break;
+
                 default:
                     Debug.LogWarning($"[GameSceneBootstrap] Unknown character '{charId}' for P{slot} — keeping Whip.");
                     break;

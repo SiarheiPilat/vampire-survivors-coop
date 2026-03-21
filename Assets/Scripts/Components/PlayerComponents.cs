@@ -143,6 +143,13 @@ namespace VampireSurvivors.Components
         /// Wiki: Attractorb increases item pickup range, roughly ×1.5/×2/×2.5/×3/×4 over 5 levels.
         /// </summary>
         public float MagnetRadiusMult;
+
+        /// <summary>
+        /// Flat projectile speed bonus added to ProjectileSpeedMult each level-up.
+        /// Default 0.0. Giovanna gets 0.01 (+1% ProjectileSpeed per level, no cap).
+        /// Wiki: Giovanna — projectile speed increases by 1% each level.
+        /// </summary>
+        public float ProjectileSpeedBonusPerLevel;
     }
 
     /// <summary>
@@ -387,5 +394,19 @@ namespace VampireSurvivors.Components
         public int   Count;        // number of orbiting bibles (1 at base)
         public bool  Spawned;      // set to true once bibles are instantiated
         public bool  IsEvolved;    // true = Unholy Vespers: Damage=30, Radius=1.75, Count=3
+    }
+
+    /// <summary>
+    /// Per-player Gatti Amari weapon state (Giovanna's starter).
+    /// Summons wandering cats that randomly attack nearby enemies in a small AoE.
+    /// Wiki base stats: Damage 10, Cooldown 5.0 s, CatLifetime 5.0 s, Amount 1.
+    /// </summary>
+    public struct GattiAmariState : IComponentData
+    {
+        public float Timer;
+        public float Cooldown;      // seconds between cat spawns — wiki base: 5.0s
+        public float Damage;        // wiki base: 10
+        public float CatLifetime;   // seconds each cat lives — wiki base: 5.0s
+        public int   Amount;        // cats spawned per cooldown (1=default); upgradeable up to 3
     }
 }

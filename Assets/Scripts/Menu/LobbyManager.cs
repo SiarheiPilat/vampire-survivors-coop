@@ -36,6 +36,7 @@ namespace VampireSurvivors.Menu
             "yattacavallo", // Holy Water
             "krochi",       // Cross  (+30% speed, 1 auto-revive)
             "dommario",     // King Bible (-40% speed, +40% Duration/Speed)
+            "giovanna",     // Gatti Amari (+20% speed, +1% ProjSpeed/level)
         };
 
         // Per-slot state
