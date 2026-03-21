@@ -1,17 +1,23 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~03:00
+> Last updated: 2026-03-21 ~03:30
 
 ## Next Up (priority order)
 
 - [ ] CharacterRegistry ScriptableObject (replace hard-coded array in LobbyManager)
-- [ ] New characters: Pugnala (needs Phiera Der Tuphello + Eight The Sparrow weapons), Giovanna (needs Gatti Amari weapon)
+- [ ] New characters: Pugnala (needs Phiera Der Tuphello + Eight The Sparrow twin pistols, complex paired weapon system)
 - [ ] Map variety: second stage tileset + different enemy spawns
 - [ ] Crimson Shroud (check wiki — separate weapon or misnamed evo?)
-- [ ] New characters: Pugnala (needs Phiera Der Tuphello + Eight The Sparrow twin pistols), Giovanna (needs Gatti Amari)
+- [ ] Vicious Hunger evolution (Gatti Amari + Stone Mask) — needs Stone Mask passive first
 - [ ] Second map/stage — different background tile set + spawn weights (more skeletons/ghouls, fewer bats)
 
 ## Completed
+
+### 2026-03-21 (Session 16 — ~03:30)
+
+- [x] **Giovanna Grana** character — Gatti Amari starter, HP=100, Speed=8.4 (+20%), `ProjectileSpeedBonusPerLevel=0.01f` (+1% ProjSpeed per level); added to LobbyManager roster
+- [x] **Gatti Amari weapon** (`GattiAmariState` + `GattiAmariCat` + `GattiAmariSystem` + `GattiAmariCatSystem`) — cats spawn at player pos (5s CD, Amount=1); wander at 1.5 u/s, change dir every ~0.75s; attack all enemies in 0.5u×AreaMult radius every 1s (10 dmg×Might); expire after 5s×DurationMult; `GattiAmariAmount` in upgrade pool (cap 3); Duplicator applies
+- [x] **LevelUpSystem** — applies `ProjectileSpeedBonusPerLevel` additively to `ProjectileSpeedMult` each level-up (0.0 for all chars except Giovanna's 0.01)
 
 ### 2026-03-21 (Session 15 — ~03:00)
 
