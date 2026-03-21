@@ -999,7 +999,7 @@ namespace VampireSurvivors.MonoBehaviours
                 if (t == UpgradeType.SilverRing && !em.HasComponent<ClockLancetState>(e0)) continue;
                 if (t == UpgradeType.GoldRing   && !em.HasComponent<ClockLancetState>(e0)) continue;
 
-                pool.Add((t, l));
+                pool.Add((t, EnhancePassiveLabel(t, l, playerStatsPre)));
             }
 
             foreach (var (type, label) in k_WeaponUpgrades)
@@ -1314,6 +1314,39 @@ namespace VampireSurvivors.MonoBehaviours
                 _currentChoices[i] = pool[i].type;
                 if (_btnLabels[i] != null) _btnLabels[i].text = pool[i].label;
             }
+        }
+
+        /// <summary>
+        /// Appends a "current → new" stat line to passive upgrade labels so players
+        /// can see exactly what they're getting. E.g. "Spinach\n+10% Might  [1.00 → 1.10]"
+        /// </summary>
+        static string EnhancePassiveLabel(UpgradeType t, string baseLabel, PlayerStats ps)
+        {
+            string stat = t switch
+            {
+                UpgradeType.Spinach       => $"Might {ps.Might:F2} → {ps.Might + 0.1f:F2}",
+                UpgradeType.Pummarola     => $"HP/s {ps.HpRegen:F1} → {ps.HpRegen + 0.2f:F1}",
+                UpgradeType.Armor         => $"Armor {ps.Armor} → {ps.Armor + 1}",
+                UpgradeType.EmptyTome     => $"CD×{ps.CooldownMult:F2} → ×{Mathf.Max(0.5f, ps.CooldownMult * 0.92f):F2}",
+                UpgradeType.Crown         => $"XP×{ps.XpMult:F2} → ×{ps.XpMult * 1.08f:F2}",
+                UpgradeType.Clover        => $"Luck {ps.Luck:F1} → {ps.Luck + 0.1f:F1}",
+                UpgradeType.Bracer        => $"ProjSpd×{ps.ProjectileSpeedMult:F2} → ×{ps.ProjectileSpeedMult * 1.1f:F2}",
+                UpgradeType.HollowHeart   => $"MaxHP {ps.MaxHp} → {Mathf.RoundToInt(ps.MaxHp * 1.1f)}",
+                UpgradeType.Duplicator    => $"Duplicator ×{ps.DuplicatorStacks + 1}",
+                UpgradeType.Candelabrador => $"Area×{ps.AreaMult:F2} → ×{ps.AreaMult * 1.1f:F2}",
+                UpgradeType.Spellbinder   => $"Dur×{ps.DurationMult:F2} → ×{ps.DurationMult * 1.1f:F2}",
+                UpgradeType.Attractorb    => $"Magnet×{ps.MagnetRadiusMult:F2} → ×{ps.MagnetRadiusMult * 1.3f:F2}",
+                UpgradeType.Wings         => $"Spd×{ps.SpeedMult:F2} → ×{ps.SpeedMult + 0.1f:F2}",
+                UpgradeType.StoneMask     => $"Gold×{ps.GoldMult:F2} → ×{ps.GoldMult + 0.1f:F2}",
+                UpgradeType.SilverRing    => $"Silver Ring ×{ps.SilverRingStacks + 1}",
+                UpgradeType.GoldRing      => $"Curse {ps.Curse:F2} → {ps.Curse + 0.05f:F2}",
+                UpgradeType.SkullOManiac  => $"Curse {ps.Curse:F2} → {ps.Curse + 0.1f:F2}",
+                UpgradeType.MetaglioLeft  => $"Regen +0.1  MaxHP+5%",
+                UpgradeType.MetaglioRight => $"Curse {ps.Curse:F2} → {ps.Curse + 0.05f:F2}",
+                UpgradeType.Tiragisu      => "Grants auto-revive stock",
+                _ => "",
+            };
+            return string.IsNullOrEmpty(stat) ? baseLabel : $"{baseLabel}\n<color=#aaffaa><size=80%>{stat}</size></color>";
         }
 
         void ApplyUpgrade(World world, int choiceIndex)

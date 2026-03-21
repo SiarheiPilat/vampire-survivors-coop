@@ -4,10 +4,14 @@
 
 ## Next Up (priority order)
 
-- [ ] **HUD stat tooltip on level-up cards** — show per-card stat line (e.g. "Might: 1.1 → 1.2") so players can see what they're gaining
 - [ ] **Buff/debuff indicator bar** — small icon strip above each player's HP bar showing active timed effects (invincibility, freeze immunity, etc.)
+- [ ] **Weapon display panel** — small icons or text list in HUD corner showing each player's current active weapons
 
 ## Completed
+
+### 2026-03-21 (Session 40 — ~23:00)
+
+- [x] **Stat tooltips on level-up upgrade cards** — `EnhancePassiveLabel()` helper appends current→new stat line in green text to each passive card (e.g. "Might 1.00 → 1.10", "CD×1.00 → ×0.92", "MaxHP 100 → 110"); uses TMP rich-text `<color=#aaffaa><size=80%>` tag for subtle green sub-line; applies to all 20 passive upgrade types; evolutions and weapon-amount cards unchanged; helps players make informed choices
 
 ### 2026-03-21 (Session 39 — ~22:45)
 
