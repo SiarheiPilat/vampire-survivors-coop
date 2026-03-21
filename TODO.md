@@ -1,16 +1,23 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~04:30
+> Last updated: 2026-03-21 ~04:50
 
 ## Next Up (priority order)
 
 - [ ] CharacterRegistry ScriptableObject (replace hard-coded array in LobbyManager)
-- [ ] Song of Mana weapon (Poppea's starter — rains notes in random pattern, similar to HolyWater but musical AoE)
+- [ ] Laurel weapon (Clerici's starter — shield/barrier that absorbs damage), then Crimson Shroud evolution
 - [ ] Map variety: second stage tileset + different enemy spawns
-- [ ] Crimson Shroud (complex — requires Laurel + Metaglio Left + Metaglio Right)
 - [ ] Second map/stage — different background tile set + spawn weights (more skeletons/ghouls, fewer bats)
+- [ ] Crimson Shroud (complex — requires Laurel + Metaglio Left + Metaglio Right)
 
 ## Completed
+
+### 2026-03-21 (Session 21 — ~04:50)
+
+- [x] **Song of Mana weapon** (`SongOfManaState` + `SongOfManaSystem`) — 10 dmg, 2.0s CD; rectangular vertical column (1.5u wide × 6.0u tall half-extents: 0.75×3.0); ignores ProjectileSpeedMult (wiki); scales with AreaMult; Burst-compiled IJobEntity (.Run(), single-threaded); horizontal knockback 3 u/s; auto-granted at level 14; Poppea starts with it
+- [x] **Mannajja evolution** (Song of Mana + Skull O'Maniac) — `SongOfManaState.IsEvolved=true`; 40 dmg, 4.5s CD, HalfWidth=3.0u (6u total), HalfHeight=4.0u (8u total); gate: has SongOfManaState + !IsEvolved + SkullOManiacStacks > 0
+- [x] **Skull O'Maniac passive** — `PlayerStats.SkullOManiacStacks` int + `Curse += 0.1f` per pickup (5 max × wiki); in upgrade pool: "+10% Curse (enemies hit harder, drop more XP)"
+- [x] **Poppea Pecorina** character — Song of Mana starter, HP=100, Speed=8.4 (+20%), `DurationBonusPerLevel=0.01f` (+1% DurationMult per level, no cap); added to LobbyManager roster; `DurationBonusPerLevel` field in PlayerStats + PlayerAuthoring; LevelUpSystem applies it additively each level-up
 
 ### 2026-03-21 (Session 20 — ~04:30)
 

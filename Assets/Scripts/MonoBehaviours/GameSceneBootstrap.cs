@@ -281,6 +281,25 @@ namespace VampireSurvivors.MonoBehaviours
                     Debug.Log($"[GameSceneBootstrap] P{slot} Giovanna: Gatti Amari, HP=100, Speed=8.4, +1%ProjSpeed/lv");
                     break;
 
+                case "poppea":
+                    // Wiki: Song of Mana starter, HP 100, Speed +20% = 8.4, +1% DurationMult per level
+                    SetBaseStats(em, entity, hp: 100, speed: 8.4f);
+                    if (em.HasComponent<WeaponState>(entity))
+                        em.RemoveComponent<WeaponState>(entity);
+                    em.AddComponentData(entity, new SongOfManaState
+                    {
+                        Timer      = 0f,
+                        Cooldown   = 2.0f,
+                        Damage     = 10f,
+                        HalfWidth  = 0.75f,
+                        HalfHeight = 3.0f,
+                    });
+                    var poppeaStats = em.GetComponentData<PlayerStats>(entity);
+                    poppeaStats.DurationBonusPerLevel = 0.01f; // +1% DurationMult per level, no cap
+                    em.SetComponentData(entity, poppeaStats);
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Poppea: Song of Mana, HP=100, Speed=8.4, +1%Duration/lv");
+                    break;
+
                 case "pugnala":
                     // Wiki: Phiera Der Tuphello + Eight The Sparrow twin pistols, HP 100, Speed 7.4, no bonus
                     SetBaseStats(em, entity, hp: 100, speed: 7.4f);

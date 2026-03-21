@@ -175,11 +175,26 @@ namespace VampireSurvivors.Components
         public int GoldRingStacks;
 
         /// <summary>
-        /// Curse stat. Default 0. Each Gold Ring pickup adds +0.05.
+        /// Curse stat. Default 0. Each Gold Ring pickup adds +0.05; each Skull O'Maniac pickup adds +0.1.
         /// Increases enemy effective stats (harder enemies) and future XP scaling.
         /// Wiki: Curse makes enemies stronger but implicitly increases reward value.
         /// </summary>
         public float Curse;
+
+        /// <summary>
+        /// Skull O'Maniac stacks. 0 = not taken. Each pickup adds +1 (max 5).
+        /// Also applies: Curse += 0.1 per pickup.
+        /// Used as gate for Mannajja evolution (Song of Mana + Skull O'Maniac, needs > 0).
+        /// Wiki: Skull O'Maniac — +10% Curse per level, 5 levels.
+        /// </summary>
+        public int SkullOManiacStacks;
+
+        /// <summary>
+        /// Flat Duration bonus added to DurationMult each level-up.
+        /// Default 0.0. Poppea Pecorina gets 0.01 (+1% DurationMult per level, no cap).
+        /// Wiki: Poppea — Duration increases by 1% each level.
+        /// </summary>
+        public float DurationBonusPerLevel;
     }
 
     /// <summary>
@@ -480,6 +495,28 @@ namespace VampireSurvivors.Components
         public float MaxRange;  // distance before despawn
         public int   Amount;    // bullets per direction (1=default); upgradeable up to 3
         /// <summary>True after Phieraggi evolution. Eight goes silent; Phiera covers all 8 directions.</summary>
+        public bool  IsEvolved;
+    }
+
+    /// <summary>
+    /// Per-player Song of Mana weapon state (Poppea Pecorina's starter).
+    /// Every Cooldown seconds, pulses a tall vertical column of mana centered on the player,
+    /// damaging all enemies within the column's rectangular bounds.
+    /// Ignores ProjectileSpeedMult (wiki: "ignores Speed stat").
+    /// Wiki base stats: Damage 10, Cooldown 2.0 s, Width 1.5 u, Height 6.0 u.
+    /// Auto-granted at level 14; Poppea starts with it.
+    ///
+    /// Evolved (Mannajja = Song of Mana + Skull O'Maniac):
+    ///   Damage 40, Cooldown 4.5 s, Width 6.0 u, Height 8.0 u (much wider coverage).
+    /// </summary>
+    public struct SongOfManaState : IComponentData
+    {
+        public float Timer;
+        public float Cooldown;   // base: 2.0s; evolved: 4.5s
+        public float Damage;     // base: 10; evolved: 40
+        public float HalfWidth;  // horizontal half-extent — base: 0.75u (full width 1.5u); evolved: 3.0u
+        public float HalfHeight; // vertical half-extent   — base: 3.0u  (full height 6.0u); evolved: 4.0u
+        /// <summary>True after Mannajja evolution: wider AoE, 40 dmg, 4.5s CD.</summary>
         public bool  IsEvolved;
     }
 

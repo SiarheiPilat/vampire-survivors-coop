@@ -42,6 +42,10 @@ namespace VampireSurvivors.Systems
                     if (stats.ValueRO.ProjectileSpeedBonusPerLevel > 0f)
                         stats.ValueRW.ProjectileSpeedMult += stats.ValueRO.ProjectileSpeedBonusPerLevel;
 
+                    // Poppea passive: +1% Duration per level (no cap)
+                    if (stats.ValueRO.DurationBonusPerLevel > 0f)
+                        stats.ValueRW.DurationMult += stats.ValueRO.DurationBonusPerLevel;
+
                     // Unlock weapons at milestone levels (structural change via ECB)
                     int newLevel = stats.ValueRO.Level;
                     switch (newLevel)
@@ -183,6 +187,19 @@ namespace VampireSurvivors.Systems
                                     Speed    = 12f,
                                     MaxRange = 12f,
                                     Amount   = 1
+                                });
+                            break;
+
+                        // Song of Mana: auto-granted at level 14 (Poppea gets it from start)
+                        case 14:
+                            if (!SystemAPI.HasComponent<SongOfManaState>(entity))
+                                ecb.AddComponent(entity, new SongOfManaState
+                                {
+                                    Timer      = 0f,
+                                    Cooldown   = 2.0f,
+                                    Damage     = 10f,
+                                    HalfWidth  = 0.75f,   // full width 1.5u
+                                    HalfHeight = 3.0f,    // full height 6.0u
                                 });
                             break;
 

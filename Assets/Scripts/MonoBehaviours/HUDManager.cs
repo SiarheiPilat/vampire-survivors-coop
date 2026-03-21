@@ -87,6 +87,8 @@ namespace VampireSurvivors.MonoBehaviours
             PhieraAmount,             // Phiera Der Tuphello +1 bullet/dir
             EightAmount,              // Eight The Sparrow +1 bullet/dir
             PhieraggiEvolution,       // Phiera + Eight + Tiragisú → 8-direction rapid fire
+            SkullOManiac,             // passive: +10% Curse (harder enemies, more XP)
+            MannajjaEvolution,        // Song of Mana + Skull O'Maniac → wide column, 40 dmg
         }
         readonly UpgradeType[] _currentChoices = new UpgradeType[3];
         readonly TMP_Text[]    _btnLabels       = new TMP_Text[3];
@@ -121,8 +123,9 @@ namespace VampireSurvivors.MonoBehaviours
             (UpgradeType.Wings,         "Wings\n+10% movement speed"),
             (UpgradeType.StoneMask,  "Stone Mask\n+10% gold earnings"),
             (UpgradeType.Tiragisu,   "Tiragisú\n+1 Revival (auto-revive stock)"),
-            (UpgradeType.SilverRing, "Silver Ring\n+5% Duration and Area"),
-            (UpgradeType.GoldRing,   "Gold Ring\n+5% Curse (harder but more rewarding)"),
+            (UpgradeType.SilverRing,    "Silver Ring\n+5% Duration and Area"),
+            (UpgradeType.GoldRing,      "Gold Ring\n+5% Curse (harder but more rewarding)"),
+            (UpgradeType.SkullOManiac,  "Skull O'Maniac\n+10% Curse (enemies hit harder, drop more XP)"),
         };
 
         static readonly (UpgradeType type, string label)[] k_WeaponUpgradesExtra =
@@ -904,6 +907,15 @@ namespace VampireSurvivors.MonoBehaviours
                         "★ Phieraggi\nPhiera + Eight + Tiragisú — 8-way rapid fire, 0.35s CD"));
             }
 
+            // Mannajja = Song of Mana + Skull O'Maniac (SkullOManiacStacks > 0)
+            if (em.HasComponent<SongOfManaState>(_pendingUpgradeEntity))
+            {
+                var som = em.GetComponentData<SongOfManaState>(_pendingUpgradeEntity);
+                if (!som.IsEvolved && playerStats.SkullOManiacStacks > 0)
+                    pool.Add((UpgradeType.MannajjaEvolution,
+                        "★ Mannajja\nSong of Mana + Skull O'Maniac — 40 dmg, 6u×8u column, 4.5s CD"));
+            }
+
             // Vicious Hunger = Gatti Amari + Stone Mask (GoldMult > 1 means stone mask was taken)
             if (em.HasComponent<GattiAmariState>(_pendingUpgradeEntity))
             {
@@ -1214,6 +1226,11 @@ namespace VampireSurvivors.MonoBehaviours
                     stats.Curse += 0.05f;
                     Debug.Log($"[HUDManager] P{pidx} chose Gold Ring — Curse = {stats.Curse:F2}");
                     break;
+                case UpgradeType.SkullOManiac:
+                    stats.SkullOManiacStacks++;
+                    stats.Curse += 0.1f;
+                    Debug.Log($"[HUDManager] P{pidx} chose Skull O'Maniac — Curse = {stats.Curse:F2} (stacks={stats.SkullOManiacStacks})");
+                    break;
                 case UpgradeType.InfiniteCorridorEvolution:
                     if (em.HasComponent<ClockLancetState>(_pendingUpgradeEntity))
                     {
@@ -1421,6 +1438,20 @@ namespace VampireSurvivors.MonoBehaviours
                         fw4.Cooldown   = 3.0f;  // wiki: 3.0s CD
                         em.SetComponentData(_pendingUpgradeEntity, fw4);
                         Debug.Log($"[HUDManager] P{pidx} evolved Fire Wand → Hellfire");
+                    }
+                    break;
+
+                case UpgradeType.MannajjaEvolution:
+                    if (em.HasComponent<SongOfManaState>(_pendingUpgradeEntity))
+                    {
+                        var som       = em.GetComponentData<SongOfManaState>(_pendingUpgradeEntity);
+                        som.IsEvolved  = true;
+                        som.Damage     = 40f;    // wiki: 40 dmg
+                        som.Cooldown   = 4.5f;   // wiki: 4.5s CD (slower but massive AoE)
+                        som.HalfWidth  = 3.0f;   // full width 6.0u — wiki: +325% area = 4.25× base (≈6u wide)
+                        som.HalfHeight = 4.0f;   // full height 8.0u
+                        em.SetComponentData(_pendingUpgradeEntity, som);
+                        Debug.Log($"[HUDManager] P{pidx} evolved Song of Mana → Mannajja (6u×8u, 40 dmg, 4.5s CD)");
                     }
                     break;
 
