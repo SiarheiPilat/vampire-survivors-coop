@@ -6,10 +6,14 @@
 
 - [x] **Achievement display** — `AchievementHintPanel` (auto-created in Lobby scene); shows "Next unlock: Name — hint" at bottom; finds closest locked char by completion ratio
 - [ ] **Floor item magnet** — when player walks over XpGem field, items magnetize toward them; scale magnet radius with Attractorb stacks
-- [ ] **Curse mechanic active effect** — enemies with `PlayerStats.Curse > 0` move faster (+10% per Curse point); currently Curse only boosts XP via wiki formula, but no speed scaling exists yet
+- [x] **Curse mechanic active effect** — `EnemyMovementSystem` computes team average Curse each frame, passes `CurseSpeedMult = 1 + avgCurse × 0.1` to both `MoveTowardPlayerJob` and `GhostMoveJob`; `ContactDamageSystem` computes `CurseDamageMult` the same way and scales `ContactDamage` before Armor subtraction; wiki: +10% speed and +10% damage per Curse point
 - [ ] **Victory Death boss** — at 30:00 spawn unkillable Death enemy (wiki: 666 contact dmg, 666 HP regen/s, cannot be killed); spawns at every player position simultaneously
 
 ## Completed
+
+### 2026-03-21 (Session 33 — ~21:15)
+
+- [x] **Curse active effects** — `EnemyMovementSystem.OnUpdate` now non-Burst; computes team average Curse, passes `CurseSpeedMult = 1 + avgCurse × 0.1` to both movement jobs (all enemies move +10% faster per Curse point); `ContactDamageSystem.OnUpdate` similarly non-Burst; computes `CurseDamageMult`, scales `ContactDamage × CurseDamageMult` before Armor reduction (+10% contact damage per Curse point); job structs retain `[BurstCompile]`
 
 ### 2026-03-21 (Session 32 — ~21:00)
 

@@ -24,7 +24,8 @@ namespace VampireSurvivors.Systems
                 .Build();
         }
 
-        [BurstCompile]
+        // OnUpdate is NOT [BurstCompile] so we can query PlayerStats for team Curse.
+        // The jobs themselves remain Burst-compiled for full performance.
         public void OnUpdate(ref SystemState state)
         {
             if (_playerQuery.IsEmpty) return;
@@ -32,11 +33,24 @@ namespace VampireSurvivors.Systems
             var playerPositions = _playerQuery.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
             float dt = SystemAPI.Time.DeltaTime;
 
+            // Average Curse across living (non-downed) players.
+            // Wiki: each Curse point → +10% enemy speed.
+            float totalCurse = 0f;
+            int   curseCount = 0;
+            foreach (var stats in SystemAPI.Query<RefRO<PlayerStats>>()
+                .WithAll<PlayerTag>().WithNone<Downed>())
+            {
+                totalCurse += stats.ValueRO.Curse;
+                curseCount++;
+            }
+            float curseSpeedMult = curseCount > 0 ? 1f + (totalCurse / curseCount) * 0.1f : 1f;
+
             // Normal enemies: move + apply knockback
             var normalJob = new MoveTowardPlayerJob
             {
                 PlayerPositions = playerPositions,
-                DeltaTime       = dt
+                DeltaTime       = dt,
+                CurseSpeedMult  = curseSpeedMult,
             };
             state.Dependency = normalJob.ScheduleParallel(state.Dependency);
 
@@ -44,7 +58,8 @@ namespace VampireSurvivors.Systems
             var ghostJob = new GhostMoveJob
             {
                 PlayerPositions = playerPositions,
-                DeltaTime       = dt
+                DeltaTime       = dt,
+                CurseSpeedMult  = curseSpeedMult,
             };
             state.Dependency = ghostJob.ScheduleParallel(state.Dependency);
 
@@ -58,6 +73,7 @@ namespace VampireSurvivors.Systems
         {
             [ReadOnly] public NativeArray<LocalTransform> PlayerPositions;
             public float DeltaTime;
+            public float CurseSpeedMult;
 
             void Execute(in EnemyStats stats, ref LocalTransform transform, ref Knockback knockback)
             {
@@ -71,7 +87,7 @@ namespace VampireSurvivors.Systems
                 }
 
                 float3 dir = math.normalizesafe(nearest - transform.Position);
-                transform.Position += dir * stats.MoveSpeed * DeltaTime;
+                transform.Position += dir * stats.MoveSpeed * CurseSpeedMult * DeltaTime;
 
                 // Apply knockback impulse and decay it (~0.25 s to dissipate)
                 if (math.lengthsq(knockback.Velocity) > 0.01f)
@@ -97,6 +113,7 @@ namespace VampireSurvivors.Systems
         {
             [ReadOnly] public NativeArray<LocalTransform> PlayerPositions;
             public float DeltaTime;
+            public float CurseSpeedMult;
 
             void Execute(in EnemyStats stats, ref LocalTransform transform, ref Knockback knockback)
             {
@@ -110,7 +127,7 @@ namespace VampireSurvivors.Systems
                 }
 
                 float3 dir = math.normalizesafe(nearest - transform.Position);
-                transform.Position += dir * stats.MoveSpeed * DeltaTime;
+                transform.Position += dir * stats.MoveSpeed * CurseSpeedMult * DeltaTime;
 
                 // Suppress knockback entirely
                 knockback.Velocity = float2.zero;

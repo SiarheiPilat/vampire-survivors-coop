@@ -98,6 +98,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] Enemy elite variants — EliteTag : IComponentData; EnemySpawnerSystem promotes 2% of spawns post-wave-scaling: HP×3, XP×2, Speed×1.15, Scale×1.35; guaranteed Chest drop on death
 - [x] Bomb pickup — BombPickup floor item; 1% enemy death drop (Luck-scaled); BombPickupSystem walk-over r=0.6u triggers AoE 80 flat dmg in 3u radius to all enemies; bypasses Armor; orange-red quad 0.3u prefab
 - [x] Achievement display — AchievementHintPanel (Menu assembly, RuntimeInitializeOnLoadMethod auto-created in Lobby scene); shows "Next unlock: Name — hint" gold text strip at bottom; finds closest-to-unlock locked character by completion ratio; self-destroys on scene change
+- [x] Curse active effects — EnemyMovementSystem + ContactDamageSystem compute team avgCurse each frame; CurseSpeedMult = 1 + avgCurse × 0.1 scales enemy movement; CurseDamageMult = same formula scales ContactDamage before Armor; wiki accurate (+10%/Curse point)
 
 ### Weapons (clone priority order)
 

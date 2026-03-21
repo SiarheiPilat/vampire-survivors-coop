@@ -28,7 +28,7 @@ namespace VampireSurvivors.Systems
             _laurelLookup     = state.GetComponentLookup<LaurelState>(isReadOnly: true);
         }
 
-        [BurstCompile]
+        // OnUpdate is NOT [BurstCompile] so we can query PlayerStats for team Curse.
         public void OnUpdate(ref SystemState state)
         {
             // InvincibilitySystem schedules a parallel job on Invincible; complete it
@@ -50,14 +50,21 @@ namespace VampireSurvivors.Systems
             var playerTransforms = playerQuery.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
             var playerStats      = playerQuery.ToComponentDataArray<PlayerStats>(Allocator.TempJob);
 
+            // Average Curse across the team → +10% enemy contact damage per Curse point
+            float totalCurse = 0f;
+            for (int i = 0; i < playerStats.Length; i++)
+                totalCurse += playerStats[i].Curse;
+            float curseDamageMult = playerStats.Length > 0 ? 1f + (totalCurse / playerStats.Length) * 0.1f : 1f;
+
             new ContactDamageJob
             {
-                PlayerEntities   = playerEntities,
-                PlayerTransforms = playerTransforms,
-                PlayerStats      = playerStats,
-                HealthLookup     = _healthLookup,
-                InvincibleLookup = _invincibleLookup,
-                LaurelLookup     = _laurelLookup,
+                PlayerEntities    = playerEntities,
+                PlayerTransforms  = playerTransforms,
+                PlayerStats       = playerStats,
+                HealthLookup      = _healthLookup,
+                InvincibleLookup  = _invincibleLookup,
+                LaurelLookup      = _laurelLookup,
+                CurseDamageMult   = curseDamageMult,
             }.Run(); // Single-threaded — multiple enemies can target the same player
 
             playerEntities.Dispose();
@@ -79,6 +86,7 @@ namespace VampireSurvivors.Systems
             [NativeDisableParallelForRestriction] public ComponentLookup<Health>     HealthLookup;
             [NativeDisableParallelForRestriction] public ComponentLookup<Invincible> InvincibleLookup;
             [ReadOnly]                            public ComponentLookup<LaurelState> LaurelLookup;
+            public float CurseDamageMult;
 
             void Execute(in EnemyStats stats, in LocalTransform transform)
             {
@@ -90,8 +98,9 @@ namespace VampireSurvivors.Systems
                     var inv = InvincibleLookup[PlayerEntities[i]];
                     if (inv.Timer > 0f) continue;
 
-                    // Armor reduces incoming damage; always deal at least 1
-                    int damage = math.max(1, stats.ContactDamage - PlayerStats[i].Armor);
+                    // Armor reduces incoming damage; Curse scales damage up; always deal at least 1
+                    int rawDamage = (int)(stats.ContactDamage * CurseDamageMult);
+                    int damage    = math.max(1, rawDamage - PlayerStats[i].Armor);
 
                     // Crimson Shroud (evolved Laurel): cap incoming damage per hit (wiki: max 10)
                     if (LaurelLookup.HasComponent(PlayerEntities[i]))
