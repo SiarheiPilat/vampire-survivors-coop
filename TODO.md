@@ -1,14 +1,25 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~06:10
+> Last updated: 2026-03-21 ~06:40
 
 ## Next Up (priority order)
 
-- [ ] **Peachone + Ebony Wings + Vandalier** — `PeachoneState`/`EbonyWingsState` rotating projectile weapons; Bi An Zi character (HP=100, Speed=7.0); Vandalier evolution (Peachone + Ebony Wings)
-- [ ] Map variety: second stage tileset + different enemy spawns
-- [ ] Second map/stage — different background tile set + spawn weights (more skeletons/ghouls, fewer bats)
+- [ ] **Orologion passive + Infinite Corridor fix** — `OrologionStacks` passive (Clock Lancet evolution gate; wiki: Orologion + Silver Ring + Gold Ring); currently InfiniteCorridorEvolution gates on SilverRing+GoldRing stacks but wiki requires Orologion too — needs Orologion passive added and gate updated
+- [ ] **Second stage / map variety** — different background tileset, enemy spawn weights (more skeletons/ghouls at higher waves), stage-select at lobby
+- [ ] **Score screen** — end-of-run stats: time survived, enemies killed, gold, levels reached per player; polished overlay instead of the current GameOverPanel
 
 ## Completed
+
+### 2026-03-21 (Session 25 — ~06:40)
+
+- [x] **PeachoneState** — rotating CW egg weapon; 10 dmg, 1.4s CD, 6 u/s, 5u range, Amount 1 (upgradeable to 3); Angle advances +30°/cycle; auto-granted at level 16
+- [x] **EbonyWingsState** — rotating CCW bat weapon (mirror stats, Angle starts at π, advances -30°/cycle); silent when IsEvolved; auto-granted at level 17
+- [x] **PeachoneSystem** — fires Amount projectiles centered on Angle; when evolved (Vandalier) fires CW+CCW simultaneously at 15 dmg, 0.7s CD
+- [x] **EbonyWingsSystem** — fires Amount projectiles CCW; ticks timer/advances Angle when evolved but spawns nothing
+- [x] **Vandalier evolution** (Peachone + Ebony Wings, no passive gate) — `PeachoneState.IsEvolved=true, Damage=15, Cooldown=0.7s`; `EbonyWingsState.IsEvolved=true`; pool entry in HUDManager BuildUpgradeChoices
+- [x] **Bi-An Zi character** — HP=100, Speed=7.0; both Peachone+EbonyWings as starters (EbonyWings Angle=π offset); added to GameSceneBootstrap + LobbyManager fallback + CharacterRegistry (index 15)
+- [x] **HUDManager** — `PeachoneAmount`, `EbonyWingsAmount`, `VandalierEvolution` UpgradeType entries; Duplicator gives +1 to both Peachone and EbonyWings when not evolved
+- [x] **LevelUpSystem** — case 16 (Peachone), case 17 (EbonyWings) with `!HasComponent` guards
 
 ### 2026-03-21 (Session 24 — ~06:10)
 
