@@ -59,3 +59,6 @@ MonoBehaviour:
   - Id: clerici
     DisplayName: Clerici
     Description: "Holy Water \u2022 HP 150 \u2022 +0.5 HP regen/s"
+  - Id: bianzi
+    DisplayName: Bi-An Zi
+    Description: "Peachone + Ebony Wings \u2022 HP 100 \u2022 twin egg-birds (CW+CCW)"

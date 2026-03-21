@@ -572,4 +572,48 @@ namespace VampireSurvivors.Components
         /// <summary>True after Vicious Hunger evolution (Gatti Amari + Stone Mask): 30 dmg, 8s CD, 2 giant cats, 7s lifetime.</summary>
         public bool  IsEvolved;
     }
+
+    /// <summary>
+    /// Per-player Peachone weapon state (Bi-An Zi's clockwise egg-bird).
+    /// Each Cooldown, fires Amount projectiles centered on Angle, then advances Angle +30° clockwise.
+    /// Wiki base stats: Damage 10, Cooldown 1.4 s, Speed 6 u/s, MaxRange 5 u, Amount 1.
+    /// Auto-granted at level 16; Bi-An Zi starts with it alongside Ebony Wings.
+    ///
+    /// Evolved (Vandalier = Peachone + Ebony Wings):
+    ///   IsEvolved=true; 15 dmg, 0.7s CD, fires in BOTH Angle and Angle+180°.
+    ///   EbonyWingsSystem goes silent when evolved.
+    /// </summary>
+    public struct PeachoneState : IComponentData
+    {
+        public float Timer;
+        public float Cooldown;   // wiki: 1.4s base; evolved: 0.7s
+        public float Damage;     // wiki: 10 base; evolved: 15
+        public float Speed;      // u/s — wiki: ~6 (slow floating eggs)
+        public float MaxRange;   // wiki: ~5u range
+        public float Angle;      // current firing angle in radians; advances +π/6 each cycle (CW)
+        public int   Amount;     // projectiles per volley; upgradeable up to 3
+        /// <summary>True after Vandalier evolution. Fires both CW and CCW; EbonyWings goes silent.</summary>
+        public bool  IsEvolved;
+    }
+
+    /// <summary>
+    /// Per-player Ebony Wings weapon state (Bi-An Zi's counterclockwise bat-bird).
+    /// Each Cooldown, fires Amount projectiles centered on Angle, then advances Angle -30° counterclockwise.
+    /// Wiki base stats: Damage 10, Cooldown 1.4 s, Speed 6 u/s, MaxRange 5 u, Amount 1.
+    /// Auto-granted at level 17; Bi-An Zi starts with it alongside Peachone.
+    ///
+    /// Evolved (Vandalier = Peachone + Ebony Wings): IsEvolved=true; system goes silent (Peachone handles both).
+    /// </summary>
+    public struct EbonyWingsState : IComponentData
+    {
+        public float Timer;
+        public float Cooldown;   // wiki: 1.4s base
+        public float Damage;     // wiki: 10 base
+        public float Speed;      // u/s — wiki: ~6
+        public float MaxRange;   // wiki: ~5u
+        public float Angle;      // current firing angle in radians; advances -π/6 each cycle (CCW)
+        public int   Amount;     // projectiles per volley; upgradeable up to 3
+        /// <summary>True after Vandalier evolution. System goes silent; Peachone handles all shots.</summary>
+        public bool  IsEvolved;
+    }
 }

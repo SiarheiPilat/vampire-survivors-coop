@@ -214,6 +214,36 @@ namespace VampireSurvivors.Systems
                                 });
                             break;
 
+                        // Peachone: CW rotating egg weapon, auto-granted at level 16
+                        case 16:
+                            if (!SystemAPI.HasComponent<PeachoneState>(entity))
+                                ecb.AddComponent(entity, new PeachoneState
+                                {
+                                    Timer    = 0f,
+                                    Cooldown = 1.4f,
+                                    Damage   = 10f,
+                                    Speed    = 6f,
+                                    MaxRange = 5f,
+                                    Angle    = 0f,
+                                    Amount   = 1
+                                });
+                            break;
+
+                        // Ebony Wings: CCW rotating bat weapon, auto-granted at level 17
+                        case 17:
+                            if (!SystemAPI.HasComponent<EbonyWingsState>(entity))
+                                ecb.AddComponent(entity, new EbonyWingsState
+                                {
+                                    Timer    = 0f,
+                                    Cooldown = 1.4f,
+                                    Damage   = 10f,
+                                    Speed    = 6f,
+                                    MaxRange = 5f,
+                                    Angle    = math.PI,  // start opposite to Peachone
+                                    Amount   = 1
+                                });
+                            break;
+
                         // Clock Lancet: auto-granted at level 11 to all characters
                         case 11:
                             if (!SystemAPI.HasComponent<ClockLancetState>(entity))

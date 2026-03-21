@@ -350,6 +350,34 @@ namespace VampireSurvivors.MonoBehaviours
                     Debug.Log($"[GameSceneBootstrap] P{slot} Pugnala: Phiera+Eight, HP=100, Speed=7.4");
                     break;
 
+                case "bianzi":
+                    // Wiki: Bi-An Zi — Peachone + Ebony Wings (twin egg-birds), HP 100, Speed 7.0, no stat bonus
+                    SetBaseStats(em, entity, hp: 100, speed: 7.0f);
+                    if (em.HasComponent<WeaponState>(entity))
+                        em.RemoveComponent<WeaponState>(entity);
+                    em.AddComponentData(entity, new PeachoneState
+                    {
+                        Timer    = 0f,
+                        Cooldown = 1.4f,
+                        Damage   = 10f,
+                        Speed    = 6f,
+                        MaxRange = 5f,
+                        Angle    = 0f,
+                        Amount   = 1
+                    });
+                    em.AddComponentData(entity, new EbonyWingsState
+                    {
+                        Timer    = 0f,
+                        Cooldown = 1.4f,
+                        Damage   = 10f,
+                        Speed    = 6f,
+                        MaxRange = 5f,
+                        Angle    = Unity.Mathematics.math.PI, // start opposite Peachone
+                        Amount   = 1
+                    });
+                    Debug.Log($"[GameSceneBootstrap] P{slot} Bi-An Zi: Peachone+EbonyWings, HP=100, Speed=7.0");
+                    break;
+
                 default:
                     Debug.LogWarning($"[GameSceneBootstrap] Unknown character '{charId}' for P{slot} — keeping Whip.");
                     break;

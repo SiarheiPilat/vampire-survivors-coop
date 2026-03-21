@@ -92,6 +92,9 @@ namespace VampireSurvivors.MonoBehaviours
             MetaglioLeft,             // passive: +0.1 HpRegen, +5% MaxHp (9 levels)
             MetaglioRight,            // passive: +5% Curse (9 levels)
             CrimsonShroudEvolution,   // Laurel + Metaglio Left + Right → damage cap 10, AoE retaliation
+            PeachoneAmount,           // Peachone +1 egg/volley
+            EbonyWingsAmount,         // Ebony Wings +1 bat/volley
+            VandalierEvolution,       // Peachone + Ebony Wings → 15 dmg, 0.7s CD, fires both directions
         }
         readonly UpgradeType[] _currentChoices = new UpgradeType[3];
         readonly TMP_Text[]    _btnLabels       = new TMP_Text[3];
@@ -135,8 +138,10 @@ namespace VampireSurvivors.MonoBehaviours
 
         static readonly (UpgradeType type, string label)[] k_WeaponUpgradesExtra =
         {
-            (UpgradeType.PhieraAmount, "Phiera +1 bullet\nFire an extra bullet in each of the 4 directions"),
-            (UpgradeType.EightAmount,  "Eight +1 bullet\nFire an extra bullet in each of the 4 diagonal directions"),
+            (UpgradeType.PhieraAmount,      "Phiera +1 bullet\nFire an extra bullet in each of the 4 directions"),
+            (UpgradeType.EightAmount,       "Eight +1 bullet\nFire an extra bullet in each of the 4 diagonal directions"),
+            (UpgradeType.PeachoneAmount,    "Peachone +1 egg\nFire an extra rotating egg per volley"),
+            (UpgradeType.EbonyWingsAmount,  "Ebony Wings +1 bat\nFire an extra rotating bat per volley"),
         };
 
         // Gold display (created programmatically)
@@ -804,6 +809,22 @@ namespace VampireSurvivors.MonoBehaviours
                             canAdd = curAmt < 3 && !es2.IsEvolved;
                         }
                         break;
+                    case UpgradeType.PeachoneAmount:
+                        if (em.HasComponent<PeachoneState>(_pendingUpgradeEntity))
+                        {
+                            var pc = em.GetComponentData<PeachoneState>(_pendingUpgradeEntity);
+                            curAmt = Unity.Mathematics.math.max(1, pc.Amount);
+                            canAdd = curAmt < 3 && !pc.IsEvolved;
+                        }
+                        break;
+                    case UpgradeType.EbonyWingsAmount:
+                        if (em.HasComponent<EbonyWingsState>(_pendingUpgradeEntity))
+                        {
+                            var ew = em.GetComponentData<EbonyWingsState>(_pendingUpgradeEntity);
+                            curAmt = Unity.Mathematics.math.max(1, ew.Amount);
+                            canAdd = curAmt < 3 && !ew.IsEvolved;
+                        }
+                        break;
                 }
                 if (canAdd) pool.Add((type, label + $"  ({curAmt}→{curAmt + 1})"));
             }
@@ -938,6 +959,16 @@ namespace VampireSurvivors.MonoBehaviours
                     playerStats.MetaglioRightStacks > 0)
                     pool.Add((UpgradeType.CrimsonShroudEvolution,
                         "★ Crimson Shroud\nLaurel + Metaglio L+R — cap dmg at 10, AoE retaliation 2u"));
+            }
+
+            // Vandalier = Peachone + Ebony Wings (no passive required — just need both weapons)
+            if (em.HasComponent<PeachoneState>(_pendingUpgradeEntity) &&
+                em.HasComponent<EbonyWingsState>(_pendingUpgradeEntity))
+            {
+                var pcEvo = em.GetComponentData<PeachoneState>(_pendingUpgradeEntity);
+                if (!pcEvo.IsEvolved)
+                    pool.Add((UpgradeType.VandalierEvolution,
+                        "★ Vandalier\nPeachone + Ebony Wings — 15 dmg, 0.7s CD, fires both CW+CCW"));
             }
 
             // Vicious Hunger = Gatti Amari + Stone Mask (GoldMult > 1 means stone mask was taken)
@@ -1106,6 +1137,16 @@ namespace VampireSurvivors.MonoBehaviours
                     if (em.HasComponent<EightSparrowState>(_pendingUpgradeEntity))
                     {
                         var w = em.GetComponentData<EightSparrowState>(_pendingUpgradeEntity);
+                        if (!w.IsEvolved) { w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1; em.SetComponentData(_pendingUpgradeEntity, w); }
+                    }
+                    if (em.HasComponent<PeachoneState>(_pendingUpgradeEntity))
+                    {
+                        var w = em.GetComponentData<PeachoneState>(_pendingUpgradeEntity);
+                        if (!w.IsEvolved) { w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1; em.SetComponentData(_pendingUpgradeEntity, w); }
+                    }
+                    if (em.HasComponent<EbonyWingsState>(_pendingUpgradeEntity))
+                    {
+                        var w = em.GetComponentData<EbonyWingsState>(_pendingUpgradeEntity);
                         if (!w.IsEvolved) { w.Amount = Unity.Mathematics.math.max(1, w.Amount) + 1; em.SetComponentData(_pendingUpgradeEntity, w); }
                     }
                     Debug.Log($"[HUDManager] P{pidx} chose Duplicator — +1 Amount to all weapons (stacks={stats.DuplicatorStacks})");
@@ -1281,6 +1322,40 @@ namespace VampireSurvivors.MonoBehaviours
                         es.Amount = Unity.Mathematics.math.max(1, es.Amount) + 1;
                         em.SetComponentData(_pendingUpgradeEntity, es);
                         Debug.Log($"[HUDManager] P{pidx} chose Eight +1 — Amount = {es.Amount}");
+                    }
+                    break;
+                case UpgradeType.PeachoneAmount:
+                    if (em.HasComponent<PeachoneState>(_pendingUpgradeEntity))
+                    {
+                        var pc = em.GetComponentData<PeachoneState>(_pendingUpgradeEntity);
+                        pc.Amount = Unity.Mathematics.math.max(1, pc.Amount) + 1;
+                        em.SetComponentData(_pendingUpgradeEntity, pc);
+                        Debug.Log($"[HUDManager] P{pidx} chose Peachone +1 — Amount = {pc.Amount}");
+                    }
+                    break;
+                case UpgradeType.EbonyWingsAmount:
+                    if (em.HasComponent<EbonyWingsState>(_pendingUpgradeEntity))
+                    {
+                        var ew = em.GetComponentData<EbonyWingsState>(_pendingUpgradeEntity);
+                        ew.Amount = Unity.Mathematics.math.max(1, ew.Amount) + 1;
+                        em.SetComponentData(_pendingUpgradeEntity, ew);
+                        Debug.Log($"[HUDManager] P{pidx} chose Ebony Wings +1 — Amount = {ew.Amount}");
+                    }
+                    break;
+                case UpgradeType.VandalierEvolution:
+                    if (em.HasComponent<PeachoneState>(_pendingUpgradeEntity) &&
+                        em.HasComponent<EbonyWingsState>(_pendingUpgradeEntity))
+                    {
+                        // Peachone handles all shots (CW + CCW), 15 dmg, 0.7s CD
+                        var pcEvo       = em.GetComponentData<PeachoneState>(_pendingUpgradeEntity);
+                        pcEvo.IsEvolved = true;
+                        pcEvo.Damage    = 15f;   // wiki: +50% dmg
+                        pcEvo.Cooldown  = 0.7f;  // wiki: 0.7s CD (half of 1.4s)
+                        em.SetComponentData(_pendingUpgradeEntity, pcEvo);
+                        var ewEvo       = em.GetComponentData<EbonyWingsState>(_pendingUpgradeEntity);
+                        ewEvo.IsEvolved = true;
+                        em.SetComponentData(_pendingUpgradeEntity, ewEvo);
+                        Debug.Log($"[HUDManager] P{pidx} evolved Peachone+EbonyWings → Vandalier (15 dmg, 0.7s CD, both dirs)");
                     }
                     break;
                 case UpgradeType.PhieraggiEvolution:

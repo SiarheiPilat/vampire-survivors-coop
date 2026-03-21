@@ -27,7 +27,7 @@ namespace VampireSurvivors.Menu
         {
             "antonio", "imelda", "pasqualina", "gennaro", "arca", "porta", "lama",
             "mortaccio", "yattacavallo", "krochi", "dommario", "giovanna",
-            "pugnala", "poppea", "clerici",
+            "pugnala", "poppea", "clerici", "bianzi",
         };
 
         int   CharacterCount => characterRegistry != null ? characterRegistry.Count : s_FallbackIds.Length;
