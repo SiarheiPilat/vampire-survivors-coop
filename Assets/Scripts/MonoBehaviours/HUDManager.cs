@@ -59,6 +59,12 @@ namespace VampireSurvivors.MonoBehaviours
         readonly int[]   _lastLevels     = new int[4];
         readonly float[] _levelUpTimers  = new float[4];
 
+        // Boss health bar (created programmatically; shown when BossTag/EliteTag/DeathBossTag entity exists)
+        GameObject     _bossHpRoot;
+        Image          _bossHpFill;
+        TMP_Text       _bossHpText;
+        EntityQuery    _bossQuery;
+
         // Upgrade-choice panel (created programmatically)
         GameObject _upgradePanel;
         TMP_Text   _upgradeTitle;
@@ -199,11 +205,17 @@ namespace VampireSurvivors.MonoBehaviours
                 ComponentType.ReadOnly<PlayerIndex>()
             );
 
+            // Boss query: any entity with BossTag, EliteTag, or DeathBossTag + Health
+            _bossQuery = world.EntityManager.CreateEntityQuery(
+                ComponentType.ReadOnly<Health>(),
+                ComponentType.ReadOnly<EnemyTag>());
+
             if (gameOverPanel != null) gameOverPanel.SetActive(false);
             CreateUpgradePanel();
             CreateGoldDisplay();
             CreateReviveBar();
             CreateReviveStocksTexts();
+            CreateBossHpBar();
         }
 
         void OnDisable()
@@ -215,6 +227,7 @@ namespace VampireSurvivors.MonoBehaviours
                 _upgradePendingQuery.Dispose();
                 _sharedGoldQuery.Dispose();
                 _reviveProgressQuery.Dispose();
+                _bossQuery.Dispose();
                 _queryCreated = false;
             }
         }
@@ -249,6 +262,7 @@ namespace VampireSurvivors.MonoBehaviours
             HandleUpgradeChoices(world);
             UpdateGoldDisplay();
             UpdateReviveBar();
+            UpdateBossHpBar(world);
             if (_upgradeShowing) return; // freeze HUD updates while choice panel is visible
 
             bool[] seen = new bool[4];
@@ -734,6 +748,95 @@ namespace VampireSurvivors.MonoBehaviours
             var golds = _sharedGoldQuery.ToComponentDataArray<SharedGold>(Allocator.Temp);
             _goldText.text = $"G: {golds[0].Total}";
             golds.Dispose();
+        }
+
+        // ─── Boss Health Bar ────────────────────────────────────────────────
+
+        void CreateBossHpBar()
+        {
+            var canvas = GetComponentInParent<Canvas>();
+            if (canvas == null) canvas = FindFirstObjectByType<Canvas>();
+            if (canvas == null) return;
+
+            _bossHpRoot = new GameObject("BossHpBar");
+            _bossHpRoot.transform.SetParent(canvas.transform, false);
+
+            var bg = _bossHpRoot.AddComponent<Image>();
+            bg.color = new Color(0f, 0f, 0f, 0.65f);
+
+            var rt = _bossHpRoot.GetComponent<RectTransform>();
+            rt.anchorMin        = new Vector2(0.1f, 0.92f);
+            rt.anchorMax        = new Vector2(0.9f, 0.97f);
+            rt.offsetMin        = Vector2.zero;
+            rt.offsetMax        = Vector2.zero;
+
+            // Red fill bar
+            var fillGo  = new GameObject("Fill");
+            fillGo.transform.SetParent(_bossHpRoot.transform, false);
+            _bossHpFill = fillGo.AddComponent<Image>();
+            _bossHpFill.color = new Color(0.85f, 0.1f, 0.1f, 1f);
+            _bossHpFill.type  = Image.Type.Filled;
+            _bossHpFill.fillMethod = Image.FillMethod.Horizontal;
+            _bossHpFill.fillAmount = 1f;
+            var fillRt = fillGo.GetComponent<RectTransform>();
+            fillRt.anchorMin = Vector2.zero;
+            fillRt.anchorMax = Vector2.one;
+            fillRt.offsetMin = new Vector2(2f, 2f);
+            fillRt.offsetMax = new Vector2(-2f, -2f);
+
+            // HP text label
+            var textGo   = new GameObject("BossHpText");
+            textGo.transform.SetParent(_bossHpRoot.transform, false);
+            _bossHpText  = textGo.AddComponent<TextMeshProUGUI>();
+            _bossHpText.alignment = TextAlignmentOptions.Center;
+            _bossHpText.fontSize  = 16f;
+            _bossHpText.color     = Color.white;
+            _bossHpText.enableWordWrapping = false;
+            var textRt   = textGo.GetComponent<RectTransform>();
+            textRt.anchorMin = Vector2.zero;
+            textRt.anchorMax = Vector2.one;
+            textRt.offsetMin = Vector2.zero;
+            textRt.offsetMax = Vector2.zero;
+
+            _bossHpRoot.SetActive(false);
+        }
+
+        void UpdateBossHpBar(World world)
+        {
+            if (_bossHpRoot == null || !_queryCreated) return;
+
+            var em = world.EntityManager;
+
+            // Find the most dangerous boss-like entity (by MaxHp descending)
+            int   bestCur = 0, bestMax = 0;
+            bool  found   = false;
+            string label  = "BOSS";
+
+            using var bossEntities = _bossQuery.ToEntityArray(Allocator.Temp);
+            foreach (var e in bossEntities)
+            {
+                bool isBoss  = em.HasComponent<BossTag>(e);
+                bool isElite = em.HasComponent<EliteTag>(e);
+                bool isDeath = em.HasComponent<DeathBossTag>(e);
+                if (!isBoss && !isElite && !isDeath) continue;
+
+                var hp = em.GetComponentData<Health>(e);
+                if (hp.Max > bestMax)
+                {
+                    bestMax  = hp.Max;
+                    bestCur  = hp.Current;
+                    found    = true;
+                    label    = isDeath ? "DEATH" : isElite ? "ELITE" : "BOSS";
+                }
+            }
+
+            _bossHpRoot.SetActive(found);
+            if (!found) return;
+
+            float ratio = bestMax > 0 ? Mathf.Clamp01((float)bestCur / bestMax) : 0f;
+            _bossHpFill.fillAmount = ratio;
+            if (_bossHpText != null)
+                _bossHpText.text = $"{label}  {bestCur:N0} / {bestMax:N0}";
         }
 
         // ─── Upgrade Choice Panel ───────────────────────────────────────────

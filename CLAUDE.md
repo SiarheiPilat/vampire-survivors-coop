@@ -102,6 +102,7 @@ critical for maintaining 60fps with 500+ entities on screen.
 - [x] Floor item magnet — GoldCoinSystem + HealthPickupSystem both magnetize floor items at 4u × MagnetRadiusMult base radius, 6 u/s; collect at 0.6u; extends Attractorb scaling to non-XP pickups
 - [x] Victory Death boss — DeathBossTag IComponentData; DeathRegenSystem +666 HP/s; HealthSystem WithNone<DeathBossTag>; HUDManager spawns one Death per player at 29:55 (5s early), scale=2.0, HP=666000, ContactDamage=666, XpValue=0; shows "DEATH APPROACHES" banner
 - [x] Curse XP multiplier — HealthSystem computes avgCurse alongside avgLuck; XP gems on enemy death use XpValue × (1 + avgCurse × 0.1); completes the Curse risk/reward loop
+- [x] Boss health bar — HUDManager dynamically creates a top-screen HP bar; queries BossTag/EliteTag/DeathBossTag entities each frame; shows label (BOSS/ELITE/DEATH) + current/max HP; hidden when no boss present
 
 ### Weapons (clone priority order)
 

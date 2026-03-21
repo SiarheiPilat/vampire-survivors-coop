@@ -11,6 +11,10 @@
 
 ## Completed
 
+### 2026-03-21 (Session 37 — ~22:15)
+
+- [x] **Boss health bar** — `HUDManager` creates a dark-background full-width bar at the top (10–90% screen width, top 3–8%) via `CreateBossHpBar()`; red fill image + white HP text "BOSS  6450 / 10000"; `UpdateBossHpBar()` queries `_bossQuery` each frame for entities with `BossTag`/`EliteTag`/`DeathBossTag`, shows the one with highest `Health.Max`; hidden when no boss; label changes to "ELITE" / "DEATH" for those variants
+
 ### 2026-03-21 (Session 36 — ~22:00)
 
 - [x] **Curse XP multiplier** — HealthSystem now computes `avgCurse` alongside `avgLuck` in the same player loop; XP gems spawned on enemy death use `enemyStats.XpValue × (1 + avgCurse × 0.1)`; wiki accurate: +10% XP per Curse point; risk/reward completes the Curse mechanic
