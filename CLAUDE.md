@@ -133,6 +133,8 @@ Characters are selected in the lobby (`LobbyManager`). `GameSceneBootstrap` read
 - [x] Big Slime — purple quad (0.8×0.8), HP=60, speed=1.2, dmg=15, XP=8; SlimeTag; splits into 2 SmallSlimes on death; 8–15% spawn weight (grows each wave)
 - [x] Small Slime — yellow-green quad (0.45×0.45), HP=20, speed=2.0, dmg=8, XP=3; SmallSlimeTag; spawned by BigSlime split, no further split; BigSlimeMaterial/SmallSlimeMaterial distinguish visually
 - [x] Boss — orange quad (1.5×1.5), base HP=500, speed=0.8, dmg=40, XP=50; BossTag; spawned by EnemySpawnerSystem every 45s (decreasing to 25s floor with waves); all stats scale with StatMultiplier
+- [x] Ghoul — dark purple quad (0.45×0.45), HP=130, speed=1.8, dmg=25, XP=15; GhoulTag; spawns from wave 5 (~10% weight grows to 12%); faster/tankier zombie variant
+- [x] Specter — pale blue quad (0.42×0.42), HP=80, speed=2.2, dmg=20, XP=12; GhostTag; **knockback-immune** (EnemyMovementSystem zeroes Knockback.Velocity each frame); spawns from wave 7 (~6% weight grows to 8%)
 
 ### Passive Items / Stats
 

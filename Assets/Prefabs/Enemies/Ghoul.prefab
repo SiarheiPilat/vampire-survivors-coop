@@ -29,8 +29,8 @@ Transform:
   m_GameObject: {fileID: 1233500337931011034}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9999, y: 9999, z: 0}
-  m_LocalScale: {x: 0.6, y: 0.6, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.45, y: 0.45, z: 0.45}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -126,10 +126,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f57ab03d3b47634bb76fd06e2f31419, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VampireSurvivors.Authoring.EnemyAuthoring
-  hp: 120
-  moveSpeed: 2.2
-  contactDamage: 30
-  xpValue: 10
+  hp: 130
+  moveSpeed: 1.8
+  contactDamage: 25
+  xpValue: 15
   isSlime: 0
   isSmallSlime: 0
   isBoss: 0
