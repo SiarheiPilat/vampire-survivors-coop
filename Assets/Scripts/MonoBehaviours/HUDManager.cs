@@ -79,8 +79,12 @@ namespace VampireSurvivors.MonoBehaviours
             LaBorraEvolution,      // Holy Water + Attractorb
             GattiAmariAmount,      // Gatti Amari +1 cat
             StoneMask,             // passive: +10% gold earnings
-            ViciousHungerEvolution,// Gatti Amari + Stone Mask
-            Tiragisu,              // passive: +1 ReviveStocks
+            ViciousHungerEvolution,   // Gatti Amari + Stone Mask
+            Tiragisu,                 // passive: +1 ReviveStocks
+            SilverRing,               // passive: +5% Duration +5% Area
+            GoldRing,                 // passive: +5% Curse
+            InfiniteCorridorEvolution,// Clock Lancet + Silver Ring + Gold Ring
+            PhieraAmount,             // Phiera Der Tuphello +1 bullet/dir
         }
         readonly UpgradeType[] _currentChoices = new UpgradeType[3];
         readonly TMP_Text[]    _btnLabels       = new TMP_Text[3];
@@ -113,8 +117,15 @@ namespace VampireSurvivors.MonoBehaviours
             (UpgradeType.Spellbinder,   "Spellbinder\n+10% Duration (effect lifetimes)"),
             (UpgradeType.Attractorb,    "Attractorb\n+30% XP magnet radius"),
             (UpgradeType.Wings,         "Wings\n+10% movement speed"),
-            (UpgradeType.StoneMask,     "Stone Mask\n+10% gold earnings"),
-            (UpgradeType.Tiragisu,      "Tiragisú\n+1 Revival (auto-revive stock)"),
+            (UpgradeType.StoneMask,  "Stone Mask\n+10% gold earnings"),
+            (UpgradeType.Tiragisu,   "Tiragisú\n+1 Revival (auto-revive stock)"),
+            (UpgradeType.SilverRing, "Silver Ring\n+5% Duration and Area"),
+            (UpgradeType.GoldRing,   "Gold Ring\n+5% Curse (harder but more rewarding)"),
+        };
+
+        static readonly (UpgradeType type, string label)[] k_WeaponUpgradesExtra =
+        {
+            (UpgradeType.PhieraAmount, "Phiera +1 bullet\nFire an extra bullet in each of the 4 directions"),
         };
 
         // Gold display (created programmatically)
@@ -751,6 +762,24 @@ namespace VampireSurvivors.MonoBehaviours
                 if (canAdd) pool.Add((type, label + $"  ({curAmt}→{curAmt + 1})"));
             }
 
+            // ── Extra weapon upgrades (Phiera, Eight, etc.) ──────────────────
+            foreach (var (type, label) in k_WeaponUpgradesExtra)
+            {
+                bool canAdd = false;
+                int  curAmt = 1;
+                switch (type)
+                {
+                    case UpgradeType.PhieraAmount:
+                        if (em.HasComponent<PhieraState>(_pendingUpgradeEntity))
+                        {
+                            curAmt = Unity.Mathematics.math.max(1, em.GetComponentData<PhieraState>(_pendingUpgradeEntity).Amount);
+                            canAdd = curAmt < 3;
+                        }
+                        break;
+                }
+                if (canAdd) pool.Add((type, label + $"  ({curAmt}→{curAmt + 1})"));
+            }
+
             // ── Evolution checks ─────────────────────────────────────────────
             var playerStats = em.GetComponentData<PlayerStats>(_pendingUpgradeEntity);
 
@@ -842,6 +871,15 @@ namespace VampireSurvivors.MonoBehaviours
                 if (!hw3.IsEvolved && playerStats.MagnetRadiusMult > 1.0f)
                     pool.Add((UpgradeType.LaBorraEvolution,
                         "★ La Borra\nHoly Water + Attractorb — puddles follow player, 40 dmg, 4 flasks"));
+            }
+
+            // Infinite Corridor = Clock Lancet + Silver Ring + Gold Ring
+            if (em.HasComponent<ClockLancetState>(_pendingUpgradeEntity))
+            {
+                var cl = em.GetComponentData<ClockLancetState>(_pendingUpgradeEntity);
+                if (!cl.IsEvolved && playerStats.SilverRingStacks > 0 && playerStats.GoldRingStacks > 0)
+                    pool.Add((UpgradeType.InfiniteCorridorEvolution,
+                        "★ Infinite Corridor\nClock Lancet + Silver Ring + Gold Ring — halves all enemy HP/s"));
             }
 
             // Vicious Hunger = Gatti Amari + Stone Mask (GoldMult > 1 means stone mask was taken)
@@ -1132,6 +1170,37 @@ namespace VampireSurvivors.MonoBehaviours
                     }
                     break;
                 }
+
+                case UpgradeType.SilverRing:
+                    stats.SilverRingStacks++;
+                    stats.DurationMult *= 1.05f;
+                    stats.AreaMult     *= 1.05f;
+                    Debug.Log($"[HUDManager] P{pidx} chose Silver Ring — Duration×{stats.DurationMult:F3} Area×{stats.AreaMult:F3}");
+                    break;
+                case UpgradeType.GoldRing:
+                    stats.GoldRingStacks++;
+                    stats.Curse += 0.05f;
+                    Debug.Log($"[HUDManager] P{pidx} chose Gold Ring — Curse = {stats.Curse:F2}");
+                    break;
+                case UpgradeType.InfiniteCorridorEvolution:
+                    if (em.HasComponent<ClockLancetState>(_pendingUpgradeEntity))
+                    {
+                        var cl      = em.GetComponentData<ClockLancetState>(_pendingUpgradeEntity);
+                        cl.IsEvolved = true;
+                        cl.Cooldown  = 1.0f;  // wiki: 1.0s CD
+                        em.SetComponentData(_pendingUpgradeEntity, cl);
+                        Debug.Log($"[HUDManager] P{pidx} evolved Clock Lancet → Infinite Corridor");
+                    }
+                    break;
+                case UpgradeType.PhieraAmount:
+                    if (em.HasComponent<PhieraState>(_pendingUpgradeEntity))
+                    {
+                        var ph = em.GetComponentData<PhieraState>(_pendingUpgradeEntity);
+                        ph.Amount = Unity.Mathematics.math.max(1, ph.Amount) + 1;
+                        em.SetComponentData(_pendingUpgradeEntity, ph);
+                        Debug.Log($"[HUDManager] P{pidx} chose Phiera +1 — Amount = {ph.Amount}");
+                    }
+                    break;
 
                 case UpgradeType.ViciousHungerEvolution:
                     if (em.HasComponent<GattiAmariState>(_pendingUpgradeEntity))

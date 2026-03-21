@@ -158,6 +158,20 @@ namespace VampireSurvivors.Systems
                                     Rng      = new Unity.Mathematics.Random((uint)(entity.Index * 987654321u + 3u))
                                 });
                             break;
+                        // Phiera Der Tuphello: auto-granted at level 12 (Pugnala gets it from start)
+                        case 12:
+                            if (!SystemAPI.HasComponent<PhieraState>(entity))
+                                ecb.AddComponent(entity, new PhieraState
+                                {
+                                    Timer    = 0f,
+                                    Cooldown = 1.4f,
+                                    Damage   = 5f,
+                                    Speed    = 12f,
+                                    MaxRange = 12f,
+                                    Amount   = 1
+                                });
+                            break;
+
                         // Clock Lancet: auto-granted at level 11 to all characters
                         case 11:
                             if (!SystemAPI.HasComponent<ClockLancetState>(entity))

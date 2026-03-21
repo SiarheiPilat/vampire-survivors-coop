@@ -447,6 +447,22 @@ namespace VampireSurvivors.Components
         public bool  IsEvolved;
     }
 
+    /// <summary>
+    /// Per-player Phiera Der Tuphello weapon state (Pugnala's red pistol).
+    /// Fires Amount bullets in each of the 4 cardinal directions simultaneously.
+    /// Wiki base stats: Damage 5, Cooldown 1.4 s, Speed 12 u/s, Amount 1, Pierce 0.
+    /// Auto-granted at level 12; Pugnala starts with it.
+    /// </summary>
+    public struct PhieraState : IComponentData
+    {
+        public float Timer;
+        public float Cooldown;  // wiki: 1.4s
+        public float Damage;    // wiki: 5
+        public float Speed;     // u/s — wiki: ~12
+        public float MaxRange;  // distance before despawn
+        public int   Amount;    // bullets per direction (1=default); upgradeable up to 3
+    }
+
     public struct GattiAmariState : IComponentData
     {
         public float Timer;
