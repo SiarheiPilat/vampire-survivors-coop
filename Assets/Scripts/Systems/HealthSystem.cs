@@ -39,17 +39,22 @@ namespace VampireSurvivors.Systems
             bool hasRunStats = SystemAPI.TryGetSingletonEntity<SharedGold>(out var runStatsEntity);
             var  runStats    = hasRunStats ? SystemAPI.GetSingleton<SharedGold>() : default;
 
-            // Average Luck across living players — scales enemy drop probabilities
-            float avgLuck = 0f;
+            // Average Luck + Curse across living players
+            // Luck  scales enemy drop probabilities: +1× per Luck point
+            // Curse scales enemy XP drops:           +10% per Curse point (wiki)
+            float avgLuck  = 0f;
+            float avgCurse = 0f;
             int   playerCount = 0;
             foreach (var stats in SystemAPI.Query<RefRO<PlayerStats>>()
                 .WithAll<PlayerTag>().WithNone<Downed>())
             {
-                avgLuck += stats.ValueRO.Luck;
+                avgLuck  += stats.ValueRO.Luck;
+                avgCurse += stats.ValueRO.Curse;
                 playerCount++;
             }
-            if (playerCount > 0) avgLuck /= playerCount;
-            float luckMult = 1f + avgLuck; // Luck=0 → 1×, Luck=0.1 → 1.1×, Luck=1.0 → 2×
+            if (playerCount > 0) { avgLuck /= playerCount; avgCurse /= playerCount; }
+            float luckMult    = 1f + avgLuck;           // Luck=0 → 1×, Luck=1.0 → 2×
+            float curseXpMult = 1f + avgCurse * 0.1f;  // Curse=0 → 1×, Curse=1.0 → 1.1×
 
             // WithNone<Downed>      — skip already-downed players
             // WithNone<DeathBossTag> — Death is unkillable; DeathRegenSystem keeps its HP full
@@ -82,17 +87,18 @@ namespace VampireSurvivors.Systems
                         var transform  = _transformLookup[entity];
                         bool hasPrefabs = SystemAPI.TryGetSingleton<SpawnerData>(out var pickupSpawner);
 
-                        // XP gem — use prefab for visuals if available, otherwise plain entity
+                        // XP gem — value scaled by Curse (wiki: +10% per Curse point)
+                        float xpValue = enemyStats.XpValue * curseXpMult;
                         if (hasPrefabs && pickupSpawner.XpGemPrefab != Entity.Null)
                         {
                             var gem = ecb.Instantiate(pickupSpawner.XpGemPrefab);
-                            ecb.SetComponent(gem, new XpGem { Value = enemyStats.XpValue });
+                            ecb.SetComponent(gem, new XpGem { Value = xpValue });
                             ecb.SetComponent(gem, LocalTransform.FromPosition(transform.Position));
                         }
                         else
                         {
                             var gem = ecb.CreateEntity();
-                            ecb.AddComponent(gem, new XpGem { Value = enemyStats.XpValue });
+                            ecb.AddComponent(gem, new XpGem { Value = xpValue });
                             ecb.AddComponent(gem, LocalTransform.FromPosition(transform.Position));
                         }
 

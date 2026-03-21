@@ -11,6 +11,10 @@
 
 ## Completed
 
+### 2026-03-21 (Session 36 — ~22:00)
+
+- [x] **Curse XP multiplier** — HealthSystem now computes `avgCurse` alongside `avgLuck` in the same player loop; XP gems spawned on enemy death use `enemyStats.XpValue × (1 + avgCurse × 0.1)`; wiki accurate: +10% XP per Curse point; risk/reward completes the Curse mechanic
+
 ### 2026-03-21 (Session 35 — ~21:45)
 
 - [x] **Victory Death boss** — `DeathBossTag : IComponentData`; `DeathRegenSystem` +666 HP/s (`[UpdateBefore(HealthSystem)]`); `HealthSystem` uses `WithNone<DeathBossTag>()` to skip destruction; `HUDManager._deathSpawned` flag; `SpawnDeathBosses()` at 29:55 spawns one Death per living player at their position (scale 2.0, HP=666000, ContactDmg=666, no XP); reuses `SpawnerData.BossPrefab` for visuals; shows "DEATH APPROACHES" banner via `StageBanner.Show()`
