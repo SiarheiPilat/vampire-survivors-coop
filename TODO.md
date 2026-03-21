@@ -1,15 +1,21 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~08:35
+> Last updated: 2026-03-21 ~09:00
 
 ## Next Up (priority order)
 
-- [ ] **Bracer passive in level-up pool fix** — Bracer and other passives that only meaningfully apply to specific weapons should show only when relevant weapons are present
-- [ ] **Unlock toast notification** — brief "UNLOCKED: Character Name!" overlay when a new character is freshly unlocked; check on lobby entry after SaveRunStats
-- [ ] **Reset Progress button** — in Settings panel, call PersistentProgress.ResetAll() (dev/debug)
 - [ ] **Achievement display** — in lobby, show progress toward next unlock ("Kill 347 more enemies")
+- [ ] **Floor item magnet** — when player walks over XpGem field, items magnetize toward them; scale magnet radius with Attractorb stacks
+- [ ] **Enemy elite variants** — rare red-tinted enemies (2% chance per spawn) with 3× HP, 2× XP, guaranteed Chest drop
+- [ ] **Bomb pickup** — floor item dropped rarely; collected → AoE 3u radius explosion, 80 dmg to all enemies
 
 ## Completed
+
+### 2026-03-21 (Session 30 — ~09:00)
+
+- [x] **Bracer/Candelabrador/Spellbinder passive gating** — `BuildUpgradeChoices` now computes `hasProjectileWeapon`, `hasAreaWeapon`, `hasDurationWeapon` booleans from player's ECS components; Bracer skipped if no projectile weapon; Candelabrador skipped if no area weapon; Spellbinder skipped if no duration weapon; SilverRing/GoldRing require ClockLancetState
+- [x] **UnlockToast** — `VampireSurvivors.Menu.UnlockToast` class (Menu assembly); `CheckAndShow(registry)` compares current unlocks vs last saved set (PlayerPrefs "unlocked_chars_v1"); queued golden banner toasts: fade-in 0.3s / hold 2.0s / fade-out 0.4s; called from `LobbyManager.Start()`
+- [x] **SettingsPanel Reset Progress button** — `resetProgressButton` Button field added; `OnResetProgress()` calls `PersistentProgress.ResetAll()` + clears unlock toast tracking; `ResetProgressButton` dark-red UI element added to SettingsPanel in LobbyScene, wired in Inspector
 
 ### 2026-03-21 (Session 29 — ~08:35)
 

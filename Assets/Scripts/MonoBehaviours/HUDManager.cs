@@ -772,14 +772,50 @@ namespace VampireSurvivors.MonoBehaviours
         {
             var em = world.EntityManager;
 
-            // Build pool: all passives (excluding capped ones) + weapon upgrades
+            // Build pool: all passives (excluding capped/irrelevant ones) + weapon upgrades
             var playerStatsPre = em.GetComponentData<PlayerStats>(_pendingUpgradeEntity);
+            var e0             = _pendingUpgradeEntity;
+
+            // ── Weapon-presence helpers (used to gate passives) ──────────────
+            // Projectile weapons: fire individual bullets/projectiles from source
+            bool hasProjectileWeapon =
+                em.HasComponent<MagicWandState>(e0)   || em.HasComponent<KnifeState>(e0)     ||
+                em.HasComponent<FireWandState>(e0)    || em.HasComponent<LightningRingState>(e0) ||
+                em.HasComponent<CrossState>(e0)       || em.HasComponent<AxeState>(e0)        ||
+                em.HasComponent<HolyWaterState>(e0)   || em.HasComponent<RunetracerState>(e0) ||
+                em.HasComponent<BoneState>(e0)        || em.HasComponent<PhieraState>(e0)     ||
+                em.HasComponent<EightSparrowState>(e0)|| em.HasComponent<PeachoneState>(e0)   ||
+                em.HasComponent<EbonyWingsState>(e0);
+
+            // Area weapons: deal damage via radius/zone
+            bool hasAreaWeapon =
+                em.HasComponent<WeaponState>(e0)      || em.HasComponent<GarlicState>(e0)     ||
+                em.HasComponent<KingBibleState>(e0)   || em.HasComponent<HolyWaterState>(e0)  ||
+                em.HasComponent<GattiAmariState>(e0)  || em.HasComponent<SongOfManaState>(e0) ||
+                em.HasComponent<LaurelState>(e0);
+
+            // Duration weapons: have a meaningful lifetime/duration stat
+            bool hasDurationWeapon =
+                em.HasComponent<HolyWaterState>(e0)   || em.HasComponent<KingBibleState>(e0)  ||
+                em.HasComponent<GattiAmariState>(e0)  || em.HasComponent<SongOfManaState>(e0) ||
+                em.HasComponent<LaurelState>(e0);
+
             var pool = new System.Collections.Generic.List<(UpgradeType type, string label)>();
             foreach (var (t, l) in k_PassiveUpgrades)
             {
                 // Filter out Metaglio at max stacks (9)
                 if (t == UpgradeType.MetaglioLeft  && playerStatsPre.MetaglioLeftStacks  >= 9) continue;
                 if (t == UpgradeType.MetaglioRight && playerStatsPre.MetaglioRightStacks >= 9) continue;
+
+                // Gate weapon-synergy passives — only offer if player has a weapon that benefits
+                if (t == UpgradeType.Bracer       && !hasProjectileWeapon) continue;
+                if (t == UpgradeType.Candelabrador && !hasAreaWeapon)       continue;
+                if (t == UpgradeType.Spellbinder  && !hasDurationWeapon)   continue;
+
+                // SilverRing / GoldRing — evolution gate for Clock Lancet; require ClockLancet
+                if (t == UpgradeType.SilverRing && !em.HasComponent<ClockLancetState>(e0)) continue;
+                if (t == UpgradeType.GoldRing   && !em.HasComponent<ClockLancetState>(e0)) continue;
+
                 pool.Add((t, l));
             }
 

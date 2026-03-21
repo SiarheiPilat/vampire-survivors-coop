@@ -89,6 +89,9 @@ namespace VampireSurvivors.Menu
             RefreshPlayButton();
             settingsPanel.SetActive(false);
             RefreshStageDisplay();
+
+            // Show toast for any characters newly unlocked since last lobby visit
+            UnlockToast.CheckAndShow(characterRegistry);
         }
 
         void CycleStage(int dir)
