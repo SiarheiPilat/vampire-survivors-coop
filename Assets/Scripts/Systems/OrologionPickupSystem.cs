@@ -4,6 +4,7 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 using VampireSurvivors.Components;
+using VampireSurvivors.Menu;
 
 namespace VampireSurvivors.Systems
 {
@@ -93,6 +94,7 @@ namespace VampireSurvivors.Systems
                 int pidx = em.GetComponentData<PlayerIndex>(playerEntities[nearestIdx]).Value;
                 Debug.Log($"[OrologionPickupSystem] P{pidx} collected Orologion — {frozenCount} enemies frozen for {FreezeDuration}s!");
 
+                PersistentProgress.IncrementOrologion();
                 em.DestroyEntity(orologionEntities[o]);
             }
 

@@ -1,15 +1,24 @@
 # Vampire Survivors Co-op — TODO
 
-> Last updated: 2026-03-21 ~08:00
+> Last updated: 2026-03-21 ~08:35
 
 ## Next Up (priority order)
 
-- [ ] **Lobby stage name UI** — add TMP_Text label to LobbyScene canvas showing current stage name; wire `stageNameText` field on LobbyManager
-- [ ] **Achievements / Unlock tracking** — track Orologion collected count (20 = Whiteout unlock); persist with PlayerPrefs
 - [ ] **Bracer passive in level-up pool fix** — Bracer and other passives that only meaningfully apply to specific weapons should show only when relevant weapons are present
-- [ ] **HUD stage name banner** — brief on-screen stage name shown at game start (2s fade-in/out)
+- [ ] **Unlock toast notification** — brief "UNLOCKED: Character Name!" overlay when a new character is freshly unlocked; check on lobby entry after SaveRunStats
+- [ ] **Reset Progress button** — in Settings panel, call PersistentProgress.ResetAll() (dev/debug)
+- [ ] **Achievement display** — in lobby, show progress toward next unlock ("Kill 347 more enemies")
 
 ## Completed
+
+### 2026-03-21 (Session 29 — ~08:35)
+
+- [x] **Lobby stage name UI** — `StageText` TMP_Text added to Lobby canvas (bottom row, golden tint); shows "Stage: Mad Forest   [ Q / E ]"; wired to `LobbyManager.stageNameText` in Inspector; `RefreshStageDisplay()` updates it on cycle
+- [x] **HUD stage name banner** — `StageBanner` MonoBehaviour (auto-created, DontDestroyOnLoad); `StageBanner.Show(name)` creates Screen-Space-Overlay Canvas + TMP label; fade-in 0.4s, hold 1.6s, fade-out 0.5s; unscaled time; sorting order 200 (above everything); called from `GameSceneBootstrap.ApplyStage()`
+- [x] **PersistentProgress** — `PersistentProgress.cs` static class; PlayerPrefs-backed: `TotalKills`, `TotalGold`, `BestSurviveMin`, `BestLevel`, `OrologionCount`; `IsUnlocked(charId)` gates 9 characters behind milestones (tier 1: always unlocked; tier 2: kills/gold/survive/level/orologion thresholds); `UnlockHint(charId)` returns progress string; `SaveRunStats()` + `IncrementOrologion()` + `ResetAll()`
+- [x] **HUDManager persist on game end** — `SaveRunProgress()` reads ECS `SharedGold.EnemiesKilled + Total` + best `PlayerStats.Level`; calls `PersistentProgress.SaveRunStats()`; fires in both `TriggerGameOver` and `TriggerVictory`
+- [x] **OrologionPickupSystem** — calls `PersistentProgress.IncrementOrologion()` on each collect
+- [x] **LobbyManager unlock gating** — `CycleCharacter` skips locked characters; `JoinSlot` falls back to "antonio" if saved character is now locked
 
 ### 2026-03-21 (Session 28 — ~08:00)
 

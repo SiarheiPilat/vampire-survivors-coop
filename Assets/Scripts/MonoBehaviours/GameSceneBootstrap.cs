@@ -74,28 +74,36 @@ namespace VampireSurvivors.MonoBehaviours
         void ApplyStage(string stageId, EntityManager em)
         {
             // Resolve stage from registry (fallback to Mad Forest colours)
-            int   stageIndex = 0;
-            Color colA       = new Color(0.07f, 0.11f, 0.07f, 1f);
-            Color colB       = new Color(0.10f, 0.15f, 0.10f, 1f);
+            int    stageIndex   = 0;
+            string displayName  = "Mad Forest";
+            Color  colA         = new Color(0.07f, 0.11f, 0.07f, 1f);
+            Color  colB         = new Color(0.10f, 0.15f, 0.10f, 1f);
 
             if (stageRegistry != null)
             {
                 var def = stageRegistry.Find(stageId);
                 if (def != null)
                 {
-                    stageIndex = stageRegistry.IndexOf(stageId);
-                    colA       = def.TileColorA;
-                    colB       = def.TileColorB;
+                    stageIndex  = stageRegistry.IndexOf(stageId);
+                    displayName = def.DisplayName;
+                    colA        = def.TileColorA;
+                    colB        = def.TileColorB;
                 }
             }
             else
             {
-                // Hardcoded fallback colours when no registry is assigned
+                // Hardcoded fallback when no registry is assigned
                 stageIndex = stageId switch
                 {
                     "inlaid_library" => 1,
                     "dairy_plant"    => 2,
                     _                => 0,
+                };
+                displayName = stageIndex switch
+                {
+                    1 => "Inlaid Library",
+                    2 => "Dairy Plant",
+                    _ => "Mad Forest",
                 };
                 (colA, colB) = stageIndex switch
                 {
@@ -107,6 +115,9 @@ namespace VampireSurvivors.MonoBehaviours
 
             // Push colours to InfiniteBackground
             InfiniteBackground.Instance?.SetStageColors(colA, colB);
+
+            // Show stage name banner overlay (fades out automatically)
+            StageBanner.Show(displayName);
 
             // Write StageIndex into SpawnerData singleton so EnemySpawnerSystem can read it
             using var spawnerQuery = em.CreateEntityQuery(ComponentType.ReadWrite<SpawnerData>());

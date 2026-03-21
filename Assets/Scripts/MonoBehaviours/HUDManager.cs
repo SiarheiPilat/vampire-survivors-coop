@@ -4,6 +4,7 @@ using Unity.Entities;
 using UnityEngine;
 using UnityEngine.UI;
 using VampireSurvivors.Components;
+using VampireSurvivors.Menu;
 using VampireSurvivors.Systems;
 
 namespace VampireSurvivors.MonoBehaviours
@@ -353,6 +354,7 @@ namespace VampireSurvivors.MonoBehaviours
         void TriggerGameOver()
         {
             _gameOver = true;
+            SaveRunProgress();
             if (gameOverPanel == null) return;
             gameOverPanel.SetActive(true);
 
@@ -369,6 +371,7 @@ namespace VampireSurvivors.MonoBehaviours
         {
             _victory = true;
             Time.timeScale = 0f;
+            SaveRunProgress();
 
             if (gameOverPanel == null) return;
             gameOverPanel.SetActive(true);
@@ -380,6 +383,39 @@ namespace VampireSurvivors.MonoBehaviours
 
             var bg = gameOverPanel.GetComponent<UnityEngine.UI.Image>();
             if (bg != null) bg.color = new Color(0.05f, 0.25f, 0.05f, 0.92f);
+        }
+
+        /// <summary>Reads ECS run stats and persists them to PlayerPrefs via PersistentProgress.</summary>
+        void SaveRunProgress()
+        {
+            var world = World.DefaultGameObjectInjectionWorld;
+            if (world == null) return;
+
+            var em = world.EntityManager;
+
+            // Gather team stats from SharedGold singleton
+            int kills = 0, gold = 0;
+            using var gq  = em.CreateEntityQuery(ComponentType.ReadOnly<SharedGold>());
+            if (gq.CalculateEntityCount() > 0)
+            {
+                using var arr = gq.ToComponentDataArray<SharedGold>(Allocator.Temp);
+                kills = arr[0].EnemiesKilled;
+                gold  = arr[0].Total;
+            }
+
+            // Best level across all active players
+            int maxLevel = 0;
+            using var pq = em.CreateEntityQuery(
+                ComponentType.ReadOnly<PlayerStats>(),
+                ComponentType.ReadOnly<PlayerTag>());
+            if (pq.CalculateEntityCount() > 0)
+            {
+                using var stats = pq.ToComponentDataArray<PlayerStats>(Allocator.Temp);
+                foreach (var s in stats)
+                    if (s.Level > maxLevel) maxLevel = s.Level;
+            }
+
+            PersistentProgress.SaveRunStats(kills, gold, _elapsedTime, maxLevel);
         }
 
         /// <summary>

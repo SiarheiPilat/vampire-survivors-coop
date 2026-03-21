@@ -131,7 +131,8 @@ namespace VampireSurvivors.Menu
                                                desc.serial, slot);
             DeviceSaveData.Load(key, out var charId, out var customIdx);
 
-            _slotChar[slot]   = charId;
+            // If saved character is now locked (progress reset?), fall back to Antonio
+            _slotChar[slot]   = PersistentProgress.IsUnlocked(charId) ? charId : "antonio";
             _slotCustom[slot] = customIdx;
 
             RefreshSlotDisplay(slot);
@@ -242,7 +243,12 @@ namespace VampireSurvivors.Menu
         void CycleCharacter(int slot, int dir)
         {
             int idx = IndexOfId(_slotChar[slot]);
-            idx = (idx + dir + CharacterCount) % CharacterCount;
+            // Cycle but skip locked characters (wrap up to CharacterCount iterations max)
+            for (int tries = 0; tries < CharacterCount; tries++)
+            {
+                idx = (idx + dir + CharacterCount) % CharacterCount;
+                if (PersistentProgress.IsUnlocked(IdAt(idx))) break;
+            }
             _slotChar[slot] = IdAt(idx);
             SaveSlot(slot);
             RefreshSlotDisplay(slot);
